@@ -14,7 +14,36 @@
 
   <!-- Boutons & input ajoutés sans toucher à ta structure -->
   <div style="text-align:center; margin-top: 30px;">
-    <a href="lexique.html" style="
+    <!-- Bouton Lexique -->
+    <a href="http://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" style="
+      background-color:#444;
+      color:white;
+      padding:10px 15px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:14px;
+      display:inline-block;
+      margin-bottom:10px;" target="_blank">
+      📘 Lexique US → FR
+    </a>
+    <br />
+
+    <!-- 🔘 Ajouter mes créations -->
+    <a href="ajouter-creations.html" style="
+      background-color:#444;
+      color:white;
+      padding:10px 15px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:14px;
+      display:inline-block;
+      margin: 10px 0;">
+      🔘 Ajouter mes créations
+    </a>
+    <br />
+
+    <!-- 📝 Notes -->
+    <a href="notes.html" style="
       background-color:#444;
       color:white;
       padding:10px 15px;
@@ -23,8 +52,9 @@
       font-size:14px;
       display:inline-block;
       margin-bottom:10px;">
-      📘 Lexique US → FR
+      📝 Notes
     </a>
+
     <br />
     <label style="display:block; margin-top:10px;">
       📄 Importer un fichier (image, PDF, texte) :
@@ -38,7 +68,6 @@
   </div>
 
   <script>
-    // Conversion US → FR des mesures simple (à compléter selon besoin)
     function convertMeasurements(text) {
       return text
         .replace(/\b(inch|inches|in)\b/gi, 'cm')
@@ -47,7 +76,6 @@
         .replace(/\bpound|lb\b/gi, 'kg');
     }
 
-    // OCR PDF avec pdf.js + Tesseract.js
     async function ocrPdf(file) {
       const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
       const pdf = await loadingTask.promise;
@@ -68,7 +96,6 @@
       return fullText;
     }
 
-    // Fonction de lecture fichier (image, texte, pdf)
     async function handleFile(file) {
       const output = document.getElementById('output');
       if (file.type === "application/pdf") {
