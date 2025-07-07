@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Traducteur Crochet</title>
 
+  <!-- Icône favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- PWA + iOS install -->
+  <link rel="apple-touch-icon" href="icon-512.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Crochet Steph" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff6fa0" />
+
   <!-- Librairies PDF.js et Tesseract.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
@@ -12,49 +23,10 @@
 <body>
   <div id="root"></div>
 
-  <!-- Boutons & input ajoutés sans toucher à ta structure -->
   <div style="text-align:center; margin-top: 30px;">
-    <!-- Bouton Lexique -->
-    <a href="http://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" style="
-      background-color:#444;
-      color:white;
-      padding:10px 15px;
-      border-radius:5px;
-      text-decoration:none;
-      font-size:14px;
-      display:inline-block;
-      margin-bottom:10px;" target="_blank">
+    <a href="lexique.html" style="background-color:#444; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-size:14px; display:inline-block; margin-bottom:10px;">
       📘 Lexique US → FR
     </a>
-    <br />
-
-    <!-- 🔘 Ajouter mes créations -->
-    <a href="ajouter-creations.html" style="
-      background-color:#444;
-      color:white;
-      padding:10px 15px;
-      border-radius:5px;
-      text-decoration:none;
-      font-size:14px;
-      display:inline-block;
-      margin: 10px 0;">
-      🔘 Ajouter mes créations
-    </a>
-    <br />
-
-    <!-- 📝 Notes -->
-    <a href="notes.html" style="
-      background-color:#444;
-      color:white;
-      padding:10px 15px;
-      border-radius:5px;
-      text-decoration:none;
-      font-size:14px;
-      display:inline-block;
-      margin-bottom:10px;">
-      📝 Notes
-    </a>
-
     <br />
     <label style="display:block; margin-top:10px;">
       📄 Importer un fichier (image, PDF, texte) :
@@ -81,14 +53,14 @@
       const pdf = await loadingTask.promise;
       let fullText = "";
 
-      for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 2 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        await page.render({canvasContext: context, viewport: viewport}).promise;
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
 
         const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
         fullText += text + "\n\n";
@@ -125,7 +97,7 @@
       }
       else if (file.type === "text/plain") {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
           const text = e.target.result;
           const convertedText = convertMeasurements(text);
           output.textContent = "📝 Texte converti :\n\n" + convertedText;
