@@ -2,97 +2,67 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ajouter mes créations</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       padding: 20px;
-      background: #fff0f5;
+      background: #fefefe;
       color: #333;
-      max-width: 600px;
-      margin: auto;
     }
-    h1 {
-      color: #d94b69;
+    h2 {
       text-align: center;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: #f4f4f4;
+      padding: 20px;
+      border-radius: 10px;
     }
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
     }
-    input[type="text"], input[type="url"], input[type="file"] {
+    input[type="text"], textarea {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
-      border-radius: 4px;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
+    }
+    input[type="file"] {
+      margin-top: 10px;
     }
     button {
       margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #d94b69;
+      background: #444;
       color: white;
+      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
-      width: 100%;
-    }
-    button:hover {
-      background-color: #b43b56;
-    }
-    .btn-back {
-      margin-top: 10px;
-      background-color: #777;
-      width: auto;
-      padding: 8px 16px;
-    }
-    .btn-back:hover {
-      background-color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>Ajouter mes créations</h1>
+  <h2>📸 Ajouter une création</h2>
+  <form>
+    <label>📌 Titre de ta création :</label>
+    <input type="text" placeholder="Ex. Bonnet au crochet">
 
-  <form id="creationForm">
-    <label for="nomCreation">Nom de la création *</label>
-    <input type="text" id="nomCreation" name="nomCreation" required />
+    <label>📷 Ajouter une photo :</label>
+    <input type="file" accept="image/*">
 
-    <label for="lienTuto">Lien vers le tuto (URL)</label>
-    <input type="url" id="lienTuto" name="lienTuto" placeholder="https://..." />
+    <label>🔗 Lien vers un tuto (facultatif) :</label>
+    <input type="text" placeholder="URL du tuto, PDF, vidéo...">
 
-    <label for="fichierTuto">Image ou PDF du tuto</label>
-    <input type="file" id="fichierTuto" name="fichierTuto" accept="image/*,.pdf" />
+    <label>📝 Commentaire (facultatif) :</label>
+    <textarea rows="4" placeholder="Notes perso, modifications du modèle..."></textarea>
 
-    <button type="submit">Ajouter la création</button>
+    <button type="submit">💾 Sauvegarder (non-fonctionnel ici)</button>
   </form>
-
-  <button class="btn btn-back" onclick="location.href='index.html'">← Retour à l'accueil</button>
-
-  <script>
-    const form = document.getElementById('creationForm');
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-
-      // Récupération des données (juste pour demo, pas de stockage)
-      const nom = form.nomCreation.value.trim();
-      const lien = form.lienTuto.value.trim();
-      const fichier = form.fichierTuto.files[0];
-
-      if (!nom) {
-        alert("Le nom de la création est obligatoire.");
-        return;
-      }
-
-      alert("Création ajoutée !\n\nNom : " + nom + "\nLien : " + (lien || "Aucun") + "\nFichier : " + (fichier ? fichier.name : "Aucun"));
-
-      form.reset();
-    });
-  </script>
 </body>
 </html>
