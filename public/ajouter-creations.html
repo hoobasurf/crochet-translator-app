@@ -1,68 +1,52 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <title>Ajouter une Création</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ajouter mes créations</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       padding: 20px;
-      background: #fefefe;
-      color: #333;
+      background-color: #fffafc;
     }
-    h2 {
-      text-align: center;
+    h1 {
+      color: #d94b69;
     }
-    form {
-      max-width: 500px;
-      margin: auto;
-      background: #f4f4f4;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input[type="text"], textarea {
+    input, textarea {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
+      margin: 10px 0;
       border-radius: 5px;
       border: 1px solid #ccc;
     }
-    input[type="file"] {
-      margin-top: 10px;
-    }
     button {
-      margin-top: 20px;
-      background: #444;
+      background-color: #d94b69;
       color: white;
       padding: 10px 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
+      font-weight: bold;
       cursor: pointer;
+    }
+    button:hover {
+      background-color: #b43b56;
     }
   </style>
 </head>
 <body>
-  <h2>📸 Ajouter une création</h2>
+  <h1>Ajouter une Création</h1>
   <form>
-    <label>📌 Titre de ta création :</label>
-    <input type="text" placeholder="Ex. Bonnet au crochet">
+    <label for="titre">Nom de la création :</label>
+    <input type="text" id="titre" placeholder="Ex : Bonnet arc-en-ciel" required>
 
-    <label>📷 Ajouter une photo :</label>
-    <input type="file" accept="image/*">
+    <label for="image">Photo (ou image tuto) :</label>
+    <input type="file" id="image" accept="image/*">
 
-    <label>🔗 Lien vers un tuto (facultatif) :</label>
-    <input type="text" placeholder="URL du tuto, PDF, vidéo...">
+    <label for="lien">Lien vers un tuto (facultatif) :</label>
+    <input type="url" id="lien" placeholder="https://...">
 
-    <label>📝 Commentaire (facultatif) :</label>
-    <textarea rows="4" placeholder="Notes perso, modifications du modèle..."></textarea>
-
-    <button type="submit">💾 Sauvegarder (non-fonctionnel ici)</button>
+    <button type="submit">Enregistrer</button>
   </form>
 </body>
 </html>
