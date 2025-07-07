@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traducteur Crochet</title>
+  <title>Crochet Steph</title>
 
-  <!-- 🧶 Icônes -->
+  <!-- Icônes pour Android/iPhone -->
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
   <link rel="manifest" href="manifest.json" />
 
-  <!-- Librairies -->
+  <!-- Librairies PDF.js et Tesseract.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
@@ -18,107 +18,93 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #fff0f5;
-      color: #333;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      backdrop-filter: brightness(0.9);
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      min-height: 100vh;
       text-align: center;
     }
 
-    .btn {
+    a.button {
       display: inline-block;
-      margin: 10px 5px;
+      margin: 10px;
       padding: 12px 20px;
       background-color: #d94b69;
       color: white;
       text-decoration: none;
-      border-radius: 5px;
+      border-radius: 8px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
       transition: background-color 0.3s ease;
     }
 
-    .btn:hover {
+    a.button:hover {
       background-color: #b43b56;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
     }
 
     #output {
       white-space: pre-wrap;
       margin-top: 20px;
       padding: 15px;
-      background: #f4f4f4;
+      background: rgba(255, 255, 255, 0.85);
+      color: #333;
       border-radius: 8px;
-    }
-
-    textarea {
-      width: 90%;
-      height: 100px;
-      margin-top: 15px;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    button.translate {
-      background-color: #444;
+      box-shadow: 0 0 5px #000;
     }
   </style>
 </head>
 <body>
-  <h1>Traducteur Crochet 🧶</h1>
+  <h1>Bienvenue sur Crochet Steph 🧶</h1>
 
-  <!-- Boutons -->
-  <a href="lexique.html" class="btn">📘 Lexique US → FR</a>
-  <a href="http://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" class="btn">🌐 Lexique Externe</a>
-  <a href="creations.html" class="btn">🧵 Ajouter mes créations</a>
-  <a href="notes.html" class="btn">📝 Note</a>
+  <a href="lexique.html" class="button">📘 Lexique US → FR</a>
+  <a href="https://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" class="button" target="_blank">🌐 Lexique en ligne</a>
+  <a href="ajouter-creation.html" class="button">🧵 Ajouter Création</a>
+  <a href="note.html" class="button">🗒️ Notes & Rappels</a>
 
-  <!-- Import Fichier -->
-  <label class="btn">
-    📄 Importer un fichier
-    <input type="file" id="fileInput" accept="image/*,.txt,.pdf" style="display:none" />
+  <br><br>
+
+  <label>
+    📄 Importer un fichier (image, PDF, texte) :
+    <input type="file" id="fileInput" accept="image/*,.txt,.pdf" />
+  </label>
+  <br>
+  <label>
+    📷 Utiliser la caméra :
+    <input type="file" accept="image/*" capture="environment" id="cameraInput">
   </label>
 
-  <!-- Caméra -->
-  <label class="btn">
-    📷 Utiliser la caméra
-    <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none" />
-  </label>
-
-  <!-- Résultat OCR + Conversion -->
   <div id="output"></div>
 
-  <!-- Zone traduction API -->
-  <textarea id="manualInput" placeholder="Ou colle ici ton texte à traduire..."></textarea><br />
-  <button class="btn translate" onclick="translateText()">🌍 Traduire (API)</button>
-
   <script>
-    // Conversion US ➝ FR des mesures et abréviations
     function convertMeasurements(text) {
       return text
         .replace(/\b(inch|inches|in)\b/gi, 'cm')
         .replace(/\b(yard|yards|yd)\b/gi, 'm')
-        .replace(/\b(ounce|oz)\b/gi, 'g')
-        .replace(/\b(pound|lb)\b/gi, 'kg')
-        .replace(/\b(single crochet|sc)\b/gi, 'maille serrée')
-        .replace(/\b(double crochet|dc)\b/gi, 'bride')
-        .replace(/\b(half double crochet|hdc)\b/gi, 'demi-bride')
-        .replace(/\b(chain|ch)\b/gi, 'maille en l’air')
-        .replace(/\b(sl st|slip stitch)\b/gi, 'maille coulée');
+        .replace(/\bounce|oz\b/gi, 'g')
+        .replace(/\bpound|lb\b/gi, 'kg');
     }
 
-    // OCR pour PDF
     async function ocrPdf(file) {
       const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
       const pdf = await loadingTask.promise;
       let fullText = "";
 
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 2 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        await page.render({canvasContext: context, viewport: viewport}).promise;
 
         const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
         fullText += text + "\n\n";
@@ -126,37 +112,37 @@
       return fullText;
     }
 
-    // Traitement fichier (OCR image, texte, PDF)
     async function handleFile(file) {
       const output = document.getElementById('output');
-      output.textContent = "⏳ Lecture du fichier...";
-      try {
-        let text = "";
-        if (file.type === "application/pdf") {
-          text = await ocrPdf(file);
-        } else if (file.type.startsWith("image/")) {
-          const imageURL = URL.createObjectURL(file);
-          const { data: { text: imgText } } = await Tesseract.recognize(imageURL, 'eng');
-          text = imgText;
-        } else if (file.type === "text/plain") {
-          const reader = new FileReader();
-          reader.onload = e => {
-            const raw = e.target.result;
-            const converted = convertMeasurements(raw);
-            output.textContent = "📝 Texte converti :\n\n" + converted;
-          };
-          reader.readAsText(file);
-          return;
-        } else {
-          output.textContent = "❌ Format non supporté.";
-          return;
+      if (file.type === "application/pdf") {
+        output.textContent = "⏳ Lecture du PDF...";
+        try {
+          const text = await ocrPdf(file);
+          const converted = convertMeasurements(text);
+          output.textContent = "📝 Texte détecté :\n\n" + converted;
+        } catch (e) {
+          output.textContent = "❌ Erreur PDF.";
         }
-
-        const convertedText = convertMeasurements(text);
-        output.textContent = "📝 Texte détecté et converti :\n\n" + convertedText;
-      } catch (e) {
-        output.textContent = "❌ Erreur lors de la lecture.";
-        console.error(e);
+      } else if (file.type.startsWith("image/")) {
+        const imageURL = URL.createObjectURL(file);
+        output.textContent = "⏳ Lecture de l'image...";
+        try {
+          const { data: { text } } = await Tesseract.recognize(imageURL, 'eng');
+          const converted = convertMeasurements(text);
+          output.textContent = "📝 Texte détecté :\n\n" + converted;
+        } catch (e) {
+          output.textContent = "❌ Erreur image.";
+        }
+      } else if (file.type === "text/plain") {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const text = e.target.result;
+          const converted = convertMeasurements(text);
+          output.textContent = "📝 Texte :\n\n" + converted;
+        };
+        reader.readAsText(file);
+      } else {
+        output.textContent = "❌ Format non supporté.";
       }
     }
 
@@ -169,35 +155,6 @@
       const file = e.target.files[0];
       if (file) handleFile(file);
     });
-
-    // Traduction via API LibreTranslate
-    async function translateText() {
-      const text = document.getElementById('manualInput').value;
-      const output = document.getElementById('output');
-      if (!text.trim()) {
-        output.textContent = "⚠️ Entrez un texte à traduire.";
-        return;
-      }
-
-      output.textContent = "⏳ Traduction en cours...";
-      try {
-        const response = await fetch("https://libretranslate.com/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            q: text,
-            source: "en",
-            target: "fr",
-            format: "text"
-          })
-        });
-        const data = await response.json();
-        output.textContent = "🌍 Traduction :\n\n" + data.translatedText;
-      } catch (e) {
-        output.textContent = "❌ Erreur de traduction.";
-        console.error(e);
-      }
-    }
   </script>
 </body>
 </html>
