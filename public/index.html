@@ -5,16 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Traducteur Crochet</title>
 
-  <!-- Icône favicon -->
+  <!-- Favicon navigateur -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- PWA + iOS install -->
+  <!-- Icône iPhone / Android -->
   <link rel="apple-touch-icon" href="icon-512.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Crochet Steph" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#ff6fa0" />
 
   <!-- Librairies PDF.js et Tesseract.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
@@ -23,8 +19,17 @@
 <body>
   <div id="root"></div>
 
+  <!-- Boutons & input ajoutés -->
   <div style="text-align:center; margin-top: 30px;">
-    <a href="lexique.html" style="background-color:#444; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-size:14px; display:inline-block; margin-bottom:10px;">
+    <a href="lexique.html" style="
+      background-color:#444;
+      color:white;
+      padding:10px 15px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:14px;
+      display:inline-block;
+      margin-bottom:10px;">
       📘 Lexique US → FR
     </a>
     <br />
@@ -40,6 +45,7 @@
   </div>
 
   <script>
+    // Conversion US → FR des mesures simple
     function convertMeasurements(text) {
       return text
         .replace(/\b(inch|inches|in)\b/gi, 'cm')
@@ -48,6 +54,7 @@
         .replace(/\bpound|lb\b/gi, 'kg');
     }
 
+    // OCR PDF
     async function ocrPdf(file) {
       const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
       const pdf = await loadingTask.promise;
@@ -78,21 +85,17 @@
           output.textContent = "📝 Texte PDF détecté et converti :\n\n" + convertedText;
         } catch (e) {
           output.textContent = "❌ Erreur lors de la lecture PDF.";
-          console.error(e);
         }
       }
       else if (file.type.startsWith("image/")) {
         const imageURL = URL.createObjectURL(file);
         output.textContent = "⏳ Lecture de l'image...";
         try {
-          const { data: { text } } = await Tesseract.recognize(imageURL, 'eng', {
-            logger: m => console.log(m)
-          });
+          const { data: { text } } = await Tesseract.recognize(imageURL, 'eng');
           const convertedText = convertMeasurements(text);
           output.textContent = "📝 Texte image détecté et converti :\n\n" + convertedText;
         } catch (e) {
           output.textContent = "❌ Erreur lors de la lecture image.";
-          console.error(e);
         }
       }
       else if (file.type === "text/plain") {
