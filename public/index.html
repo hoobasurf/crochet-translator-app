@@ -8,14 +8,26 @@
 <body>
   <div id="root"></div>
 
-  <!-- ✅ Bloc ajouté sans modifier ta structure -->
-  <div style="margin-top: 40px; padding: 20px; text-align: center;">
-    <h3>Fonctionnalités disponibles :</h3>
-    <ul style="list-style: none; padding: 0; font-size: 16px;">
-      <li>📄 Traduire du texte, PDF, image ou URL</li>
-      <li>📷 Utiliser la caméra de ton téléphone</li>
-      <li>🔤 Convertir les mesures US → FR automatiquement</li>
-    </ul>
+  <!-- ✅ Bouton vers la page Lexique -->
+  <div style="text-align:center; margin-top: 20px;">
+    <a href="lexique.html" style="
+      background-color:#444;
+      color:white;
+      padding:10px 15px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:14px;
+      display:inline-block;
+      margin-bottom:10px;">
+      📘 Lexique US → FR
+    </a>
+  </div>
+
+  <!-- ✅ Zone fonctionnelle (boutons) -->
+  <div style="text-align:center; margin-top: 10px;">
+    <button onclick="alert('Importer fichier')" style="margin: 5px;">📄 Importer un fichier</button>
+    <button onclick="alert('Utiliser la caméra')" style="margin: 5px;">📷 Prendre une photo</button>
+    <button onclick="alert('Conversion US > FR')" style="margin: 5px;">🔤 Conversion US → FR</button>
   </div>
 </body>
 </html>
