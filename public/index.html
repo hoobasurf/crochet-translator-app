@@ -8,8 +8,8 @@
 <body>
   <div id="root"></div>
 
-  <!-- ✅ Bouton vers la page Lexique -->
-  <div style="text-align:center; margin-top: 20px;">
+  <!-- ✅ Boutons ajoutés en bas de page, sans toucher à la structure de ton site -->
+  <div style="text-align:center; margin-top: 30px;">
     <a href="lexique.html" style="
       background-color:#444;
       color:white;
@@ -21,13 +21,60 @@
       margin-bottom:10px;">
       📘 Lexique US → FR
     </a>
+    <br />
+    <label style="display:block; margin-top:10px;">
+      📄 Importer un fichier (image, PDF, texte) :
+      <input type="file" id="fileInput" accept="image/*,.txt,.pdf" />
+    </label>
+    <label style="display:block; margin-top:10px;">
+      📷 Utiliser la caméra :
+      <input type="file" accept="image/*" capture="environment" id="cameraInput">
+    </label>
+    <div id="output" style="white-space: pre-wrap; margin-top: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px;"></div>
   </div>
 
-  <!-- ✅ Zone fonctionnelle (boutons) -->
-  <div style="text-align:center; margin-top: 10px;">
-    <button onclick="alert('Importer fichier')" style="margin: 5px;">📄 Importer un fichier</button>
-    <button onclick="alert('Utiliser la caméra')" style="margin: 5px;">📷 Prendre une photo</button>
-    <button onclick="alert('Conversion US > FR')" style="margin: 5px;">🔤 Conversion US → FR</button>
-  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <script>
+    function handleFile(file) {
+      if (file.type.startsWith("image/")) {
+        const imageURL = URL.createObjectURL(file);
+        document.getElementById('output').textContent = "⏳ Lecture de l'image...";
+        Tesseract.recognize(imageURL, 'eng', {
+          logger: m => console.log(m)
+        }).then(({ data: { text } }) => {
+          const convertedText = convertMeasurements(text);
+          document.getElementById('output').textContent = "📝 Texte détecté et converti :\n\n" + convertedText;
+        });
+      } else if (file.type === "text/plain") {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const text = e.target.result;
+          const convertedText = convertMeasurements(text);
+          document.getElementById('output').textContent = "📝 Texte converti :\n\n" + convertedText;
+        };
+        reader.readAsText(file);
+      } else {
+        document.getElementById('output').textContent = "❌ Format non supporté encore (PDF bientôt disponible).";
+      }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    document.getElementById('cameraInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    function convertMeasurements(text) {
+      return text
+        .replace(/\b(inch|inches|in)\b/gi, 'cm')
+        .replace(/\b(yard|yards|yd)\b/gi, 'm')
+        .replace(/\bounce|oz\b/gi, 'g')
+        .replace(/\bpound|lb\b/gi, 'kg');
+    }
+  </script>
 </body>
 </html>
