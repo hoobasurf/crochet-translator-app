@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Traducteur Crochet</title>
+
+  <!-- Librairies PDF.js et Tesseract.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- ✅ Boutons ajoutés en bas de page, sans toucher à la structure de ton site -->
+  <!-- Boutons & input ajoutés sans toucher à ta structure -->
   <div style="text-align:center; margin-top: 30px;">
     <a href="lexique.html" style="
       background-color:#444;
@@ -33,28 +37,76 @@
     <div id="output" style="white-space: pre-wrap; margin-top: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px;"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <script>
-    function handleFile(file) {
-      if (file.type.startsWith("image/")) {
-        const imageURL = URL.createObjectURL(file);
-        document.getElementById('output').textContent = "⏳ Lecture de l'image...";
-        Tesseract.recognize(imageURL, 'eng', {
-          logger: m => console.log(m)
-        }).then(({ data: { text } }) => {
+    // Conversion US → FR des mesures simple (à compléter selon besoin)
+    function convertMeasurements(text) {
+      return text
+        .replace(/\b(inch|inches|in)\b/gi, 'cm')
+        .replace(/\b(yard|yards|yd)\b/gi, 'm')
+        .replace(/\bounce|oz\b/gi, 'g')
+        .replace(/\bpound|lb\b/gi, 'kg');
+    }
+
+    // OCR PDF avec pdf.js + Tesseract.js
+    async function ocrPdf(file) {
+      const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
+      const pdf = await loadingTask.promise;
+      let fullText = "";
+
+      for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({canvasContext: context, viewport: viewport}).promise;
+
+        const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
+        fullText += text + "\n\n";
+      }
+      return fullText;
+    }
+
+    // Fonction de lecture fichier (image, texte, pdf)
+    async function handleFile(file) {
+      const output = document.getElementById('output');
+      if (file.type === "application/pdf") {
+        output.textContent = "⏳ Lecture et reconnaissance PDF...";
+        try {
+          const text = await ocrPdf(file);
           const convertedText = convertMeasurements(text);
-          document.getElementById('output').textContent = "📝 Texte détecté et converti :\n\n" + convertedText;
-        });
-      } else if (file.type === "text/plain") {
+          output.textContent = "📝 Texte PDF détecté et converti :\n\n" + convertedText;
+        } catch (e) {
+          output.textContent = "❌ Erreur lors de la lecture PDF.";
+          console.error(e);
+        }
+      }
+      else if (file.type.startsWith("image/")) {
+        const imageURL = URL.createObjectURL(file);
+        output.textContent = "⏳ Lecture de l'image...";
+        try {
+          const { data: { text } } = await Tesseract.recognize(imageURL, 'eng', {
+            logger: m => console.log(m)
+          });
+          const convertedText = convertMeasurements(text);
+          output.textContent = "📝 Texte image détecté et converti :\n\n" + convertedText;
+        } catch (e) {
+          output.textContent = "❌ Erreur lors de la lecture image.";
+          console.error(e);
+        }
+      }
+      else if (file.type === "text/plain") {
         const reader = new FileReader();
         reader.onload = function(e) {
           const text = e.target.result;
           const convertedText = convertMeasurements(text);
-          document.getElementById('output').textContent = "📝 Texte converti :\n\n" + convertedText;
+          output.textContent = "📝 Texte converti :\n\n" + convertedText;
         };
         reader.readAsText(file);
-      } else {
-        document.getElementById('output').textContent = "❌ Format non supporté encore (PDF bientôt disponible).";
+      }
+      else {
+        output.textContent = "❌ Format non supporté.";
       }
     }
 
@@ -67,14 +119,6 @@
       const file = e.target.files[0];
       if (file) handleFile(file);
     });
-
-    function convertMeasurements(text) {
-      return text
-        .replace(/\b(inch|inches|in)\b/gi, 'cm')
-        .replace(/\b(yard|yards|yd)\b/gi, 'm')
-        .replace(/\bounce|oz\b/gi, 'g')
-        .replace(/\bpound|lb\b/gi, 'kg');
-    }
   </script>
 </body>
 </html>
