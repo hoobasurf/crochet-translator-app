@@ -2,97 +2,42 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Notes - Pense-bête</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notes</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       padding: 20px;
-      background: #fff0f5;
+      background: #fffdf5;
       color: #333;
-      max-width: 600px;
-      margin: auto;
     }
-    h1 {
-      color: #d94b69;
+    h2 {
       text-align: center;
     }
     textarea {
       width: 100%;
-      height: 200px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
+      height: 250px;
+      padding: 15px;
+      font-size: 14px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
       resize: vertical;
     }
     label {
       display: block;
-      margin-top: 15px;
+      margin-top: 20px;
       font-weight: bold;
     }
     input[type="file"] {
-      margin-top: 5px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #d94b69;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-    }
-    button:hover {
-      background-color: #b43b56;
-    }
-    .btn-back {
       margin-top: 10px;
-      background-color: #777;
-      width: auto;
-      padding: 8px 16px;
-    }
-    .btn-back:hover {
-      background-color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>Notes / Pense-bête</h1>
+  <h2>📝 Mes notes</h2>
+  <textarea placeholder="Écris ici ton pense-bête, rappel ou modèle..."></textarea>
 
-  <form id="notesForm">
-    <label for="noteTexte">Écrire votre note :</label>
-    <textarea id="noteTexte" name="noteTexte" placeholder="Vos rappels, idées, pensées..."></textarea>
-
-    <label for="fichierNote">Ajouter une image ou un PDF</label>
-    <input type="file" id="fichierNote" name="fichierNote" accept="image/*,.pdf" />
-
-    <button type="submit">Sauvegarder la note</button>
-  </form>
-
-  <button class="btn btn-back" onclick="location.href='index.html'">← Retour à l'accueil</button>
-
-  <script>
-    const notesForm = document.getElementById('notesForm');
-    notesForm.addEventListener('submit', e => {
-      e.preventDefault();
-
-      const noteText = notesForm.noteTexte.value.trim();
-      const fichier = notesForm.fichierNote.files[0];
-
-      if (!noteText && !fichier) {
-        alert("Merci d'ajouter une note ou un fichier.");
-        return;
-      }
-
-      alert("Note sauvegardée !\n\nTexte : " + (noteText || "Aucun") + "\nFichier : " + (fichier ? fichier.name : "Aucun"));
-
-      notesForm.reset();
-    });
-  </script>
+  <label>📎 Ajouter un fichier (image ou PDF) :</label>
+  <input type="file" accept="image/*, .pdf">
 </body>
 </html>
