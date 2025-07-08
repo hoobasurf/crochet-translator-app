@@ -6,53 +6,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #fefefe;
-      padding: 40px 20px;
-      color: #333;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      margin: 0;
+      font-family: sans-serif;
+      color: white;
     }
     .container {
+      background-color: rgba(0,0,0,0.6);
+      padding: 20px;
+      margin: 40px auto;
       max-width: 600px;
-      margin: auto;
-    }
-    h1 {
-      text-align: center;
+      border-radius: 12px;
     }
     input, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .button {
-      display: inline-block;
-      background: #444;
-      color: white;
-      padding: 10px 15px;
-      text-decoration: none;
       border-radius: 5px;
-      font-size: 15px;
+      border: none;
+    }
+    button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>➕ Ajouter une Création</h1>
-
-    <label for="nom">Nom de la création :</label>
-    <input type="text" id="nom" placeholder="Ex: Châle arc-en-ciel" />
-
-    <label for="description">Description :</label>
-    <textarea id="description" rows="5" placeholder="Décrivez votre création ici..."></textarea>
-
-    <label for="fichier">Joindre une image ou un fichier PDF :</label>
-    <input type="file" id="fichier" accept="image/*,.pdf" />
-
-    <a href="index.html" class="button">⬅️ Retour à l'accueil</a>
-    <a href="#" class="button" onclick="alert('Création enregistrée (simulation)')">💾 Enregistrer</a>
+    <h1>Ajouter une création</h1>
+    <input type="text" id="titre" placeholder="Titre de la création" />
+    <textarea id="contenu" rows="6" placeholder="Décris ta création ici..."></textarea>
+    <button onclick="sauver()">Enregistrer</button>
+    <p id="confirmation" style="margin-top:10px;"></p>
   </div>
+
+  <script>
+    function sauver() {
+      const titre = document.getElementById("titre").value;
+      const contenu = document.getElementById("contenu").value;
+      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+      creations.push({ titre, contenu });
+      localStorage.setItem("creations", JSON.stringify(creations));
+      document.getElementById("confirmation").textContent = "✅ Création enregistrée !";
+    }
+  </script>
 </body>
 </html>
