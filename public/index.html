@@ -16,6 +16,7 @@
     <button onclick="translateText()">Traduire le texte</button>
     <button onclick="document.getElementById('fileInput').click()">Convertir une image/PDF</button>
     <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none;" />
+
     <div id="output" class="output"></div>
 
     <a href="ajouter-creation.html" class="btn-link">➕ Ajouter une création</a>
@@ -34,13 +35,14 @@
     async function translateText() {
       const input = document.getElementById("inputText").value;
       const output = document.getElementById("output");
+
       if (!input.trim()) {
         output.innerText = "❌ Aucun texte à traduire.";
         return;
       }
 
       try {
-        const response = await fetch("/api/translate", {
+        const response = await fetch("/.netlify/functions/translate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
