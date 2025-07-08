@@ -1,52 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ajouter une Création</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Ajouter une création</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #fffafc;
+      background: #fefefe;
+      padding: 40px 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
     }
     h1 {
-      color: #d94b69;
+      text-align: center;
     }
     input, textarea {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
+      margin-top: 10px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
     }
-    button {
-      background-color: #d94b69;
+    .button {
+      display: inline-block;
+      background: #444;
       color: white;
-      padding: 10px 20px;
-      border: none;
+      padding: 10px 15px;
+      text-decoration: none;
       border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #b43b56;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
-  <h1>Ajouter une Création</h1>
-  <form>
-    <label for="titre">Nom de la création :</label>
-    <input type="text" id="titre" placeholder="Ex : Bonnet arc-en-ciel" required>
+  <div class="container">
+    <h1>➕ Ajouter une Création</h1>
 
-    <label for="image">Photo (ou image tuto) :</label>
-    <input type="file" id="image" accept="image/*">
+    <label for="nom">Nom de la création :</label>
+    <input type="text" id="nom" placeholder="Ex: Châle arc-en-ciel" />
 
-    <label for="lien">Lien vers un tuto (facultatif) :</label>
-    <input type="url" id="lien" placeholder="https://...">
+    <label for="description">Description :</label>
+    <textarea id="description" rows="5" placeholder="Décrivez votre création ici..."></textarea>
 
-    <button type="submit">Enregistrer</button>
-  </form>
+    <label for="fichier">Joindre une image ou un fichier PDF :</label>
+    <input type="file" id="fichier" accept="image/*,.pdf" />
+
+    <a href="index.html" class="button">⬅️ Retour à l'accueil</a>
+    <a href="#" class="button" onclick="alert('Création enregistrée (simulation)')">💾 Enregistrer</a>
+  </div>
 </body>
 </html>
