@@ -2,91 +2,67 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes créations</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-    }
     .container {
-      padding: 30px;
-      max-width: 1000px;
-      margin: auto;
-      background-color: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      background: linear-gradient(90deg, #ff89e9, #b072ff);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
-    }
-    .item {
+      max-width: 800px;
+      margin: 5vh auto;
       background-color: rgba(255, 255, 255, 0.1);
-      padding: 10px;
+      padding: 30px;
       border-radius: 10px;
+      backdrop-filter: blur(8px);
       text-align: center;
-      position: relative;
     }
-    .item img {
-      width: 100%;
+    .creation {
+      margin-bottom: 30px;
+    }
+    img {
+      max-width: 100%;
       border-radius: 8px;
     }
-    .btns {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-around;
+    h3 {
+      margin: 10px 0 5px;
     }
-    .btns button {
-      background: linear-gradient(90deg, #ff89e9, #b072ff);
-      border: none;
-      border-radius: 6px;
-      color: white;
-      padding: 6px 10px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .back-link {
-      display: block;
-      margin-bottom: 15px;
-      color: white;
-      text-align: center;
-      text-decoration: underline;
+    p {
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <a href="index.html" class="back-link">← Retour à l'accueil</a>
-    <h1>Mes créations</h1>
-    <div class="grid">
-      <div class="item">
-        <img src="image1.jpg" alt="Création 1" />
-        <div class="btns">
-          <button>Modifier</button>
-          <button>Supprimer</button>
-        </div>
-      </div>
-      <div class="item">
-        <img src="image2.jpg" alt="Création 2" />
-        <div class="btns">
-          <button>Modifier</button>
-          <button>Supprimer</button>
-        </div>
-      </div>
-      <!-- autres éléments à générer dynamiquement -->
-    </div>
+    <h2>🎨 Mes créations</h2>
+    <div id="liste"></div>
+    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
+
+  <script>
+    const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+    const liste = document.getElementById("liste");
+
+    if (creations.length === 0) {
+      liste.innerHTML = "<p>Aucune création encore 😢</p>";
+    } else {
+      creations.forEach((c, i) => {
+        liste.innerHTML += `
+          <div class="creation">
+            <img src="${c.image}" alt="Création ${i+1}">
+            <h3>${c.titre}</h3>
+            <p>${c.description}</p>
+            <button onclick="supprimer(${i})">🗑 Supprimer</button>
+          </div>
+        `;
+      });
+    }
+
+    function supprimer(index) {
+      if (confirm("Supprimer cette création ?")) {
+        creations.splice(index, 1);
+        localStorage.setItem("creations", JSON.stringify(creations));
+        location.reload();
+      }
+    }
+  </script>
 </body>
 </html>
