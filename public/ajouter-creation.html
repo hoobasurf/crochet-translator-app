@@ -2,56 +2,70 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ajouter une création</title>
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
       margin: 0;
-      padding: 0;
       font-family: sans-serif;
       background: url('fond-accueil.jpg') no-repeat center center fixed;
       background-size: cover;
       color: white;
     }
     .container {
-      max-width: 600px;
+      max-width: 500px;
       margin: 5vh auto;
       background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
-      border-radius: 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    h1 {
       text-align: center;
-      backdrop-filter: blur(8px);
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #ff89e9, #b072ff);
+      -webkit-background-clip: text;
+      color: transparent;
     }
-    textarea, input {
+    input, textarea {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: none;
-    }
-    button, .btn-link {
       padding: 12px;
-      font-size: 16px;
-      background-color: #ffffffaa;
-      color: #000;
+      margin-bottom: 15px;
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      border-radius: 8px;
+    }
+    input[type="file"] {
+      background-color: white;
+    }
+    button {
       width: 100%;
-      margin: 10px 0;
-      text-decoration: none;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff89e9, #b072ff);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .back-link {
       display: block;
+      margin-bottom: 15px;
+      color: white;
+      text-align: center;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Ajouter une création</h2>
-    <input type="text" id="titre" placeholder="Nom de la création" />
-    <textarea id="description" rows="4" placeholder="Décris ta création..."></textarea>
+    <a href="index.html" class="back-link">← Retour à l'accueil</a>
+    <h1>Ajouter une création</h1>
+    <input type="text" placeholder="Titre de la création" />
+    <textarea rows="4" placeholder="Description..."></textarea>
     <input type="file" accept="image/*" />
-    <button onclick="history.back()">⬅ Retour</button>
-    <button onclick="alert('Création enregistrée ✅')">💾 Enregistrer</button>
+    <button>Enregistrer la création</button>
   </div>
 </body>
 </html>
