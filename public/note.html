@@ -2,53 +2,83 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Mes notes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mes Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-attachment: fixed;
       margin: 0;
       font-family: sans-serif;
-      color: white;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
-    .container {
-      background-color: rgba(0,0,0,0.6);
+
+    #container {
+      background-color: rgba(255, 255, 255, 0.85);
+      max-width: 800px;
+      margin: 20px auto;
       padding: 20px;
-      margin: 40px auto;
-      max-width: 600px;
-      border-radius: 12px;
+      border-radius: 10px;
     }
-    .note {
-      background-color: rgba(255,255,255,0.8);
-      color: black;
+
+    textarea {
+      width: 100%;
       padding: 10px;
-      margin-bottom: 10px;
       border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .note {
+      background: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #333;
+      display: inline-block;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Mes créations enregistrées</h1>
-    <div id="liste"></div>
+  <div id="container">
+    <a href="index.html">⬅️ Retour à l'accueil</a>
+    <h2>🗒️ Ajouter une note</h2>
+    <textarea id="noteInput" rows="4" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="saveNote()">Enregistrer</button>
+
+    <h3>🗂️ Mes notes enregistrées :</h3>
+    <div id="noteList"></div>
   </div>
 
   <script>
-    const liste = document.getElementById("liste");
-    const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+    function saveNote() {
+      const input = document.getElementById('noteInput').value.trim();
+      if (!input) return;
 
-    if (creations.length === 0) {
-      liste.innerHTML = "<p>Aucune création encore enregistrée.</p>";
-    } else {
-      creations.forEach(({ titre, contenu }) => {
-        const note = document.createElement("div");
-        note.className = "note";
-        note.innerHTML = "<h3>" + titre + "</h3><p>" + contenu + "</p>";
-        liste.appendChild(note);
-      });
+      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      notes.push(input);
+      localStorage.setItem('notes', JSON.stringify(notes));
+      document.getElementById('noteInput').value = '';
+      displayNotes();
     }
+
+    function displayNotes() {
+      const container = document.getElementById('noteList');
+      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      container.innerHTML = notes.map(text => `<div class="note">${text}</div>`).join('');
+    }
+
+    displayNotes();
   </script>
 </body>
 </html>
