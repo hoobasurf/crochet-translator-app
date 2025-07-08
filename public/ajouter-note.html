@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajouter une note</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 5vh auto;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      text-align: center;
+      color: white;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📝 Ajouter une note</h2>
+    <textarea id="noteInput" rows="5" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="ajouterNote()">💾 Enregistrer</button>
+    <a href="index.html" class="btn-link">⬅ Retour</a>
+  </div>
+
+  <script>
+    function ajouterNote() {
+      const texte = document.getElementById("noteInput").value.trim();
+      if (!texte) {
+        alert("Note vide !");
+        return;
+      }
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      notes.push({ texte, date: new Date().toLocaleString() });
+      localStorage.setItem("notes", JSON.stringify(notes));
+      window.location.href = "note.html";
+    }
+  </script>
+</body>
+</html>
