@@ -12,72 +12,57 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
       border-radius: 10px;
-      text-align: center;
       backdrop-filter: blur(8px);
+      text-align: center;
+      color: white;
     }
-    input, textarea {
+    textarea, input[type="file"] {
       width: 100%;
-      margin: 10px 0;
       padding: 10px;
       border-radius: 6px;
-      border: none;
-    }
-    .preview {
-      margin-top: 15px;
-    }
-    img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    .btn-link {
-      margin-top: 20px;
-      display: block;
+      margin-bottom: 20px;
+      background: white;
+      color: black;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Ajouter une création</h2>
-    <input type="text" id="titre" placeholder="Titre de la création" />
-    <textarea id="description" rows="4" placeholder="Description..."></textarea>
-    <input type="file" id="image" accept="image/*" />
-    <div class="preview" id="preview"></div>
-    <button onclick="sauvegarderCreation()">Enregistrer</button>
-    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
+    <h2>➕ Ajouter une création</h2>
+    <textarea id="texte" rows="4" placeholder="Décris ta création..."></textarea>
+    <input type="file" accept="image/*" onchange="loadImage(event)">
+    <br>
+    <button onclick="ajouter()">💾 Enregistrer</button>
+    <a href="index.html" class="btn-link">⬅ Retour</a>
   </div>
 
   <script>
-    const imageInput = document.getElementById('image');
-    const preview = document.getElementById('preview');
+    let imageData = "";
 
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
+    function loadImage(event) {
       const reader = new FileReader();
-      reader.onload = e => {
-        preview.innerHTML = `<img src="${e.target.result}" alt="Aperçu"/>`;
+      reader.onload = function(e) {
+        imageData = e.target.result;
       };
-      reader.readAsDataURL(file);
-    });
+      reader.readAsDataURL(event.target.files[0]);
+    }
 
-    function sauvegarderCreation() {
-      const titre = document.getElementById('titre').value;
-      const description = document.getElementById('description').value;
-      const image = imageInput.files[0];
-
-      if (!titre || !description || !image) {
-        alert('Remplis tous les champs !');
+    function ajouter() {
+      const texte = document.getElementById("texte").value.trim();
+      if (!texte) {
+        alert("Ajoute un texte pour ta création !");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const creations = JSON.parse(localStorage.getItem('creations') || '[]');
-        creations.push({ titre, description, image: reader.result });
-        localStorage.setItem('creations', JSON.stringify(creations));
-        alert('Création enregistrée !');
-        window.location.href = 'creations.html';
-      };
-      reader.readAsDataURL(image);
+      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+      creations.push({
+        texte,
+        image: imageData,
+        date: new Date().toLocaleString()
+      });
+
+      localStorage.setItem("creations", JSON.stringify(creations));
+      window.location.href = "creations.html";
     }
   </script>
 </body>
