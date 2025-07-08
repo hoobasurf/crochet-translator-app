@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes créations</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .container {
+      padding: 30px;
+      max-width: 1000px;
+      margin: auto;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(90deg, #ff89e9, #b072ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .item img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .btns {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-around;
+    }
+    .btns button {
+      background: linear-gradient(90deg, #ff89e9, #b072ff);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .back-link {
+      display: block;
+      margin-bottom: 15px;
+      color: white;
+      text-align: center;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link">← Retour à l'accueil</a>
+    <h1>Mes créations</h1>
+    <div class="grid">
+      <div class="item">
+        <img src="image1.jpg" alt="Création 1" />
+        <div class="btns">
+          <button>Modifier</button>
+          <button>Supprimer</button>
+        </div>
+      </div>
+      <div class="item">
+        <img src="image2.jpg" alt="Création 2" />
+        <div class="btns">
+          <button>Modifier</button>
+          <button>Supprimer</button>
+        </div>
+      </div>
+      <!-- autres éléments à générer dynamiquement -->
+    </div>
+  </div>
+</body>
+</html>
