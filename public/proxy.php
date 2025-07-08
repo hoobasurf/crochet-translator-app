@@ -11,6 +11,7 @@ $options = [
         'content' => json_encode($data),
     ],
 ];
+
 $context  = stream_context_create($options);
 $result = file_get_contents('https://translate.argosopentech.com/translate', false, $context);
 echo $result;
