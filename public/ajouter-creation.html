@@ -2,70 +2,83 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ajouter une création</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-    }
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 5vh auto;
       background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    }
-    h1 {
+      border-radius: 10px;
       text-align: center;
-      margin-bottom: 20px;
-      background: linear-gradient(90deg, #ff89e9, #b072ff);
-      -webkit-background-clip: text;
-      color: transparent;
+      backdrop-filter: blur(8px);
     }
     input, textarea {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
       border: none;
+    }
+    .preview {
+      margin-top: 15px;
+    }
+    img {
+      max-width: 100%;
       border-radius: 8px;
     }
-    input[type="file"] {
-      background-color: white;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #ff89e9, #b072ff);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .back-link {
+    .btn-link {
+      margin-top: 20px;
       display: block;
-      margin-bottom: 15px;
-      color: white;
-      text-align: center;
-      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <a href="index.html" class="back-link">← Retour à l'accueil</a>
-    <h1>Ajouter une création</h1>
-    <input type="text" placeholder="Titre de la création" />
-    <textarea rows="4" placeholder="Description..."></textarea>
-    <input type="file" accept="image/*" />
-    <button>Enregistrer la création</button>
+    <h2>Ajouter une création</h2>
+    <input type="text" id="titre" placeholder="Titre de la création" />
+    <textarea id="description" rows="4" placeholder="Description..."></textarea>
+    <input type="file" id="image" accept="image/*" />
+    <div class="preview" id="preview"></div>
+    <button onclick="sauvegarderCreation()">Enregistrer</button>
+    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
+
+  <script>
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('preview');
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Aperçu"/>`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function sauvegarderCreation() {
+      const titre = document.getElementById('titre').value;
+      const description = document.getElementById('description').value;
+      const image = imageInput.files[0];
+
+      if (!titre || !description || !image) {
+        alert('Remplis tous les champs !');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+        creations.push({ titre, description, image: reader.result });
+        localStorage.setItem('creations', JSON.stringify(creations));
+        alert('Création enregistrée !');
+        window.location.href = 'creations.html';
+      };
+      reader.readAsDataURL(image);
+    }
+  </script>
 </body>
 </html>
