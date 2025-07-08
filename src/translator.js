@@ -1,20 +1,29 @@
-import axios from 'axios';
+const fetch = require("node-fetch");
 
-const translateText = async (text, from = 'en', to = 'fr') => {
+exports.handler = async function(event) {
   try {
-    const res = await axios.post('https://libretranslate.com/translate', {
-      q: text,
-      source: from,
-      target: to,
-      format: 'text'
-    }, {
-      headers: { accept: 'application/json' }
+    const { text, language } = JSON.parse(event.body);
+
+    const response = await fetch("https://libretranslate.de/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        q: text,
+        source: "en",
+        target: language,
+        format: "text"
+      })
     });
-    return res.data.translatedText;
-  } catch (err) {
-    console.error('Erreur de traduction :', err);
-    return '❌ Erreur de traduction';
+
+    const data = await response.json();
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ translation: data.translatedText })
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Erreur API de traduction", details: error.message })
+    };
   }
 };
-
-export default translateText;
