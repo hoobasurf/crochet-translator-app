@@ -7,49 +7,51 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     .container {
-      max-width: 800px;
+      max-width: 600px;
       margin: 5vh auto;
       background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
       border-radius: 10px;
       backdrop-filter: blur(8px);
       text-align: center;
+      color: white;
     }
     .creation {
-      margin-bottom: 30px;
+      background-color: rgba(255,255,255,0.2);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
     }
-    img {
+    .creation img {
       max-width: 100%;
-      border-radius: 8px;
+      border-radius: 6px;
+      margin-top: 10px;
     }
-    h3 {
-      margin: 10px 0 5px;
-    }
-    p {
-      margin-bottom: 5px;
+    .creation small {
+      color: #ccc;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>🎨 Mes créations</h2>
-    <div id="liste"></div>
+    <div id="creations"></div>
     <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
     const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-    const liste = document.getElementById("liste");
+    const container = document.getElementById("creations");
 
     if (creations.length === 0) {
-      liste.innerHTML = "<p>Aucune création encore 😢</p>";
+      container.innerHTML = "<p>Aucune création enregistrée 😢</p>";
     } else {
       creations.forEach((c, i) => {
-        liste.innerHTML += `
+        container.innerHTML += `
           <div class="creation">
-            <img src="${c.image}" alt="Création ${i+1}">
-            <h3>${c.titre}</h3>
-            <p>${c.description}</p>
+            <p>${c.texte}</p>
+            ${c.image ? `<img src="${c.image}" alt="Création">` : ''}
+            <small>${c.date}</small><br>
             <button onclick="supprimer(${i})">🗑 Supprimer</button>
           </div>
         `;
