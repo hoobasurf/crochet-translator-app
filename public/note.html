@@ -3,33 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ajouter une note</title>
+  <title>Mes notes</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 5vh auto;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .note {
+      background-color: rgba(255,255,255,0.2);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    .note small {
+      color: #ccc;
+    }
+    button {
+      margin-top: 5px;
+      background: linear-gradient(to right, #e91e63, #9c27b0);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>📝 Ajouter une note</h2>
-    <textarea id="noteInput" rows="5" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="ajouterNote()">💾 Enregistrer la note</button>
-    <a href="note.html" class="btn-link">📒 Voir mes notes</a>
+    <h2>📒 Mes notes</h2>
+    <div id="notes"></div>
     <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    function ajouterNote() {
-      const input = document.getElementById("noteInput");
-      const texte = input.value.trim();
-      if (!texte) {
-        alert("Merci d'écrire quelque chose !");
-        return;
+    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+    const container = document.getElementById("notes");
+
+    if (notes.length === 0) {
+      container.innerHTML = "<p>Aucune note enregistrée 😢</p>";
+    } else {
+      notes.forEach((note, i) => {
+        container.innerHTML += `
+          <div class="note">
+            <p>${note.texte}</p>
+            <small>${note.date}</small><br>
+            <button onclick="supprimer(${i})">🗑 Supprimer</button>
+          </div>
+        `;
+      });
+    }
+
+    function supprimer(index) {
+      if (confirm("Supprimer cette note ?")) {
+        notes.splice(index, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        location.reload();
       }
-
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notes.push({ texte, date: new Date().toLocaleString() });
-      localStorage.setItem("notes", JSON.stringify(notes));
-
-      input.value = "";
-      alert("✅ Note enregistrée !");
     }
   </script>
 </body>
