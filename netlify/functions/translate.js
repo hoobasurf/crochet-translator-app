@@ -1,26 +1,24 @@
 const fetch = require("node-fetch");
 
-exports.handler = async function (event, context) {
+exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
     const response = await fetch("https://translate.argosopentech.com/translate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    const result = await response.json();
     return {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify(result),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Erreur serveur de traduction" })
+      body: JSON.stringify({ error: "Erreur lors de la traduction." }),
     };
   }
 };
