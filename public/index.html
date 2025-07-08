@@ -15,68 +15,54 @@
       background-size: cover;
       color: white;
     }
-
     .container {
       max-width: 600px;
-      margin: 8vh auto;
-      background-color: rgba(255, 255, 255, 0.08);
+      margin: 5vh auto;
+      background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
-      border-radius: 12px;
+      border-radius: 10px;
       text-align: center;
       backdrop-filter: blur(8px);
-      box-shadow: 0 0 15px rgba(255,255,255,0.15);
     }
-
     h1 {
       margin-bottom: 20px;
-      font-weight: 500;
     }
-
     textarea {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       margin-bottom: 15px;
-      border-radius: 6px;
+      border-radius: 5px;
       border: none;
       resize: vertical;
-      font-size: 15px;
     }
-
     button, .btn-link {
       display: block;
       width: 100%;
       padding: 12px;
       margin: 10px 0;
       font-size: 16px;
-      background-color: #ffffffcc;
+      background-color: #ffffffaa;
       color: #000;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       text-decoration: none;
     }
-
     .output {
       margin-top: 20px;
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px;
       border-radius: 6px;
     }
-
-    input[type="file"] {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Traduction / OCR</h1>
-
     <textarea id="inputText" rows="4" placeholder="Collez le texte ici..."></textarea>
     <button onclick="translateText()">Traduire le texte</button>
-
     <button onclick="document.getElementById('fileInput').click()">Convertir une image/PDF</button>
-    <input type="file" id="fileInput" accept="image/*,application/pdf" />
+    <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none;" />
 
     <div id="output" class="output"></div>
 
