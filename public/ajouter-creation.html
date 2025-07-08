@@ -2,59 +2,83 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Ajouter une création</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mes Créations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-attachment: fixed;
       margin: 0;
       font-family: sans-serif;
-      color: white;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
-    .container {
-      background-color: rgba(0,0,0,0.6);
+
+    #container {
+      background-color: rgba(255, 255, 255, 0.85);
+      max-width: 800px;
+      margin: 20px auto;
       padding: 20px;
-      margin: 40px auto;
-      max-width: 600px;
-      border-radius: 12px;
+      border-radius: 10px;
     }
-    input, textarea {
+
+    textarea {
       width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .creation {
+      background: #fff;
       padding: 10px;
       margin-top: 10px;
       border-radius: 5px;
-      border: none;
     }
-    button {
-      background-color: #ff69b4;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin-top: 10px;
-      border-radius: 5px;
+
+    a {
+      text-decoration: none;
+      color: #333;
+      display: inline-block;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Ajouter une création</h1>
-    <input type="text" id="titre" placeholder="Titre de la création" />
-    <textarea id="contenu" rows="6" placeholder="Décris ta création ici..."></textarea>
-    <button onclick="sauver()">Enregistrer</button>
-    <p id="confirmation" style="margin-top:10px;"></p>
+  <div id="container">
+    <a href="index.html">⬅️ Retour à l'accueil</a>
+    <h2>✏️ Ajouter une création</h2>
+    <textarea id="creationInput" rows="4" placeholder="Écris ta création ici..."></textarea>
+    <button onclick="saveCreation()">Enregistrer</button>
+
+    <h3>📂 Mes créations enregistrées :</h3>
+    <div id="creationList"></div>
   </div>
 
   <script>
-    function sauver() {
-      const titre = document.getElementById("titre").value;
-      const contenu = document.getElementById("contenu").value;
-      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-      creations.push({ titre, contenu });
-      localStorage.setItem("creations", JSON.stringify(creations));
-      document.getElementById("confirmation").textContent = "✅ Création enregistrée !";
+    function saveCreation() {
+      const input = document.getElementById('creationInput').value.trim();
+      if (!input) return;
+
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      creations.push(input);
+      localStorage.setItem('creations', JSON.stringify(creations));
+      document.getElementById('creationInput').value = '';
+      displayCreations();
     }
+
+    function displayCreations() {
+      const container = document.getElementById('creationList');
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      container.innerHTML = creations.map(text => `<div class="creation">${text}</div>`).join('');
+    }
+
+    displayCreations();
   </script>
 </body>
 </html>
