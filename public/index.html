@@ -4,152 +4,169 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Traducteur Crochet</title>
-
+  <link rel="icon" href="favicon.png" type="image/png" />
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      padding: 0;
+      font-family: sans-serif;
+      background-image: url('fond-accueil.jpg');
       background-size: cover;
-      color: #222;
+      background-position: center;
+      background-attachment: fixed;
     }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
+
+    #root {
       padding: 20px;
-      background: rgba(255,255,255,0.85);
-      border-radius: 8px;
-      text-align: center;
     }
-    a.button {
-      background-color: #444;
-      color: white;
-      padding: 10px 15px;
-      margin: 5px;
-      display: inline-block;
-      border-radius: 5px;
-      text-decoration: none;
-      font-size: 14px;
+
+    .main-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 800px;
+      margin: 50px auto;
     }
-    label, textarea {
-      display: block;
-      width: 100%;
-      margin-top: 15px;
+
+    a.button-link {
+      background-color:#444;
+      color:white;
+      padding:10px 15px;
+      border-radius:5px;
+      text-decoration:none;
+      font-size:14px;
+      display:inline-block;
+      margin: 10px;
     }
-    textarea {
-      height: 100px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #aaa;
-      resize: vertical;
-    }
+
     #output {
       white-space: pre-wrap;
       margin-top: 20px;
       padding: 15px;
       background: #f4f4f4;
       border-radius: 8px;
-      text-align: left;
+      color: black;
     }
   </style>
-  
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>🧶 Traducteur Crochet</h1>
-    
-    <a href="https://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" class="button">📘 Lexique US → FR</a>
-    <a href="ajouter-creation.html" class="button">➕ Ajouter Création</a>
-    <a href="note.html" class="button">📝 Note</a>
-    
-    <label>
-      📄 Importer un fichier (image, PDF, texte) :
-      <input type="file" id="fileInput" accept="image/*,.txt,.pdf" />
-    </label>
-    
-    <label>
-      📷 Utiliser la caméra :
-      <input type="file" accept="image/*" capture="environment" id="cameraInput" />
-    </label>
+  <div class="main-container">
+    <div style="text-align:center;">
+      <a href="lexique.html" class="button-link">📘 Lexique US → FR</a>
+      <a href="ajouter-creation.html" class="button-link">➕ Ajouter une création</a>
+      <a href="note.html" class="button-link">📝 Mes notes</a>
 
-    <textarea id="manualInput" placeholder="Ou colle ton texte ici..."></textarea>
-    <button onclick="translateManual()">🌍 Traduire le texte</button>
+      <label style="display:block; margin-top:10px;">
+        📄 Importer un fichier (image, PDF, texte) :
+        <input type="file" id="fileInput" accept="image/*,.txt,.pdf" />
+      </label>
 
-    <div id="output">Résultat...</div>
+      <label style="display:block; margin-top:10px;">
+        📷 Utiliser la caméra :
+        <input type="file" accept="image/*" capture="environment" id="cameraInput">
+      </label>
+    </div>
+
+    <div id="output"></div>
   </div>
 
   <script>
+    function convertMeasurements(text) {
+      return text
+        .replace(/\b(inch|inches|in)\b/gi, 'cm')
+        .replace(/\b(yard|yards|yd)\b/gi, 'm')
+        .replace(/\bounce|oz\b/gi, 'g')
+        .replace(/\bpound|lb\b/gi, 'kg');
+    }
+
     async function translateText(text) {
       try {
-        const res = await fetch('https://translate.argosopentech.com/translate', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({q: text, source:'en', target:'fr', format:'text'})
+        const response = await fetch("https://translate.argosopentech.com/translate", {
+          method: "POST",
+          body: JSON.stringify({
+            q: text,
+            source: "en",
+            target: "fr",
+            format: "text"
+          }),
+          headers: { "Content-Type": "application/json" }
         });
-        const json = await res.json();
-        return json.translatedText;
-      } catch {
-        return '❌ API indisponible.';
-      }
-    }
-    async function translateManual() {
-      const out = document.getElementById('output');
-      const txt = document.getElementById('manualInput').value.trim();
-      if (!txt) { out.textContent = '🛑 Aucun texte.'; return; }
-      out.textContent = '⏳ Traduction en cours...';
-      const t = await translateText(txt);
-      out.textContent = t;
-    }
-    
-    function convertMeasurements(text) {
-      return text.replace(/\b(inch|inches|in)\b/gi,'cm')
-                 .replace(/\b(yard|yards|yd)\b/gi,'m')
-                 .replace(/\b(ounce|oz)\b/gi,'g')
-                 .replace(/\b(pound|lb)\b/gi,'kg');
-    }
-    async function ocrPdf(file) {
-      const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
-      let all = '';
-      for (let i=1;i<=pdf.numPages;i++){
-        const p=await pdf.getPage(i);
-        const vp=p.getViewport({scale:2});
-        const c=document.createElement('canvas');
-        c.width=vp.width; c.height=vp.height;
-        await p.render({canvasContext:c.getContext('2d'), viewport: vp}).promise;
-        const { data:{text}} = await Tesseract.recognize(c,'eng');
-        all+=text+'\n';
-      }
-      return all;
-    }
-    async function handleFile(file) {
-      const out = document.getElementById('output');
-      out.textContent = '⏳ Lecture...';
-      try {
-        let txt='';
-        if(file.type==='application/pdf') txt=await ocrPdf(file);
-        else if(file.type.startsWith('image/')) {
-          const r = await Tesseract.recognize(URL.createObjectURL(file),'eng');
-          txt=r.data.text;
-        } else if(file.type==='text/plain'){
-          txt=await file.text();
-        } else {
-          out.textContent = '❌ Format non supporté.';
-          return;
-        }
-        txt=convertMeasurements(txt);
-        out.textContent = '⏳ Traduction...';
-        const t = await translateText(txt);
-        out.textContent = t;
-      } catch {
-        out.textContent = '❌ Lecture/Traduction échouée.';
+
+        const result = await response.json();
+        return result.translatedText || "❌ Traduction non reçue.";
+      } catch (error) {
+        console.error(error);
+        return "❌ Erreur API de traduction.";
       }
     }
 
-    document.getElementById('fileInput').addEventListener('change', e=>handleFile(e.target.files[0]));
-    document.getElementById('cameraInput').addEventListener('change', e=>handleFile(e.target.files[0]));
+    async function ocrPdf(file) {
+      const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
+      const pdf = await loadingTask.promise;
+      let fullText = "";
+
+      for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({canvasContext: context, viewport}).promise;
+
+        const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
+        fullText += text + "\n\n";
+      }
+      return fullText;
+    }
+
+    async function handleFile(file) {
+      const output = document.getElementById('output');
+      output.textContent = "⏳ Lecture du fichier...";
+      let text = "";
+
+      try {
+        if (file.type === "application/pdf") {
+          text = await ocrPdf(file);
+        } else if (file.type.startsWith("image/")) {
+          const { data: { text: imageText } } = await Tesseract.recognize(URL.createObjectURL(file), 'eng');
+          text = imageText;
+        } else if (file.type === "text/plain") {
+          const reader = new FileReader();
+          reader.onload = async function(e) {
+            const plainText = e.target.result;
+            const converted = convertMeasurements(plainText);
+            const translated = await translateText(converted);
+            output.textContent = "📝 Texte converti et traduit :\n\n" + translated;
+          };
+          reader.readAsText(file);
+          return;
+        } else {
+          output.textContent = "❌ Format non supporté.";
+          return;
+        }
+
+        const converted = convertMeasurements(text);
+        const translated = await translateText(converted);
+        output.textContent = "📝 Texte détecté, converti et traduit :\n\n" + translated;
+      } catch (err) {
+        output.textContent = "❌ Erreur durant l'OCR ou la traduction.";
+        console.error(err);
+      }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    document.getElementById('cameraInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
   </script>
 </body>
 </html>
