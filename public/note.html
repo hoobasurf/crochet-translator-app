@@ -2,83 +2,54 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Mes Notes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ajouter une note</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
       margin: 0;
+      padding: 0;
       font-family: sans-serif;
-      background-image: url('fond-accueil.jpg');
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      color: white;
     }
-
-    #container {
-      background-color: rgba(255, 255, 255, 0.85);
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
+    .container {
+      max-width: 600px;
+      margin: 5vh auto;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
       border-radius: 10px;
+      text-align: center;
+      backdrop-filter: blur(8px);
     }
-
     textarea {
       width: 100%;
       padding: 10px;
       border-radius: 5px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    .note {
-      background: #fff;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-    }
-
-    a {
-      text-decoration: none;
-      color: #333;
-      display: inline-block;
+      border: none;
       margin-bottom: 10px;
+    }
+    button, .btn-link {
+      padding: 12px;
+      font-size: 16px;
+      background-color: #ffffffaa;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin: 10px 0;
+      text-decoration: none;
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <a href="index.html">⬅️ Retour à l'accueil</a>
-    <h2>🗒️ Ajouter une note</h2>
-    <textarea id="noteInput" rows="4" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="saveNote()">Enregistrer</button>
-
-    <h3>🗂️ Mes notes enregistrées :</h3>
-    <div id="noteList"></div>
+  <div class="container">
+    <h2>Ajouter une note</h2>
+    <textarea rows="6" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="history.back()">⬅ Retour</button>
+    <button onclick="alert('Note enregistrée ✅')">💾 Enregistrer</button>
   </div>
-
-  <script>
-    function saveNote() {
-      const input = document.getElementById('noteInput').value.trim();
-      if (!input) return;
-
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      notes.push(input);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      document.getElementById('noteInput').value = '';
-      displayNotes();
-    }
-
-    function displayNotes() {
-      const container = document.getElementById('noteList');
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      container.innerHTML = notes.map(text => `<div class="note">${text}</div>`).join('');
-    }
-
-    displayNotes();
-  </script>
 </body>
 </html>
