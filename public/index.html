@@ -1,164 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traducteur Crochet</title>
-
-  <!-- Fond d'écran -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crochet Steph</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <style>
     body {
       margin: 0;
+      padding: 0;
       font-family: sans-serif;
-      background-image: url('fond-accueil.jpg');
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    }
-
-    #content-wrapper {
-      background-color: rgba(255, 255, 255, 0.85);
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 800px;
-      margin: auto;
-      margin-top: 20px;
-    }
-
-    .button-link {
-      background-color: #444;
       color: white;
-      padding: 10px 15px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 5vh auto;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
       border-radius: 5px;
+      border: none;
+      resize: vertical;
+    }
+    button, .btn-link {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      background-color: #ffffffaa;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
       text-decoration: none;
-      font-size: 14px;
-      display: inline-block;
-      margin: 5px;
+    }
+    .output {
+      margin-top: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 6px;
     }
   </style>
-
-  <!-- Librairies -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
-  <div id="content-wrapper">
-    <div style="text-align:center;">
-      <a href="lexique.html" class="button-link">📘 Lexique US → FR</a>
-      <a href="ajouter-creation.html" class="button-link">📂 Mes créations</a>
-      <a href="note.html" class="button-link">🗒️ Mes notes</a>
-    </div>
+  <div class="container">
+    <h1>Traduction / OCR</h1>
+    <textarea id="inputText" rows="4" placeholder="Collez le texte ici..."></textarea>
+    <button onclick="translateText()">Traduire le texte</button>
+    <button onclick="document.getElementById('fileInput').click()">Convertir une image/PDF</button>
+    <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none;" />
 
-    <label style="display:block; margin-top:15px;">
-      📄 Importer un fichier (image, PDF, texte) :
-      <input type="file" id="fileInput" accept="image/*,.txt,.pdf" />
-    </label>
+    <div id="output" class="output"></div>
 
-    <label style="display:block; margin-top:10px;">
-      📷 Utiliser la caméra :
-      <input type="file" accept="image/*" capture="environment" id="cameraInput">
-    </label>
-
-    <div style="margin-top: 15px;">
-      🖊️ Texte à traduire :
-      <textarea id="manualText" rows="4" style="width:100%; padding:10px; border-radius:5px;"></textarea>
-      <button onclick="translateManualText()" style="margin-top:10px;">Traduire</button>
-    </div>
-
-    <div id="output" style="white-space: pre-wrap; margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px;"></div>
+    <a href="ajouter-creation.html" class="btn-link">➕ Ajouter une création</a>
+    <a href="note.html" class="btn-link">📝 Ajouter une note</a>
+    <a href="creations.html" class="btn-link">🎨 Mes créations</a>
+    <a href="notes.html" class="btn-link">📒 Mes notes</a>
   </div>
 
   <script>
-    function convertMeasurements(text) {
-      return text
-        .replace(/\b(inch|inches|in)\b/gi, 'cm')
-        .replace(/\b(yard|yards|yd)\b/gi, 'm')
-        .replace(/\bounce|oz\b/gi, 'g')
-        .replace(/\bpound|lb\b/gi, 'kg');
-    }
+    async function translateText() {
+      const input = document.getElementById("inputText").value;
+      const output = document.getElementById("output");
+      if (!input.trim()) {
+        output.innerText = "❌ Aucun texte à traduire.";
+        return;
+      }
 
-    async function translateText(text) {
       try {
-        const response = await fetch('https://translate.argosopentech.com/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("https://translate.argosopentech.com/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            q: text,
-            source: 'en',
-            target: 'fr',
-            format: 'text'
+            q: input,
+            source: "fr",
+            target: "en",
+            format: "text"
           })
         });
 
+        if (!response.ok) throw new Error("Erreur API");
+
         const data = await response.json();
-        return data.translatedText || "❌ Erreur API de traduction.";
-      } catch (e) {
-        return "❌ Erreur API de traduction.";
+        output.innerHTML = `<strong>✅ Traduction :</strong><br>${data.translatedText}`;
+      } catch (err) {
+        output.innerHTML = "❌ Erreur API de traduction.";
       }
-    }
-
-    async function handleFile(file) {
-      const output = document.getElementById('output');
-      if (file.type === "application/pdf") {
-        output.textContent = "⏳ Lecture et reconnaissance PDF...";
-        const loadingTask = pdfjsLib.getDocument(URL.createObjectURL(file));
-        const pdf = await loadingTask.promise;
-        let fullText = "";
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: 2 });
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          await page.render({ canvasContext: context, viewport }).promise;
-
-          const { data: { text } } = await Tesseract.recognize(canvas, 'eng');
-          fullText += text + "\n\n";
-        }
-
-        const convertedText = convertMeasurements(fullText);
-        const translated = await translateText(convertedText);
-        output.textContent = "📝 Texte détecté, converti et traduit :\n\n" + translated;
-      }
-      else if (file.type.startsWith("image/")) {
-        output.textContent = "⏳ Lecture de l'image...";
-        const imageURL = URL.createObjectURL(file);
-        const { data: { text } } = await Tesseract.recognize(imageURL, 'eng');
-        const convertedText = convertMeasurements(text);
-        const translated = await translateText(convertedText);
-        output.textContent = "📝 Texte détecté, converti et traduit :\n\n" + translated;
-      }
-      else if (file.type === "text/plain") {
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          const text = e.target.result;
-          const convertedText = convertMeasurements(text);
-          const translated = await translateText(convertedText);
-          output.textContent = "📝 Texte converti et traduit :\n\n" + translated;
-        };
-        reader.readAsText(file);
-      } else {
-        output.textContent = "❌ Format non supporté.";
-      }
-    }
-
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) handleFile(file);
-    });
-
-    document.getElementById('cameraInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) handleFile(file);
-    });
-
-    async function translateManualText() {
-      const text = document.getElementById('manualText').value;
-      const converted = convertMeasurements(text);
-      const translated = await translateText(converted);
-      document.getElementById('output').textContent = "📝 Texte converti et traduit :\n\n" + translated;
     }
   </script>
 </body>
