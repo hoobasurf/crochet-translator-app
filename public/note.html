@@ -2,48 +2,53 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Notes personnelles</title>
+  <title>Mes notes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #fefefe;
-      padding: 40px 20px;
-      color: #333;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      margin: 0;
+      font-family: sans-serif;
+      color: white;
     }
     .container {
+      background-color: rgba(0,0,0,0.6);
+      padding: 20px;
+      margin: 40px auto;
       max-width: 600px;
-      margin: auto;
+      border-radius: 12px;
     }
-    h1 {
-      text-align: center;
-    }
-    textarea {
-      width: 100%;
-      height: 300px;
+    .note {
+      background-color: rgba(255,255,255,0.8);
+      color: black;
       padding: 10px;
-      margin-top: 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    .button {
-      display: inline-block;
-      background: #444;
-      color: white;
-      padding: 10px 15px;
-      text-decoration: none;
+      margin-bottom: 10px;
       border-radius: 5px;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📝 Note personnelle</h1>
-    <textarea placeholder="Écris ici ta note..."></textarea><br/>
-    <a href="index.html" class="button">⬅️ Retour à l'accueil</a>
-    <a href="#" class="button" onclick="alert('Note sauvegardée (simulation)')">💾 Sauvegarder</a>
+    <h1>Mes créations enregistrées</h1>
+    <div id="liste"></div>
   </div>
+
+  <script>
+    const liste = document.getElementById("liste");
+    const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+
+    if (creations.length === 0) {
+      liste.innerHTML = "<p>Aucune création encore enregistrée.</p>";
+    } else {
+      creations.forEach(({ titre, contenu }) => {
+        const note = document.createElement("div");
+        note.className = "note";
+        note.innerHTML = "<h3>" + titre + "</h3><p>" + contenu + "</p>";
+        liste.appendChild(note);
+      });
+    }
+  </script>
 </body>
 </html>
