@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajouter une note</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mes notes</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     .container {
       max-width: 600px;
@@ -12,39 +12,51 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 30px;
       border-radius: 10px;
-      text-align: center;
       backdrop-filter: blur(8px);
+      text-align: center;
     }
-    textarea {
-      width: 100%;
-      height: 150px;
-      margin: 15px 0;
-      padding: 10px;
+    .note {
+      background-color: rgba(255,255,255,0.2);
+      padding: 15px;
+      margin: 10px 0;
       border-radius: 6px;
-      border: none;
+    }
+    .note small {
+      color: #ccc;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Ajouter une note</h2>
-    <textarea id="note" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="sauvegarderNote()">Enregistrer</button>
+    <h2>📒 Mes notes</h2>
+    <div id="notes"></div>
     <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    function sauvegarderNote() {
-      const texte = document.getElementById("note").value;
-      if (!texte.trim()) {
-        alert("Note vide !");
-        return;
+    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+    const container = document.getElementById("notes");
+
+    if (notes.length === 0) {
+      container.innerHTML = "<p>Aucune note enregistrée 😢</p>";
+    } else {
+      notes.forEach((note, i) => {
+        container.innerHTML += `
+          <div class="note">
+            <p>${note.texte}</p>
+            <small>${note.date}</small><br>
+            <button onclick="supprimer(${i})">🗑 Supprimer</button>
+          </div>
+        `;
+      });
+    }
+
+    function supprimer(index) {
+      if (confirm("Supprimer cette note ?")) {
+        notes.splice(index, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        location.reload();
       }
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notes.push({ texte, date: new Date().toLocaleString() });
-      localStorage.setItem("notes", JSON.stringify(notes));
-      alert("Note enregistrée !");
-      window.location.href = "notes.html";
     }
   </script>
 </body>
