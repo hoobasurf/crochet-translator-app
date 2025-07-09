@@ -1,93 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Traduction Crochet</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>🧶 Traduction Crochet</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traduction de texte</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🧶 Traduire une description de crochet</h1>
+    <textarea id="inputText" rows="6" placeholder="Entrez une description en anglais..."></textarea>
+    <button onclick="translateText()">Traduire</button>
+    <div class="output" id="outputText"></div>
+    <a class="btn-link" href="note.html">📒 Mes notes</a>
+    <a class="btn-link" href="image.html">🖼️ Convertir une image PDF</a>
+  </div>
 
-      <div class="translator-section">
-        <textarea id="inputText" placeholder="Écris ton texte à traduire..."></textarea>
-        <select id="languageSelect">
-          <option value="en">Anglais</option>
-          <option value="es">Espagnol</option>
-          <option value="de">Allemand</option>
-          <option value="it">Italien</option>
-        </select>
-        <button onclick="translateText()">🔤 Traduire</button>
-        <div id="translatedResult" class="result-box"></div>
-      </div>
+  <script>
+    async function translateText() {
+      const text = document.getElementById("inputText").value;
+      const output = document.getElementById("outputText");
+      output.innerHTML = "⏳ Traduction en cours...";
 
-      <hr />
+      try {
+        const response = await fetch("/.netlify/functions/translate", {
+          method: "POST",
+          body: JSON.stringify({ text }),
+        });
 
-      <div class="upload-section">
-        <h2>📷 Convertir une image PDF</h2>
-        <input type="file" id="imageInput" accept="image/*,application/pdf" onchange="handleImageUpload()" />
-        <div id="imagePreview" class="image-preview"></div>
-      </div>
+        const data = await response.json();
 
-      <hr />
-
-      <div class="notes-section">
-        <a href="note.html"><button>📒 Mes notes</button></a>
-      </div>
-    </div>
-
-    <script>
-      async function translateText() {
-        const inputText = document.getElementById("inputText").value;
-        const targetLang = document.getElementById("languageSelect").value;
-        const resultBox = document.getElementById("translatedResult");
-
-        resultBox.textContent = "⏳ Traduction en cours...";
-
-        try {
-          const response = await fetch("/.netlify/functions/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: inputText, targetLang })
-          });
-
-          const data = await response.json();
-
-          if (data.translatedText) {
-            resultBox.textContent = `✅ ${data.translatedText}`;
-          } else {
-            resultBox.textContent = "❌ Erreur API de traduction.";
-          }
-        } catch (error) {
-          resultBox.textContent = "❌ Erreur de communication avec l'API.";
-        }
-      }
-
-      function handleImageUpload() {
-        const input = document.getElementById("imageInput");
-        const preview = document.getElementById("imagePreview");
-
-        if (input.files && input.files[0]) {
-          const file = input.files[0];
-          const reader = new FileReader();
-
-          reader.onload = function (e) {
-            // Image
-            if (file.type.startsWith("image/")) {
-              preview.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée" class="preview-img"/>`;
-            }
-            // PDF
-            else if (file.type === "application/pdf") {
-              preview.innerHTML = `<embed src="${e.target.result}" type="application/pdf" width="100%" height="500px"/>`;
-            }
-          };
-
-          reader.readAsDataURL(file);
+        if (response.ok) {
+          output.innerHTML = `<strong>Résultat :</strong><br>${data.translatedText}`;
         } else {
-          preview.innerHTML = "";
+          output.innerHTML = "❌ Erreur API de traduction.";
         }
+      } catch (error) {
+        output.innerHTML = "⚠️ Une erreur est survenue.";
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
