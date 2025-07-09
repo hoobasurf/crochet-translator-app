@@ -1,36 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Convertir une image PDF</title>
+  <meta charset="UTF-8">
+  <title>Convertir Image PDF</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🖼️ Convertir une image PDF</h1>
-    <input type="file" id="imageInput" accept="image/*,application/pdf" />
-    <div id="imagePreview" class="output"></div>
-    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
+    <h1>🖼 Convertir une image PDF</h1>
+    <input type="file" accept="image/*" id="imageInput" />
+    <div id="preview" class="output"></div>
+    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
     const input = document.getElementById("imageInput");
-    const preview = document.getElementById("imagePreview");
+    const preview = document.getElementById("preview");
 
     input.addEventListener("change", () => {
       const file = input.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = () => {
-        if (file.type.startsWith("image/")) {
-          preview.innerHTML = `<img src="${reader.result}" style="max-width:100%; border-radius:10px;">`;
-        } else if (file.type === "application/pdf") {
-          preview.innerHTML = `<p>📄 Fichier PDF sélectionné : ${file.name}</p>`;
-        } else {
-          preview.innerHTML = `<p>❌ Format non supporté.</p>`;
-        }
+      reader.onload = function (e) {
+        preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%; border-radius:8px;" />`;
       };
       reader.readAsDataURL(file);
     });
