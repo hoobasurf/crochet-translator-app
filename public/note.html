@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes Notes</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Mes notes</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>📒 Mes notes</h1>
-    <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="sauverNote()">Sauvegarder</button>
-    <div id="notesList" class="output"></div>
-    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
+
+    <textarea id="noteInput" rows="8" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="saveNote()">💾 Enregistrer la note</button>
+
+    <div class="output" id="savedNote">
+      <p>Aucune note enregistrée 😢</p>
+    </div>
+
+    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    function sauverNote() {
-      const input = document.getElementById("noteInput").value;
-      if (!input) return;
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notes.push({ text: input, date: new Date().toLocaleString() });
-      localStorage.setItem("notes", JSON.stringify(notes));
-      document.getElementById("noteInput").value = "";
-      afficherNotes();
+    function saveNote() {
+      const content = document.getElementById("noteInput").value.trim();
+      if (!content) {
+        alert("Merci d’écrire quelque chose !");
+        return;
+      }
+      localStorage.setItem("userNote", content);
+      displayNote();
     }
 
-    function afficherNotes() {
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      const list = notes.map(note => `
-        <div class="note">
-          <p>${note.text}</p>
-          <small>${note.date}</small>
-        </div>`).join("") || "Aucune note enregistrée 😢";
-      document.getElementById("notesList").innerHTML = list;
+    function displayNote() {
+      const note = localStorage.getItem("userNote");
+      const output = document.getElementById("savedNote");
+      if (note) {
+        output.innerHTML = `<div class="note">${note}<br><small>✔️ Enregistré localement</small></div>`;
+      } else {
+        output.innerHTML = `<p>Aucune note enregistrée 😢</p>`;
+      }
     }
 
-    afficherNotes();
+    window.onload = displayNote;
   </script>
 </body>
 </html>
