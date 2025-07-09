@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Outil de traduction intelligente</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Traduire à partir d’un fichier, d’une image ou d’un lien</h1>
+
+    <h2>1. 📷 Image locale</h2>
+    <input type="file" accept="image/*" id="imageInput">
+    <button onclick="handleImage()">Extraire et traduire</button>
+
+    <h2>2. 📁 Fichier texte / PDF</h2>
+    <input type="file" accept=".txt, .pdf" id="fileInput">
+    <button onclick="handleFile()">Lire et traduire</button>
+
+    <h2>3. 🔗 URL d’image</h2>
+    <input type="text" id="urlInput" placeholder="Colle une URL d’image ou de page">
+    <button onclick="handleURL()">Charger et traduire</button>
+
+    <div class="output" id="preview"></div>
+    <div class="output" id="originalText"></div>
+    <div class="output" id="translatedText"></div>
+
+    <a href="index.html" class="btn-link">⬅ Retour à l’accueil</a>
+  </div>
+
+  <!-- OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+
+  <script>
+    async function translateText(text) {
+      const res = await fetch("/.netlify/functions/translate", {
+        method: "POST",
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      document.getElementById("translatedText").innerHTML =
+        `<strong>🈯 Traduction :</strong><br>${data.translatedText || data.error}`;
+    }
+
+    async function handleImage() {
+      const file = document.getElementById("imageInput").files[0];
+      if (!file) return alert("Choisis une image.");
+
+      const imgURL = URL.createObjectURL(file);
+      document.getElementById("preview").innerHTML = `<img src="${imgURL}" style="max-width:100%; border-radius:10px;">`;
+      document.getElementById("originalText").innerText = "📖 Lecture du texte...";
+
+      const result = await Tesseract.recognize(imgURL, 'eng');
+      const text = result.data.text;
+      document.getElementById("originalText").innerHTML = `<strong>Texte détecté :</strong><br>${text}`;
+      translateText(text);
+    }
+
+    async function handleFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return alert("Choisis un fichier.");
+
+      if (file.type === "application/pdf") {
+        document.getElementById("originalText").innerHTML = "❌ Lecture de PDF non encore intégrée. (Prévu avec pdf.js)";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = reader.result;
+        document.getElementById("originalText").innerHTML = `<strong>Contenu :</strong><br>${text}`;
+        translateText(text);
+      };
+      reader.readAsText(file);
+    }
+
+    async function handleURL() {
+      const url = document.getElementById("urlInput").value;
+      if (!url) return alert("Colle une URL valide.");
+
+      document.getElementById("preview").innerHTML = `<img src="${url}" style="max-width:100%; border-radius:10px;">`;
+      document.getElementById("originalText").innerText = "📖 Lecture de l’image distante...";
+
+      const result = await Tesseract.recognize(url, 'eng');
+      const text = result.data.text;
+      document.getElementById("originalText").innerHTML = `<strong>Texte détecté :</strong><br>${text}`;
+      translateText(text);
+    }
+  </script>
+</body>
+</html>
