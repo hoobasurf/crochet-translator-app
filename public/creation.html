@@ -3,78 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes Créations</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Créations</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h2>🎨 Mes créations</h2>
-
-    <input type="text" id="titre" placeholder="Titre"/><br/>
-    <textarea id="description" rows="3" placeholder="Description..."></textarea><br/>
-    <input type="file" id="image" accept="image/*"/><br/>
-    <button onclick="ajouterCreation()">Ajouter</button>
-
-    <div id="creationsList"></div>
-
-    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
+    <h2>Mes Créations</h2>
+    <input type="file" id="creationInput" accept="image/*" />
+    <button onclick="addCreation()">Ajouter une création</button>
+    <div id="creationContainer"></div>
+    <a class="btn-link" href="index.html">⬅ Retour</a>
   </div>
 
   <script>
-    function afficherCreations() {
-      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-      const container = document.getElementById("creationsList");
-      if (creations.length === 0) {
-        container.innerHTML = "<p>Aucune création enregistrée 😢</p>";
-        return;
-      }
+    function addCreation() {
+      const input = document.getElementById("creationInput");
+      const file = input.files[0];
+      const container = document.getElementById("creationContainer");
 
-      container.innerHTML = creations.map((c, i) => `
-        <div class="note">
-          <h3>${c.titre}</h3>
-          <p>${c.description}</p>
-          ${c.image ? `<img src="${c.image}" style="max-width:100%;border-radius:6px;"/>` : ""}
-          <br/><button onclick="supprimerCreation(${i})">🗑 Supprimer</button>
-        </div>
-      `).join("");
+      if (!file) return;
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.style.maxWidth = "100%";
+      img.style.marginBottom = "10px";
+
+      container.prepend(img);
+      input.value = "";
     }
-
-    function ajouterCreation() {
-      const titre = document.getElementById("titre").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const fichier = document.getElementById("image").files[0];
-
-      if (!titre || !description) return alert("Remplis tous les champs");
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const imageBase64 = e.target.result;
-        const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-        creations.push({ titre, description, image: imageBase64 });
-        localStorage.setItem("creations", JSON.stringify(creations));
-        document.getElementById("titre").value = "";
-        document.getElementById("description").value = "";
-        document.getElementById("image").value = "";
-        afficherCreations();
-      };
-
-      if (fichier) reader.readAsDataURL(fichier);
-      else {
-        const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-        creations.push({ titre, description, image: "" });
-        localStorage.setItem("creations", JSON.stringify(creations));
-        afficherCreations();
-      }
-    }
-
-    function supprimerCreation(index) {
-      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-      creations.splice(index, 1);
-      localStorage.setItem("creations", JSON.stringify(creations));
-      afficherCreations();
-    }
-
-    afficherCreations();
   </script>
 </body>
 </html>
