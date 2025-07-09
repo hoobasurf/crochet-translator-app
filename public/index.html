@@ -3,17 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Accueil - Crochet App</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Traducteur de Crochet</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>📌 Bienvenue</h1>
+    <h1>Traducteur Crochet 🧶</h1>
+
+    <h2>Traduire un texte</h2>
+    <textarea id="inputText" rows="6" placeholder="Écris ou colle ton texte ici..."></textarea>
+    <button onclick="translateText()">Traduire</button>
+    <div class="output" id="output"></div>
 
     <a class="btn-link" href="translator.html">Traduire une image, un fichier ou une URL</a>
-    <a class="btn-link" href="text.html">Traduire un texte</a>
-    <a class="btn-link" href="note.html">📝 Note</a>
-    <a class="btn-link" href="creation.html">🎨 Création</a>
+    <a class="btn-link" href="note.html">Notes</a>
+    <a class="btn-link" href="creation.html">Créations</a>
   </div>
+
+  <script>
+    async function translateText() {
+      const text = document.getElementById('inputText').value;
+      const res = await fetch('/.netlify/functions/translate', {
+        method: 'POST',
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      document.getElementById('output').innerText = data.translatedText || data.error;
+    }
+  </script>
 </body>
 </html>
