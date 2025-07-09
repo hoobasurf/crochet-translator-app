@@ -1,73 +1,43 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notes</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>📒 Notes</h1>
-    <textarea id="noteInput" rows="4" placeholder="Écris une note..."></textarea>
-    <input type="file" id="noteImage" accept="image/*">
-    <button onclick="addNote()">Ajouter</button>
+    <h2>Mes Notes</h2>
+    <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
+    <input type="file" id="noteImage" accept="image/*" />
+    <button onclick="addNote()">Ajouter la note</button>
     <div id="notesContainer"></div>
+    <a class="btn-link" href="index.html">⬅ Retour</a>
   </div>
 
   <script>
-    let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-
     function addNote() {
-      const text = document.getElementById("noteInput").value;
+      const noteText = document.getElementById("noteInput").value;
       const file = document.getElementById("noteImage").files[0];
+      const container = document.getElementById("notesContainer");
 
-      if (!text && !file) return;
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const note = {
-          text,
-          image: file ? reader.result : null,
-          date: new Date().toLocaleString()
-        };
-        notes.push(note);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        displayNotes();
-      };
-
+      const note = document.createElement("div");
+      note.className = "note";
+      note.innerHTML = `<p>${noteText}</p><small>${new Date().toLocaleString()}</small>`;
+      
       if (file) {
-        reader.readAsDataURL(file);
-      } else {
-        reader.onload();
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.style.maxWidth = "100%";
+        img.style.marginTop = "10px";
+        note.appendChild(img);
       }
 
+      container.prepend(note);
       document.getElementById("noteInput").value = "";
       document.getElementById("noteImage").value = "";
     }
-
-    function displayNotes() {
-      const container = document.getElementById("notesContainer");
-      container.innerHTML = "";
-
-      if (notes.length === 0) {
-        container.innerHTML = "<p>Aucune note enregistrée 😢</p>";
-        return;
-      }
-
-      notes.forEach(note => {
-        const div = document.createElement("div");
-        div.className = "note";
-        div.innerHTML = `
-          <p>${note.text}</p>
-          ${note.image ? `<img src="${note.image}" style="max-width:100%; border-radius:8px;" />` : ""}
-          <small>${note.date}</small>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    displayNotes();
   </script>
 </body>
 </html>
