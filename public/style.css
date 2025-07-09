@@ -1,99 +1,82 @@
 body {
+  font-family: 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-  background: url('fond-accueil.jpg') no-repeat center center fixed;
+  background: url('fond-ecran.jpg') no-repeat center center fixed;
   background-size: cover;
-  color: white;
-}
-.container {
-  max-width: 600px;
-  margin: 5vh auto;
-  background-color: rgba(255, 255, 255, 0.15);
-  padding: 30px;
-  border-radius: 12px;
-  text-align: center;
-  backdrop-filter: blur(8px);
-}
-h1, h2 {
-  margin-bottom: 20px;
-}
-textarea, input[type="text"], input[type="file"] {
-  width: 100%;
-  min-height: 160px;
-  font-size: 16px;
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255,255,255,0.2);
   color: #333;
-  resize: vertical;
 }
-.button, .btn-link {
-  display: block;
-  width: 80%;
-  margin: 12px auto;
-  padding: 14px;
-  font-size: 18px;
-  background: linear-gradient(to right, #e91e63, #9c27b0);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-.button:hover, .btn-link:hover {
-  transform: scale(1.05);
-}
-.output {
-  margin-top: 20px;
-  background-color: rgba(0,0,0,0.5);
-  padding: 15px;
-  border-radius: 10px;
-  text-align: left;
-  font-size: 16px;
-  color: white;
-}
-.note-card, .creation-card {
-  background-color: rgba(255,255,255,0.2);
-  padding: 15px;
-  margin: 12px 0;
-  border-radius: 10px;
-}
-.note-card img, .creation-card img {
-  max-width: 100%;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-.note-card small, .creation-card small {
-  color: #ddd;
-}
-.logo-header {
-  display: inline-block;
-  vertical-align: middle;
-}
-#chat, #yarn {
+
+.header {
+  text-align: center;
+  padding-top: 30px;
   position: relative;
+}
+
+#app-title {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
   display: inline-block;
-  vertical-align: middle;
 }
-#chat {
+
+.pelote, .chat {
   width: 60px;
-  animation: catJump 0.8s ease-out;
+  position: absolute;
+  top: 20px;
 }
-@yarn {
-  width: 50px;
-  margin-left: 10px;
-  animation: yarnRoll 2s linear infinite;
+
+.pelote {
+  left: calc(50% + 110px);
 }
-@keyframes catJump {
-  0% { transform: translateY(100px); opacity: 0; }
-  50% { transform: translateY(0) scale(1.1); opacity: 1; }
-  100% { transform: translateY(0) scale(1); }
+
+.chat {
+  left: calc(50% - 150px);
 }
-@keyframes yarnRoll {
-  0% { transform: translateX(0) rotate(0deg); }
-  100% { transform: translateX(10px) rotate(360deg); }
+
+.anime-chat {
+  animation: chatJump 2s ease-out forwards;
+}
+
+.anime-pelote {
+  animation: peloteRoll 2s ease-out forwards;
+}
+
+@keyframes chatJump {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px) rotate(-10deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+
+@keyframes peloteRoll {
+  0% { transform: translateX(0) rotate(0); }
+  100% { transform: translateX(20px) rotate(360deg); }
+}
+
+.main-buttons {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn-link {
+  display: inline-block;
+  width: 250px;
+  margin: 12px 0;
+  padding: 14px 20px;
+  font-size: 1.1em;
+  text-align: center;
+  background: linear-gradient(to right, #ffc0cb, #ff69b4);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s, background 0.3s;
+}
+
+.btn-link:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #ff69b4, #ffc0cb);
 }
