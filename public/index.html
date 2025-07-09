@@ -2,35 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Traduction et Notes</title>
+  <title>Accueil</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Bienvenue</h1>
-    
-    <!-- Encadré de texte pour écrire ou coller -->
-    <textarea id="inputText" rows="6" placeholder="Écris ou colle ici ton texte à traduire..."></textarea>
-    
-    <!-- Langue cible -->
-    <select id="targetLang">
-      <option value="">Choisir une langue</option>
-      <option value="en">Anglais</option>
-      <option value="fr">Français</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <option value="it">Italien</option>
-    </select>
+    <h1>Traduction & Création</h1>
 
-    <button onclick="translateText()">Traduire le texte</button>
-    
-    <div class="output" id="outputText"></div>
+    <textarea id="textInput" placeholder="Écris ton texte ici..."></textarea>
+    <br>
+    <button onclick="translateText()">Traduire</button>
 
-    <!-- Liens supplémentaires -->
+    <div id="output" class="output"></div>
+
+    <hr>
+
     <a class="btn-link" href="translator.html">Traduire une image, un fichier ou une URL</a>
     <a class="btn-link" href="note.html">Notes</a>
     <a class="btn-link" href="creation.html">Créations</a>
-    <a class="btn-link" href="convert.html">Convertir une image en PDF</a>
   </div>
 
   <script src="translate.js"></script>
