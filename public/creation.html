@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes créations</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mes Créations</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: url('ton-fond.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+    .content {
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 40px 60px;
+      border-radius: 15px;
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 1.5rem;
+    }
+    a {
+      display: inline-block;
+      margin-top: 30px;
+      font-size: 1.4rem;
+      color: orange;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    a:hover {
+      color: darkorange;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Mes créations</h2>
-    <textarea id="creationText" placeholder="Titre ou légende..."></textarea>
-    <input type="file" id="creationImg" accept="image/*">
-    <button class="button" onclick="addCreation()">Ajouter</button>
-    <div id="creaList"></div>
-    <a class="btn-link" href="index.html">← Retour</a>
+  <div class="content">
+    <h1>Voici mes créations</h1>
+    <p>Page en construction...</p>
+    <a href="index.html">← Retour à l'accueil</a>
   </div>
-  <script>
-function addCreation() {
-  const t = document.getElementById("creationText").value.trim();
-  const f = document.getElementById("creationImg").files[0];
-  const L = document.getElementById("creaList");
-  const d = document.createElement("div"); d.className="creation-card";
-  if (f) {
-    const img = document.createElement("img");
-    const r = new FileReader();
-    r.onload = () => img.src = r.result;
-    r.readAsDataURL(f);
-    d.appendChild(img);
-  }
-  if (t) d.appendChild(Object.assign(document.createElement("p"), { textContent: t }));
-  d.appendChild(Object.assign(document.createElement("small"), { textContent: new Date().toLocaleString() }));
-  L.prepend(d);
-  document.getElementById("creationText").value="";
-  document.getElementById("creationImg").value="";
-}
-  </script>
 </body>
 </html>
