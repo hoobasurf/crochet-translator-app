@@ -6,62 +6,94 @@ body {
   background-size: cover;
   color: white;
 }
-
 .container {
   max-width: 600px;
   margin: 5vh auto;
   background-color: rgba(255, 255, 255, 0.15);
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
   backdrop-filter: blur(8px);
 }
-
 h1, h2 {
   margin-bottom: 20px;
 }
-
-textarea {
+textarea, input[type="text"], input[type="file"] {
   width: 100%;
-  min-height: 180px;
+  min-height: 160px;
   font-size: 16px;
-  padding: 15px;
+  padding: 12px;
   margin-bottom: 20px;
   border-radius: 8px;
   border: none;
+  background: rgba(255,255,255,0.2);
+  color: #333;
   resize: vertical;
 }
-
-button, .btn-link {
-  display: inline-block;
-  width: auto;
-  padding: 12px 20px;
-  margin: 10px 5px;
-  font-size: 16px;
+.button, .btn-link {
+  display: block;
+  width: 80%;
+  margin: 12px auto;
+  padding: 14px;
+  font-size: 18px;
   background: linear-gradient(to right, #e91e63, #9c27b0);
   color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   text-decoration: none;
+  transition: transform 0.2s ease;
 }
-
+.button:hover, .btn-link:hover {
+  transform: scale(1.05);
+}
 .output {
   margin-top: 20px;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0,0,0,0.5);
   padding: 15px;
   border-radius: 10px;
-  font-size: 16px;
   text-align: left;
+  font-size: 16px;
+  color: white;
 }
-
-.note {
+.note-card, .creation-card {
   background-color: rgba(255,255,255,0.2);
   padding: 15px;
-  margin: 10px 0;
+  margin: 12px 0;
   border-radius: 10px;
 }
-
-.note small {
-  color: #ccc;
+.note-card img, .creation-card img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.note-card small, .creation-card small {
+  color: #ddd;
+}
+.logo-header {
+  display: inline-block;
+  vertical-align: middle;
+}
+#chat, #yarn {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+#chat {
+  width: 60px;
+  animation: catJump 0.8s ease-out;
+}
+@yarn {
+  width: 50px;
+  margin-left: 10px;
+  animation: yarnRoll 2s linear infinite;
+}
+@keyframes catJump {
+  0% { transform: translateY(100px); opacity: 0; }
+  50% { transform: translateY(0) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes yarnRoll {
+  0% { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(10px) rotate(360deg); }
 }
