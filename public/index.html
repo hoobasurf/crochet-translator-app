@@ -1,43 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traducteur Crochet</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Accueil - Outils de Traduction</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Traducteur Crochet 🧶</h1>
-    <textarea id="inputText" placeholder="Entrez du texte en anglais..."></textarea>
-    <button onclick="traduireTexte()">Traduire</button>
-    <div id="output" class="output"></div>
+    <h1>📌 Outils de traduction</h1>
 
-    <a href="note.html" class="btn-link">📒 Mes notes</a>
-    <a href="image.html" class="btn-link">🖼 Convertir une image PDF</a>
+    <a class="btn-link" href="translator.html">📷 Traduire une image, un fichier ou une URL</a>
+    <a class="btn-link" href="note.html">📝 Écrire une note</a>
+
   </div>
-
-  <script>
-    async function traduireTexte() {
-      const text = document.getElementById("inputText").value;
-      const output = document.getElementById("output");
-      output.innerHTML = "⏳ Traduction en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/translate", {
-          method: "POST",
-          body: JSON.stringify({ text }),
-        });
-        const data = await response.json();
-        if (data.translatedText) {
-          output.innerHTML = `📝 ${data.translatedText}`;
-        } else {
-          output.innerHTML = "❌ Erreur de traduction.";
-        }
-      } catch (error) {
-        output.innerHTML = "⚠️ Erreur serveur.";
-      }
-    }
-  </script>
 </body>
 </html>
