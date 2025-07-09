@@ -3,42 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ajouter une note</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Mes Notes</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
-    <h1>📝 Ajouter une note</h1>
-    
-    <textarea id="noteInput" rows="6" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="ajouterNote()">Enregistrer</button>
+    <h2>📒 Mes notes</h2>
 
-    <div class="output" id="notesContainer">
-      <!-- Les notes s’affichent ici -->
-    </div>
+    <textarea id="noteInput" rows="4" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="ajouterNote()">Ajouter</button>
+
+    <div id="notesList"></div>
 
     <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    function ajouterNote() {
-      const notesContainer = document.getElementById("notesContainer");
-      const input = document.getElementById("noteInput");
-      const texte = input.value.trim();
+    const notesList = document.getElementById("notesList");
 
-      if (!texte) return;
-
-      const date = new Date().toLocaleString("fr-FR");
-      const noteHTML = `
-        <div class="note">
-          <p>${texte.replace(/\n/g, "<br>")}</p>
-          <small>🕒 ${date}</small>
-        </div>
-      `;
-
-      notesContainer.innerHTML = noteHTML + notesContainer.innerHTML;
-      input.value = "";
+    function afficherNotes() {
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      notesList.innerHTML = notes.length === 0 
+        ? "<p>Aucune note enregistrée 😢</p>" 
+        : notes.map((n, i) => `
+            <div class="note">
+              <p>${n}</p>
+              <small><button onclick="supprimerNote(${i})">🗑 Supprimer</button></small>
+            </div>
+          `).join("");
     }
+
+    function ajouterNote() {
+      const note = document.getElementById("noteInput").value.trim();
+      if (!note) return;
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      notes.push(note);
+      localStorage.setItem("notes", JSON.stringify(notes));
+      document.getElementById("noteInput").value = "";
+      afficherNotes();
+    }
+
+    function supprimerNote(index) {
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      notes.splice(index, 1);
+      localStorage.setItem("notes", JSON.stringify(notes));
+      afficherNotes();
+    }
+
+    afficherNotes();
   </script>
 </body>
 </html>
