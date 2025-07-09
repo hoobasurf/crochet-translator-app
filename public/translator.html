@@ -5,40 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduire Image/Fichier/URL</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>📷 Traduction OCR</h1>
-    
-    <p>Choisis un type de contenu à traduire :</p>
-    
-    <input type="file" id="fileInput" accept="image/*,.pdf" />
-    <br><br>
+    <h1>OCR + Traduction</h1>
 
-    <input type="text" id="urlInput" placeholder="Ou colle une URL d’image" />
-    <br><br>
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="imageURL" placeholder="Ou colle une URL d'image ici..." />
+    <button onclick="processImage()">Extraire et traduire</button>
 
-    <button onclick="traduire()">Traduire</button>
-    
-    <div class="output" id="output">
-      <!-- Résultat ou messages -->
-    </div>
-    
-    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
+    <div class="output" id="ocrResult">Texte détecté ici...</div>
   </div>
 
   <script>
-    function traduire() {
-      const file = document.getElementById('fileInput').files[0];
-      const url = document.getElementById('urlInput').value;
-      const output = document.getElementById('output');
-      
-      if (!file && !url) {
-        output.innerHTML = "❌ Merci de choisir un fichier ou de coller une URL.";
+    function processImage() {
+      const file = document.getElementById('imageInput').files[0];
+      const url = document.getElementById('imageURL').value;
+
+      const imageSource = file ? URL.createObjectURL(file) : url;
+
+      if (!imageSource) {
+        document.getElementById('ocrResult').innerText = "Aucune image sélectionnée.";
         return;
       }
 
-      output.innerHTML = "🔧 Cette fonctionnalité est en cours de développement (OCR). Revenez bientôt !";
+      Tesseract.recognize(imageSource, 'eng', {
+        logger: m => console.log(m)
+      }).then(({ data: { text } }) => {
+        document.getElementById('ocrResult').innerText = "Texte détecté :\n" + text;
+        return fetch('/.netlify/functions/translate', {
+          method: 'POST',
+          body: JSON.stringify({ text })
+        });
+      }).then(res => res.json())
+        .then(data => {
+          document.getElementById('ocrResult').innerText += "\n\nTraduction :\n" + (data.translatedText || data.error);
+        }).catch(err => {
+          document.getElementById('ocrResult').innerText = "Erreur OCR : " + err.message;
+        });
     }
   </script>
 </body>
