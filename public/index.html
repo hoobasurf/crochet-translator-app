@@ -1,66 +1,93 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crochet Steph</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <meta name="theme-color" content="#e91e63">
-</head>
-<body>
-  <div class="container">
-    <h1>Traduction / OCR</h1>
-    <textarea id="inputText" rows="4" placeholder="Collez le texte ici..."></textarea>
-    <button onclick="translateText()">Traduire le texte</button>
-    <button onclick="document.getElementById('fileInput').click()">Convertir une image/PDF</button>
-    <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none;" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Traduction Crochet</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧶 Traduction Crochet</h1>
 
-    <div id="output" class="output"></div>
+      <div class="translator-section">
+        <textarea id="inputText" placeholder="Écris ton texte à traduire..."></textarea>
+        <select id="languageSelect">
+          <option value="en">Anglais</option>
+          <option value="es">Espagnol</option>
+          <option value="de">Allemand</option>
+          <option value="it">Italien</option>
+        </select>
+        <button onclick="translateText()">🔤 Traduire</button>
+        <div id="translatedResult" class="result-box"></div>
+      </div>
 
-    <a href="ajouter-creation.html" class="btn-link">➕ Ajouter une création</a>
-    <a href="note.html" class="btn-link">📝 Ajouter une note</a>
-    <a href="creations.html" class="btn-link">🎨 Mes créations</a>
-    <a href="notes.html" class="btn-link">📒 Mes notes</a>
-  </div>
+      <hr />
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('✅ Service Worker enregistré'))
-        .catch(err => console.error('❌ SW erreur', err));
-    }
+      <div class="upload-section">
+        <h2>📷 Convertir une image PDF</h2>
+        <input type="file" id="imageInput" accept="image/*,application/pdf" onchange="handleImageUpload()" />
+        <div id="imagePreview" class="image-preview"></div>
+      </div>
 
-    async function translateText() {
-      const input = document.getElementById("inputText").value;
-      const output = document.getElementById("output");
+      <hr />
 
-      if (!input.trim()) {
-        output.innerText = "❌ Aucun texte à traduire.";
-        return;
+      <div class="notes-section">
+        <a href="note.html"><button>📒 Mes notes</button></a>
+      </div>
+    </div>
+
+    <script>
+      async function translateText() {
+        const inputText = document.getElementById("inputText").value;
+        const targetLang = document.getElementById("languageSelect").value;
+        const resultBox = document.getElementById("translatedResult");
+
+        resultBox.textContent = "⏳ Traduction en cours...";
+
+        try {
+          const response = await fetch("/.netlify/functions/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: inputText, targetLang })
+          });
+
+          const data = await response.json();
+
+          if (data.translatedText) {
+            resultBox.textContent = `✅ ${data.translatedText}`;
+          } else {
+            resultBox.textContent = "❌ Erreur API de traduction.";
+          }
+        } catch (error) {
+          resultBox.textContent = "❌ Erreur de communication avec l'API.";
+        }
       }
 
-      try {
-        const response = await fetch("/.netlify/functions/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            q: input,
-            source: "fr",
-            target: "en",
-            format: "text"
-          })
-        });
+      function handleImageUpload() {
+        const input = document.getElementById("imageInput");
+        const preview = document.getElementById("imagePreview");
 
-        if (!response.ok) throw new Error("Erreur API");
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          const reader = new FileReader();
 
-        const data = await response.json();
-        output.innerHTML = `<strong>✅ Traduction :</strong><br>${data.translatedText}`;
-      } catch (err) {
-        output.innerHTML = "❌ Erreur API de traduction.";
+          reader.onload = function (e) {
+            // Image
+            if (file.type.startsWith("image/")) {
+              preview.innerHTML = `<img src="${e.target.result}" alt="Image sélectionnée" class="preview-img"/>`;
+            }
+            // PDF
+            else if (file.type === "application/pdf") {
+              preview.innerHTML = `<embed src="${e.target.result}" type="application/pdf" width="100%" height="500px"/>`;
+            }
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          preview.innerHTML = "";
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
