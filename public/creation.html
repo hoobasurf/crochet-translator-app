@@ -1,35 +1,161 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Créations</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Créations magiques</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .magic-container {
+      max-width: 600px;
+      margin: 8vh auto;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .magic-container h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #ffe4fa;
+      text-shadow: 0 0 5px #ff00ff;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      font-size: 16px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      resize: vertical;
+    }
+
+    .file-input {
+      margin-bottom: 20px;
+      color: #eee;
+    }
+
+    .preview {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .btn-link {
+      display: inline-block;
+      width: auto;
+      padding: 10px 20px;
+      background: linear-gradient(to right, #e91e63, #9c27b0);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 10px;
+      transition: transform 0.2s;
+    }
+
+    .btn-link:hover {
+      transform: scale(1.05);
+    }
+
+    .creation-output {
+      margin-top: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px 15px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Mes Créations</h2>
-    <input type="file" id="creationInput" accept="image/*" />
-    <button onclick="addCreation()">Ajouter une création</button>
-    <div id="creationContainer"></div>
-    <a class="btn-link" href="index.html">⬅ Retour</a>
+
+  <a class="back-button" href="index.html">← Retour</a>
+
+  <div class="magic-container">
+    <h1>Ajoute ta création magique ✨</h1>
+
+    <textarea id="creationText" placeholder="Écris ton idée, poème, souvenir magique..."></textarea>
+
+    <div class="file-input">
+      <label for="imageUpload">Ou ajoute une image magique :</label><br>
+      <input type="file" id="imageUpload" accept="image/*">
+      <br>
+      <img id="imagePreview" class="preview" />
+    </div>
+
+    <button class="btn-link" onclick="enregistrerCreation()">Enregistrer ✨</button>
+
+    <div class="creation-output" id="outputZone" style="display:none;">
+      <h3>🌟 Création enregistrée :</h3>
+      <p id="textOutput"></p>
+      <img id="imgOutput" style="max-width:100%; border-radius:10px; display:none;">
+    </div>
   </div>
 
   <script>
-    function addCreation() {
-      const input = document.getElementById("creationInput");
-      const file = input.files[0];
-      const container = document.getElementById("creationContainer");
+    const imageInput = document.getElementById("imageUpload");
+    const imagePreview = document.getElementById("imagePreview");
 
-      if (!file) return;
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.style.maxWidth = "100%";
-      img.style.marginBottom = "10px";
+    function enregistrerCreation() {
+      const text = document.getElementById("creationText").value.trim();
+      const img = imagePreview.src;
 
-      container.prepend(img);
-      input.value = "";
+      if (!text && (!imageInput.files[0])) {
+        alert("Ajoute au moins un texte ou une image !");
+        return;
+      }
+
+      document.getElementById("textOutput").textContent = text;
+      if (img && imageInput.files[0]) {
+        const outputImg = document.getElementById("imgOutput");
+        outputImg.src = img;
+        outputImg.style.display = "block";
+      }
+
+      document.getElementById("outputZone").style.display = "block";
     }
   </script>
 </body>
