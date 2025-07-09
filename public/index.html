@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta charset="UTF-8">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crochet Steph</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
@@ -85,65 +87,31 @@
       100% { opacity: 1; transform: scale(1); }
     }
   </style>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Animation Accueil</title>
-<style>
-  body {
-    background: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    overflow: hidden;
-  }
-  #animation-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-  }
-  #chat {
-    position: absolute;
-    bottom: 0;
-    left: 20px;
-    width: 120px;
-    transition: transform 1s ease-in-out;
-  }
-  #pelote {
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
-    width: 100px;
-    cursor: pointer;
-    animation: bounce 2s infinite ease-in-out;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-  }
-  #pelote:hover {
-    animation-play-state: paused;
-    transform: rotate(20deg);
-  }
-</style>
 </head>
 <body>
+  <div class="container">
   <div class="container intro-animation">
     <h1>
+      <img id="chat" src="chat.png" alt="Chat" class="logo-header">
+      Crochet Steph
+      <img id="yarn" src="pelote.png" alt="Pelote" class="logo-header">
       <span>Crochet Steph</span>
       <img src="chat.png" alt="Chat" class="cat" />
       <img src="pelote.png" alt="Pelote" class="yarn" />
     </h1>
+    <textarea id="textInput" placeholder="Écris ou colle ton texte ici..."></textarea>
+    <button class="button" onclick="translateText()">Traduire le texte</button>
+    <div id="output" class="output"></div>
+    <hr>
+    <a class="btn-link" href="translator.html">Traduire image / fichier / URL</a>
+    <a class="btn-link" href="note.html">Notes</a>
+    <a class="btn-link" href="creations.html">Mes créations</a>
 
     <a class="btn-link" href="translator.html">Traduire un texte</a>
     <a class="btn-link" href="image.html">Traduire une image</a>
     <a class="btn-link" href="note.html">Note</a>
     <a class="btn-link" href="creation.html">Mes créations</a>
   </div>
-<div id="animation-container">
-  <img src="chat.png" alt="Chat" id="chat" />
-  <img src="pelote.png" alt="Pelote" id="pelote" />
-</div>
+  <script src="translate.js"></script>
 </body>
 </html>
