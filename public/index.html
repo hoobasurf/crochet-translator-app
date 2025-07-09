@@ -1,25 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Crochet Steph</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background: linear-gradient(to right, #ffe0f0, #f0f8ff);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 50px;
+      animation: fadeInDown 1s ease;
+    }
+
+    .cat {
+      position: absolute;
+      left: -80px;
+      bottom: -10px;
+      width: 60px;
+      animation: catWalk 6s ease-in-out 1;
+    }
+
+    .yarn {
+      position: absolute;
+      right: -60px;
+      bottom: -10px;
+      width: 40px;
+      animation: yarnRoll 6s ease-in-out 1;
+    }
+
+    @keyframes catWalk {
+      0% { transform: translateX(-150px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateX(240px); opacity: 1; }
+    }
+
+    @keyframes yarnRoll {
+      0% { transform: translateX(150px) rotate(0deg); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateX(-240px) rotate(360deg); opacity: 1; }
+    }
+
+    .btn-link {
+      display: block;
+      width: 250px;
+      margin: 15px auto;
+      padding: 15px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 20px;
+      background-color: #ffb6c1;
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.3s ease;
+    }
+
+    .btn-link:hover {
+      background-color: #ff9cb0;
+    }
+
+    .intro-animation {
+      opacity: 0;
+      transform: scale(0.9);
+      animation: fadeZoom 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeZoom {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container intro-animation">
     <h1>
-      <img id="chat" src="chat.png" alt="Chat" class="logo-header">
-      Crochet Steph
-      <img id="yarn" src="pelote.png" alt="Pelote" class="logo-header">
+      <span>Crochet Steph</span>
+      <img src="chat.png" alt="Chat" class="cat" />
+      <img src="pelote.png" alt="Pelote" class="yarn" />
     </h1>
-    <textarea id="textInput" placeholder="Écris ou colle ton texte ici..."></textarea>
-    <button class="button" onclick="translateText()">Traduire le texte</button>
-    <div id="output" class="output"></div>
-    <hr>
-    <a class="btn-link" href="translator.html">Traduire image / fichier / URL</a>
-    <a class="btn-link" href="note.html">Notes</a>
-    <a class="btn-link" href="creations.html">Mes créations</a>
+
+    <a class="btn-link" href="translator.html">Traduire un texte</a>
+    <a class="btn-link" href="image.html">Traduire une image</a>
+    <a class="btn-link" href="note.html">Note</a>
+    <a class="btn-link" href="creation.html">Mes créations</a>
   </div>
-  <script src="translate.js"></script>
 </body>
 </html>
