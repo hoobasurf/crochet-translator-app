@@ -1,103 +1,53 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crochet Steph</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      font-family: 'Comic Sans MS', sans-serif;
-      background: linear-gradient(to right, #ffe0f0, #f0f8ff);
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    .container {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      position: relative;
-      display: inline-block;
-      margin-bottom: 50px;
-      animation: fadeInDown 1s ease;
-    }
-
-    .cat {
-      position: absolute;
-      left: -80px;
-      bottom: -10px;
-      width: 60px;
-      animation: catWalk 6s ease-in-out 1;
-    }
-
-    .yarn {
-      position: absolute;
-      right: -60px;
-      bottom: -10px;
-      width: 40px;
-      animation: yarnRoll 6s ease-in-out 1;
-    }
-
-    @keyframes catWalk {
-      0% { transform: translateX(-150px); opacity: 0; }
-      30% { opacity: 1; }
-      100% { transform: translateX(240px); opacity: 1; }
-    }
-
-    @keyframes yarnRoll {
-      0% { transform: translateX(150px) rotate(0deg); opacity: 0; }
-      30% { opacity: 1; }
-      100% { transform: translateX(-240px) rotate(360deg); opacity: 1; }
-    }
-
-    .btn-link {
-      display: block;
-      width: 250px;
-      margin: 15px auto;
-      padding: 15px;
-      font-size: 1.1em;
-      border: none;
-      border-radius: 20px;
-      background-color: #ffb6c1;
-      color: #fff;
-      cursor: pointer;
-      text-decoration: none;
-      transition: 0.3s ease;
-    }
-
-    .btn-link:hover {
-      background-color: #ff9cb0;
-    }
-
-    .intro-animation {
-      opacity: 0;
-      transform: scale(0.9);
-      animation: fadeZoom 0.8s ease-out forwards;
-    }
-
-    @keyframes fadeZoom {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Animation Accueil</title>
+<style>
+  body {
+    background: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  #animation-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+  #chat {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    width: 120px;
+    transition: transform 1s ease-in-out;
+  }
+  #pelote {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    width: 100px;
+    cursor: pointer;
+    animation: bounce 2s infinite ease-in-out;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  #pelote:hover {
+    animation-play-state: paused;
+    transform: rotate(20deg);
+  }
+</style>
 </head>
 <body>
-  <div class="container intro-animation">
-    <h1>
-      <span>Crochet Steph</span>
-      <img src="chat.png" alt="Chat" class="cat" />
-      <img src="pelote.png" alt="Pelote" class="yarn" />
-    </h1>
-
-    <a class="btn-link" href="translator.html">Traduire un texte</a>
-    <a class="btn-link" href="image.html">Traduire une image</a>
-    <a class="btn-link" href="note.html">Note</a>
-    <a class="btn-link" href="creation.html">Mes créations</a>
-  </div>
+<div id="animation-container">
+  <img src="chat.png" alt="Chat" id="chat" />
+  <img src="pelote.png" alt="Pelote" id="pelote" />
+</div>
 </body>
 </html>
