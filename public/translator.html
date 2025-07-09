@@ -2,61 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Traduire une image ou un fichier</title>
+  <title>Traduire image / fichier</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h2>Traduire une image / fichier</h2>
-
+    <h2>Traduire image / fichier</h2>
     <input type="file" id="imageUpload" accept="image/*">
-    <button onclick="analyzeImage()">Analyser l’image</button>
-
-    <div id="detectedText" class="output"></div>
-
-    <h3>Traduction :</h3>
-    <div id="translatedText" class="output"></div>
-
+    <button class="button" onclick="analyzeImage()">Analyser et traduire</button>
+    <div id="detected" class="output"></div>
+    <div id="translated" class="output"></div>
     <a class="btn-link" href="index.html">← Retour</a>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <script>
-    async function analyzeImage() {
-      const fileInput = document.getElementById('imageUpload');
-      const detectedDiv = document.getElementById('detectedText');
-      const translatedDiv = document.getElementById('translatedText');
-
-      if (!fileInput.files[0]) {
-        alert("Ajoute une image !");
-        return;
-      }
-
-      detectedDiv.textContent = "Analyse de l’image...";
-      translatedDiv.textContent = "";
-
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const res = await Tesseract.recognize(reader.result, 'eng');
-          const text = res.data.text;
-          detectedDiv.textContent = text;
-
-          const translated = await translateText(text, "fr");
-          translatedDiv.textContent = translated;
-
-        } catch (e) {
-          detectedDiv.textContent = "Erreur : " + e.message;
-        }
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    }
-
-    async function translateText(input, targetLang = "fr") {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(input)}&langpair=en|${targetLang}`);
-      const data = await res.json();
-      return data.responseData.translatedText;
-    }
+async function analyzeImage() {
+  const inp = document.getElementById("imageUpload");
+  const outD = document.getElementById("detected");
+  const outT = document.getElementById("translated");
+  outD.textContent = "Analyse de l’image...";
+  outT.textContent = "";
+  if (!inp.files[0]) { outD.textContent="Aucune image sélectionnée !"; return; }
+  try {
+    const { data: { text }} = await Tesseract.recognize(inp.files[0], 'eng');
+    outD.textContent = text || "(aucun texte trouvé)";
+    const resp = await fetch('/.netlify/functions/translate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text })
+    });
+    const js = await resp.json();
+    outT.textContent = js.translatedText || "(erreur traduction)";
+  } catch(e) {
+    outD.textContent = "Erreur OCR/Trad : " + e.message;
+  }
+}
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js"></script>
 </body>
 </html>
