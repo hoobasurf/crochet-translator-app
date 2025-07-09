@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction et Outils</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Traduction et Notes</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Traduction & Création</h1>
+    <h1>Bienvenue</h1>
     
-    <textarea id="textInput" placeholder="Écris ou colle ton texte ici..."></textarea>
-    <button onclick="translateText()">Traduire le texte</button>
-    <div class="output" id="output"></div>
+    <!-- Encadré de texte pour écrire ou coller -->
+    <textarea id="inputText" rows="6" placeholder="Écris ou colle ici ton texte à traduire..."></textarea>
+    
+    <!-- Langue cible -->
+    <select id="targetLang">
+      <option value="">Choisir une langue</option>
+      <option value="en">Anglais</option>
+      <option value="fr">Français</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+      <option value="it">Italien</option>
+    </select>
 
+    <button onclick="translateText()">Traduire le texte</button>
+    
+    <div class="output" id="outputText"></div>
+
+    <!-- Liens supplémentaires -->
     <a class="btn-link" href="translator.html">Traduire une image, un fichier ou une URL</a>
     <a class="btn-link" href="note.html">Notes</a>
     <a class="btn-link" href="creation.html">Créations</a>
+    <a class="btn-link" href="convert.html">Convertir une image en PDF</a>
   </div>
 
-  <script>
-    async function translateText() {
-      const text = document.getElementById("textInput").value;
-      const response = await fetch("/.netlify/functions/translate", {
-        method: "POST",
-        body: JSON.stringify({ text }),
-      });
-      const result = await response.json();
-      document.getElementById("output").innerText = result.translatedText || result.error;
-    }
-  </script>
+  <script src="translate.js"></script>
 </body>
 </html>
