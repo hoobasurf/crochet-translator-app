@@ -3,62 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes notes</title>
+  <title>📒 Mes Notes</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .container {
-      max-width: 600px;
-      margin: 5vh auto;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 10px;
-      backdrop-filter: blur(8px);
+    body {
+      background: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
+      padding: 20px;
+    }
+    .notes-container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #333;
       color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
     }
     .note {
-      background-color: rgba(255,255,255,0.2);
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 6px;
+      text-align: left;
+      margin-top: 20px;
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
     }
-    .note small {
-      color: #ccc;
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #007BFF;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>📒 Mes notes</h2>
-    <div id="notes"></div>
-    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
+  <div class="notes-container">
+    <h1>📒 Mes Notes</h1>
+
+    <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
+    <br />
+    <button onclick="ajouterNote()">Enregistrer la note</button>
+
+    <div id="notesList"></div>
+
+    <a href="index.html" class="back-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-    const container = document.getElementById("notes");
+    function ajouterNote() {
+      const note = document.getElementById("noteInput").value.trim();
+      if (note) {
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.push(note);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        document.getElementById("noteInput").value = "";
+        afficherNotes();
+      }
+    }
 
-    if (notes.length === 0) {
-      container.innerHTML = "<p>Aucune note enregistrée 😢</p>";
-    } else {
-      notes.forEach((note, i) => {
-        container.innerHTML += `
-          <div class="note">
-            <p>${note.texte}</p>
-            <small>${note.date}</small><br>
-            <button onclick="supprimer(${i})">🗑 Supprimer</button>
-          </div>
-        `;
+    function afficherNotes() {
+      const notes = JSON.parse(localStorage.getItem("notes")) || [];
+      const notesList = document.getElementById("notesList");
+      notesList.innerHTML = "";
+
+      if (notes.length === 0) {
+        notesList.innerHTML = "<p>Aucune note enregistrée 😢</p>";
+        return;
+      }
+
+      notes.forEach((note, index) => {
+        const div = document.createElement("div");
+        div.className = "note";
+        div.textContent = note;
+        notesList.appendChild(div);
       });
     }
 
-    function supprimer(index) {
-      if (confirm("Supprimer cette note ?")) {
-        notes.splice(index, 1);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        location.reload();
-      }
-    }
+    window.onload = afficherNotes;
   </script>
 </body>
 </html>
