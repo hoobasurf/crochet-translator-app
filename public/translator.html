@@ -1,81 +1,55 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduire une image, un fichier ou une URL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traduire Image, Fichier ou URL</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <a href="index.html" class="btn-link">← Retour à l'accueil</a>
-    <h1>Traduction de contenu</h1>
+    <h2>Traduire une image, un fichier ou une URL</h2>
 
-    <h2>1. Coller un texte à traduire</h2>
-    <textarea id="inputText" rows="6" placeholder="Colle ou écris ici le texte à traduire..."></textarea>
-
-    <label for="targetLang">Langue cible :</label>
-    <select id="targetLang">
-      <option value="fr">Français</option>
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <option value="it">Italien</option>
-    </select>
-
-    <button onclick="translateText()">Traduire</button>
-
-    <div class="output" id="translationResult"></div>
-
-    <hr />
-
-    <h2>2. Traduire une image (OCR)</h2>
     <input type="file" id="imageInput" accept="image/*" />
-    <button onclick="processImage()">Analyser l'image</button>
-    <div class="output" id="ocrResult"></div>
-
-    <hr />
-
-    <h2>3. Traduire un site Web ou fichier distant</h2>
-    <input type="text" id="urlInput" placeholder="Colle l'URL d'une page ou d’un fichier..."/>
-    <button onclick="fakeURLTranslation()">Analyser l’URL</button>
-    <div class="output" id="urlResult"></div>
+    <button onclick="handleImage()">Traduire l'image</button>
+    
+    <p id="ocrStatus"></p>
+    <div class="output" id="ocrOutput"></div>
+    
+    <a class="btn-link" href="index.html">⬅ Retour</a>
   </div>
 
   <script>
-    async function translateText() {
-      const text = document.getElementById("inputText").value.trim();
-      const lang = document.getElementById("targetLang").value;
+    async function handleImage() {
+      const input = document.getElementById("imageInput");
+      if (!input.files.length) return alert("Choisis une image.");
 
-      if (!text || !lang) {
-        document.getElementById("translationResult").innerText = "Texte ou langue cible manquants.";
-        return;
-      }
+      document.getElementById("ocrStatus").innerText = "Analyse de l'image...";
+      const file = input.files[0];
+      const reader = new FileReader();
 
-      // Simulation de traduction (remplacer ici par API réelle si besoin)
-      const translated = "[Traduction en " + lang + "]: " + text;
-      document.getElementById("translationResult").innerText = translated;
-    }
+      reader.onload = async function () {
+        const base64 = reader.result.split(",")[1];
+        const ocrRes = await fetch("https://api.ocr.space/parse/image", {
+          method: "POST",
+          headers: { apikey: "helloworld", "Content-Type": "application/x-www-form-urlencoded" },
+          body: `base64Image=data:image/jpeg;base64,${base64}`
+        });
 
-    function fakeURLTranslation() {
-      const url = document.getElementById("urlInput").value.trim();
-      if (!url) {
-        document.getElementById("urlResult").innerText = "Aucune URL fournie.";
-        return;
-      }
+        const ocrData = await ocrRes.json();
+        const detectedText = ocrData.ParsedResults?.[0]?.ParsedText || "Aucun texte trouvé.";
 
-      document.getElementById("urlResult").innerText = "Analyse simulée de : " + url + " (fonctionnalité avancée à venir)";
-    }
+        const translateRes = await fetch("/.netlify/functions/translate", {
+          method: "POST",
+          body: JSON.stringify({ text: detectedText }),
+        });
+        const result = await translateRes.json();
 
-    function processImage() {
-      const file = document.getElementById("imageInput").files[0];
-      if (!file) {
-        document.getElementById("ocrResult").innerText = "Aucune image sélectionnée.";
-        return;
-      }
+        document.getElementById("ocrStatus").innerText = "Texte détecté :";
+        document.getElementById("ocrOutput").innerText = result.translatedText || result.error;
+      };
 
-      // Simulation OCR
-      document.getElementById("ocrResult").innerText = "Texte détecté :\n[Contenu simulé]\n→ Traduction à venir...";
+      reader.readAsDataURL(file);
     }
   </script>
 </body>
