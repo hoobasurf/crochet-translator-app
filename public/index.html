@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traducteur de Crochet</title>
+  <title>Traduction et Outils</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Traducteur Crochet 🧶</h1>
-
-    <h2>Traduire un texte</h2>
-    <textarea id="inputText" rows="6" placeholder="Écris ou colle ton texte ici..."></textarea>
-    <button onclick="translateText()">Traduire</button>
+    <h1>Traduction & Création</h1>
+    
+    <textarea id="textInput" placeholder="Écris ou colle ton texte ici..."></textarea>
+    <button onclick="translateText()">Traduire le texte</button>
     <div class="output" id="output"></div>
 
     <a class="btn-link" href="translator.html">Traduire une image, un fichier ou une URL</a>
@@ -22,13 +21,13 @@
 
   <script>
     async function translateText() {
-      const text = document.getElementById('inputText').value;
-      const res = await fetch('/.netlify/functions/translate', {
-        method: 'POST',
-        body: JSON.stringify({ text })
+      const text = document.getElementById("textInput").value;
+      const response = await fetch("/.netlify/functions/translate", {
+        method: "POST",
+        body: JSON.stringify({ text }),
       });
-      const data = await res.json();
-      document.getElementById('output').innerText = data.translatedText || data.error;
+      const result = await response.json();
+      document.getElementById("output").innerText = result.translatedText || result.error;
     }
   </script>
 </body>
