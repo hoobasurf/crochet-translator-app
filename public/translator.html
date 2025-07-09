@@ -2,55 +2,61 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Traduire Image, Fichier ou URL</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Traduire une image ou un fichier</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h2>Traduire une image, un fichier ou une URL</h2>
+    <h2>Traduire une image / fichier</h2>
 
-    <input type="file" id="imageInput" accept="image/*" />
-    <button onclick="handleImage()">Traduire l'image</button>
-    
-    <p id="ocrStatus"></p>
-    <div class="output" id="ocrOutput"></div>
-    
-    <a class="btn-link" href="index.html">⬅ Retour</a>
+    <input type="file" id="imageUpload" accept="image/*">
+    <button onclick="analyzeImage()">Analyser l’image</button>
+
+    <div id="detectedText" class="output"></div>
+
+    <h3>Traduction :</h3>
+    <div id="translatedText" class="output"></div>
+
+    <a class="btn-link" href="index.html">← Retour</a>
   </div>
 
   <script>
-    async function handleImage() {
-      const input = document.getElementById("imageInput");
-      if (!input.files.length) return alert("Choisis une image.");
+    async function analyzeImage() {
+      const fileInput = document.getElementById('imageUpload');
+      const detectedDiv = document.getElementById('detectedText');
+      const translatedDiv = document.getElementById('translatedText');
 
-      document.getElementById("ocrStatus").innerText = "Analyse de l'image...";
-      const file = input.files[0];
+      if (!fileInput.files[0]) {
+        alert("Ajoute une image !");
+        return;
+      }
+
+      detectedDiv.textContent = "Analyse de l’image...";
+      translatedDiv.textContent = "";
+
       const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const res = await Tesseract.recognize(reader.result, 'eng');
+          const text = res.data.text;
+          detectedDiv.textContent = text;
 
-      reader.onload = async function () {
-        const base64 = reader.result.split(",")[1];
-        const ocrRes = await fetch("https://api.ocr.space/parse/image", {
-          method: "POST",
-          headers: { apikey: "helloworld", "Content-Type": "application/x-www-form-urlencoded" },
-          body: `base64Image=data:image/jpeg;base64,${base64}`
-        });
+          const translated = await translateText(text, "fr");
+          translatedDiv.textContent = translated;
 
-        const ocrData = await ocrRes.json();
-        const detectedText = ocrData.ParsedResults?.[0]?.ParsedText || "Aucun texte trouvé.";
-
-        const translateRes = await fetch("/.netlify/functions/translate", {
-          method: "POST",
-          body: JSON.stringify({ text: detectedText }),
-        });
-        const result = await translateRes.json();
-
-        document.getElementById("ocrStatus").innerText = "Texte détecté :";
-        document.getElementById("ocrOutput").innerText = result.translatedText || result.error;
+        } catch (e) {
+          detectedDiv.textContent = "Erreur : " + e.message;
+        }
       };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
 
-      reader.readAsDataURL(file);
+    async function translateText(input, targetLang = "fr") {
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(input)}&langpair=en|${targetLang}`);
+      const data = await res.json();
+      return data.responseData.translatedText;
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2/dist/tesseract.min.js"></script>
 </body>
 </html>
