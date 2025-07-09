@@ -5,55 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Création</title>
   <style>
-    body, html {
+    body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-    }
-    body {
       background: url('fond-accueil.jpg') no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
-      text-shadow: 0 0 5px black;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
     }
-    .content {
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 20px;
       text-align: center;
-      background: rgba(0,0,0,0.5);
-      padding: 40px 60px;
-      border-radius: 15px;
-      max-width: 600px;
-      width: 90%;
+      color: #fff;
     }
-    h1 {
-      font-size: 3rem;
+    h2 {
+      font-size: 2em;
       margin-bottom: 20px;
     }
-    p {
-      font-size: 1.5rem;
-    }
-    a {
+    a.button {
       display: inline-block;
-      margin-top: 30px;
-      font-size: 1.4rem;
-      color: orange;
+      padding: 12px 25px;
+      margin-top: 20px;
+      font-size: 1em;
       text-decoration: none;
-      transition: color 0.3s ease;
+      color: white;
+      background-color: #4CAF50;
+      border-radius: 10px;
+      transition: background 0.3s;
     }
-    a:hover {
-      color: darkorange;
-      text-decoration: underline;
+    a.button:hover {
+      background-color: #3e8e41;
     }
   </style>
 </head>
 <body>
-  <div class="content">
-    <h1>Création</h1>
-    <p>Page en construction...</p>
-    <a href="index.html">← Retour à l'accueil</a>
+  <div class="container">
+    <h2>Bienvenue dans la page Création</h2>
+    <p>Ici tu pourras ajouter ton contenu personnalisé.</p>
+    <a href="index.html" class="button">Retour à l'accueil</a>
   </div>
 </body>
 </html>
