@@ -3,40 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction de texte</title>
+  <title>Traducteur Crochet</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🧶 Traduire une description de crochet</h1>
-    <textarea id="inputText" rows="6" placeholder="Entrez une description en anglais..."></textarea>
-    <button onclick="translateText()">Traduire</button>
-    <div class="output" id="outputText"></div>
-    <a class="btn-link" href="note.html">📒 Mes notes</a>
-    <a class="btn-link" href="image.html">🖼️ Convertir une image PDF</a>
+    <h1>Traducteur Crochet 🧶</h1>
+    <textarea id="inputText" placeholder="Entrez du texte en anglais..."></textarea>
+    <button onclick="traduireTexte()">Traduire</button>
+    <div id="output" class="output"></div>
+
+    <a href="note.html" class="btn-link">📒 Mes notes</a>
+    <a href="image.html" class="btn-link">🖼 Convertir une image PDF</a>
   </div>
 
   <script>
-    async function translateText() {
+    async function traduireTexte() {
       const text = document.getElementById("inputText").value;
-      const output = document.getElementById("outputText");
+      const output = document.getElementById("output");
       output.innerHTML = "⏳ Traduction en cours...";
-
+      
       try {
         const response = await fetch("/.netlify/functions/translate", {
           method: "POST",
           body: JSON.stringify({ text }),
         });
-
         const data = await response.json();
-
-        if (response.ok) {
-          output.innerHTML = `<strong>Résultat :</strong><br>${data.translatedText}`;
+        if (data.translatedText) {
+          output.innerHTML = `📝 ${data.translatedText}`;
         } else {
-          output.innerHTML = "❌ Erreur API de traduction.";
+          output.innerHTML = "❌ Erreur de traduction.";
         }
       } catch (error) {
-        output.innerHTML = "⚠️ Une erreur est survenue.";
+        output.innerHTML = "⚠️ Erreur serveur.";
       }
     }
   </script>
