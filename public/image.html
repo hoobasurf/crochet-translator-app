@@ -2,44 +2,96 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Convertir Image PDF</title>
+  <title>Traduire depuis une image</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🖼 Convertir une image en PDF</h1>
-    <input type="file" accept="image/*" id="imageInput" />
+    <h1>📷 Traduire le texte d’une image</h1>
+
+    <input type="file" accept="image/*" id="fileInput" />
+    <p>ou</p>
+    <input type="text" id="imageURL" placeholder="Colle l’URL de l’image ici" />
+    <button id="processBtn">🔍 Extraire et traduire</button>
+
     <div id="preview" class="output"></div>
-    <button id="downloadBtn" style="display:none;">📥 Télécharger en PDF</button>
+    <div id="originalText" class="output"></div>
+    <div id="translatedText" class="output"></div>
+
     <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <script>
-    const input = document.getElementById("imageInput");
+    const fileInput = document.getElementById("fileInput");
+    const imageURL = document.getElementById("imageURL");
     const preview = document.getElementById("preview");
-    const downloadBtn = document.getElementById("downloadBtn");
-    let imgData = "";
+    const originalText = document.getElementById("originalText");
+    const translatedText = document.getElementById("translatedText");
 
-    input.addEventListener("change", () => {
-      const file = input.files[0];
-      if (!file) return;
+    document.getElementById("processBtn").addEventListener("click", async () => {
+      originalText.innerHTML = "🧠 Lecture de l’image...";
+      translatedText.innerHTML = "";
+      preview.innerHTML = "";
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        imgData = e.target.result;
-        preview.innerHTML = `<img src="${imgData}" style="max-width:100%; border-radius:8px; margin-top:10px;" />`;
-        downloadBtn.style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    });
+      let imageSrc = "";
 
-    downloadBtn.addEventListener("click", async () => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "JPEG", 10, 10, 190, 0); // auto height
-      pdf.save("image.pdf");
-    });
-  </script>
-</body>
-</html>
+      if (fileInput.files[0]) {
+        imageSrc = URL.createObjectURL(fileInput.files[0]);
+      } else if (imageURL.value) {
+        imageSrc = imageURL.value;
+      } else {
+        originalText.innerHTML = "⚠️ Merci de choisir une image ou de coller un lien.";
+        return;
+      }
+
+      preview.innerHTML = `<img src="${imageSrc}" style="max-width:100%; margin:10px 0; border-radius:6px;" />`;
+
+      try {
+        const result = await Tesseract.recognize(
+          imageSrc,
+          'eng',
+          { logger: m => console.log(m) }
+        );
+
+        const text = result.data.text;
+        originalText.innerHTML = `<strong>Texte détecté :</strong><br>${text}`;
+
+        // Envoyer à l
+
+Merci pour la précision 🙏 ! Tu ne veux **pas convertir l'image en PDF**, mais bien :
+
+---
+
+## ✅ Objectif clair :
+> **Traduire automatiquement le texte contenu dans une image, un fichier, ou depuis une URL de site.**
+
+---
+
+## ✳️ Tu veux donc 3 options :
+1. 📷 **Téléverser une image** → extraire le texte → le traduire (ex: capture d’écran, photo).
+2. 📁 **Importer un fichier texte ou PDF** → lire son contenu → traduire.
+3. 🌐 **Entrer l’URL d’un site** → extraire son texte → traduire.
+
+---
+
+## 🧠 Solution complète à mettre en place :
+
+### 🔸1. **Pour les images** :
+Utiliser l’**OCR** (Reconnaissance Optique de Caractères) avec [Tesseract.js](https://github.com/naptha/tesseract.js) pour extraire le texte de l'image, puis l’envoyer à l’API de traduction.
+
+---
+
+### 🔸2. **Pour les fichiers PDF/TXT** :
+Lire le fichier avec `FileReader`, ou une lib comme `pdf.js`, et l’envoyer à la traduction.
+
+---
+
+### 🔸3. **Pour une URL de site** :
+Faire une requête à cette URL (via fonction backend proxy), récupérer le contenu HTML, extraire le texte (via `cheerio` ou `jsdom`), puis le traduire.
+
+---
+
+## 📄 Nouvelle page `image.html` (renommée `translator-tools.html` ?)
+
+Souhaites-tu que je te crée une **interface avec 3 boutons clairs** :
