@@ -2,26 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Accueil</title>
+  <title>Crochet Steph</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Traduction & Création</h1>
-
-    <textarea id="textInput" placeholder="Écris ton texte ici..."></textarea>
-    <br>
-    <button onclick="translateText()">Traduire</button>
-
+    <h1>
+      <img id="chat" src="chat.png" alt="Chat" class="logo-header">
+      Crochet Steph
+      <img id="yarn" src="pelote.png" alt="Pelote" class="logo-header">
+    </h1>
+    <textarea id="textInput" placeholder="Écris ou colle ton texte ici..."></textarea>
+    <button class="button" onclick="translateText()">Traduire le texte</button>
     <div id="output" class="output"></div>
-
     <hr>
-
-    <a class="btn-link" href="translator.html">Traduire une image, un fichier ou une URL</a>
+    <a class="btn-link" href="translator.html">Traduire image / fichier / URL</a>
     <a class="btn-link" href="note.html">Notes</a>
-    <a class="btn-link" href="creation.html">Créations</a>
+    <a class="btn-link" href="creations.html">Mes créations</a>
   </div>
-
   <script src="translate.js"></script>
 </body>
 </html>
