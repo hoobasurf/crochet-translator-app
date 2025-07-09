@@ -3,54 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes Notes</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h2>📒 Mes notes</h2>
-
-    <textarea id="noteInput" rows="4" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="ajouterNote()">Ajouter</button>
-
-    <div id="notesList"></div>
-
-    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
+    <h1>📒 Notes</h1>
+    <textarea id="noteInput" rows="4" placeholder="Écris une note..."></textarea>
+    <input type="file" id="noteImage" accept="image/*">
+    <button onclick="addNote()">Ajouter</button>
+    <div id="notesContainer"></div>
   </div>
 
   <script>
-    const notesList = document.getElementById("notesList");
+    let notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
-    function afficherNotes() {
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notesList.innerHTML = notes.length === 0 
-        ? "<p>Aucune note enregistrée 😢</p>" 
-        : notes.map((n, i) => `
-            <div class="note">
-              <p>${n}</p>
-              <small><button onclick="supprimerNote(${i})">🗑 Supprimer</button></small>
-            </div>
-          `).join("");
-    }
+    function addNote() {
+      const text = document.getElementById("noteInput").value;
+      const file = document.getElementById("noteImage").files[0];
 
-    function ajouterNote() {
-      const note = document.getElementById("noteInput").value.trim();
-      if (!note) return;
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notes.push(note);
-      localStorage.setItem("notes", JSON.stringify(notes));
+      if (!text && !file) return;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const note = {
+          text,
+          image: file ? reader.result : null,
+          date: new Date().toLocaleString()
+        };
+        notes.push(note);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        displayNotes();
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.onload();
+      }
+
       document.getElementById("noteInput").value = "";
-      afficherNotes();
+      document.getElementById("noteImage").value = "";
     }
 
-    function supprimerNote(index) {
-      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notes.splice(index, 1);
-      localStorage.setItem("notes", JSON.stringify(notes));
-      afficherNotes();
+    function displayNotes() {
+      const container = document.getElementById("notesContainer");
+      container.innerHTML = "";
+
+      if (notes.length === 0) {
+        container.innerHTML = "<p>Aucune note enregistrée 😢</p>";
+        return;
+      }
+
+      notes.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "note";
+        div.innerHTML = `
+          <p>${note.text}</p>
+          ${note.image ? `<img src="${note.image}" style="max-width:100%; border-radius:8px;" />` : ""}
+          <small>${note.date}</small>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    afficherNotes();
+    displayNotes();
   </script>
 </body>
 </html>
