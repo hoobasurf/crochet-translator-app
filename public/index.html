@@ -22,7 +22,7 @@
       const text = document.getElementById("inputText").value;
       const output = document.getElementById("output");
       output.innerHTML = "⏳ Traduction en cours...";
-      
+
       try {
         const response = await fetch("/.netlify/functions/translate", {
           method: "POST",
