@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes notes</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ajouter une note</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>📒 Mes notes</h1>
+    <h1>📝 Ajouter une note</h1>
+    
+    <textarea id="noteInput" rows="6" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="ajouterNote()">Enregistrer</button>
 
-    <textarea id="noteInput" rows="8" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="saveNote()">💾 Enregistrer la note</button>
-
-    <div class="output" id="savedNote">
-      <p>Aucune note enregistrée 😢</p>
+    <div class="output" id="notesContainer">
+      <!-- Les notes s’affichent ici -->
     </div>
 
     <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    function saveNote() {
-      const content = document.getElementById("noteInput").value.trim();
-      if (!content) {
-        alert("Merci d’écrire quelque chose !");
-        return;
-      }
-      localStorage.setItem("userNote", content);
-      displayNote();
-    }
+    function ajouterNote() {
+      const notesContainer = document.getElementById("notesContainer");
+      const input = document.getElementById("noteInput");
+      const texte = input.value.trim();
 
-    function displayNote() {
-      const note = localStorage.getItem("userNote");
-      const output = document.getElementById("savedNote");
-      if (note) {
-        output.innerHTML = `<div class="note">${note}<br><small>✔️ Enregistré localement</small></div>`;
-      } else {
-        output.innerHTML = `<p>Aucune note enregistrée 😢</p>`;
-      }
-    }
+      if (!texte) return;
 
-    window.onload = displayNote;
+      const date = new Date().toLocaleString("fr-FR");
+      const noteHTML = `
+        <div class="note">
+          <p>${texte.replace(/\n/g, "<br>")}</p>
+          <small>🕒 ${date}</small>
+        </div>
+      `;
+
+      notesContainer.innerHTML = noteHTML + notesContainer.innerHTML;
+      input.value = "";
+    }
   </script>
 </body>
 </html>
