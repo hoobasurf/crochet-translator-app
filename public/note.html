@@ -7,52 +7,32 @@
 </head>
 <body>
   <div class="container">
-    <h2>Mes Notes</h2>
-
-    <textarea id="noteInput" placeholder="Écris une note..."></textarea>
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="addNote()">Ajouter</button>
-
+    <h2>Mes notes</h2>
+    <textarea id="noteText" placeholder="Écris une note..."></textarea>
+    <input type="file" id="noteImg" accept="image/*">
+    <button class="button" onclick="addNote()">Ajouter</button>
     <div id="notesList"></div>
-
     <a class="btn-link" href="index.html">← Retour</a>
   </div>
-
   <script>
-    function addNote() {
-      const text = document.getElementById('noteInput').value;
-      const file = document.getElementById('imageInput').files[0];
-      const list = document.getElementById('notesList');
-
-      const div = document.createElement('div');
-      div.className = 'note';
-
-      if (text) {
-        const p = document.createElement('p');
-        p.textContent = text;
-        div.appendChild(p);
-      }
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const img = document.createElement('img');
-          img.src = reader.result;
-          img.style.maxWidth = '100%';
-          div.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      }
-
-      const small = document.createElement('small');
-      small.textContent = new Date().toLocaleString();
-      div.appendChild(small);
-
-      list.prepend(div);
-
-      document.getElementById('noteInput').value = '';
-      document.getElementById('imageInput').value = '';
-    }
+function addNote() {
+  const t = document.getElementById("noteText").value.trim();
+  const f = document.getElementById("noteImg").files[0];
+  const L = document.getElementById("notesList");
+  const d = document.createElement("div"); d.className="note-card";
+  if (t) d.appendChild(Object.assign(document.createElement("p"), { textContent: t }));
+  if (f) {
+    const img = document.createElement("img");
+    const r = new FileReader();
+    r.onload = () => img.src = r.result;
+    r.readAsDataURL(f);
+    d.appendChild(img);
+  }
+  d.appendChild(Object.assign(document.createElement("small"), { textContent: new Date().toLocaleString() }));
+  L.prepend(d);
+  document.getElementById("noteText").value="";
+  document.getElementById("noteImg").value="";
+}
   </script>
 </body>
 </html>
