@@ -9,35 +9,34 @@
 <body>
   <div class="container">
     <h1>📒 Mes notes</h1>
-    <textarea id="noteInput" rows="4" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="addNote()">Ajouter la note</button>
-    <div id="notesContainer"></div>
-    <a class="btn-link" href="index.html">⬅ Retour à l'accueil</a>
+    <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
+    <button onclick="sauverNote()">Sauvegarder</button>
+    <div id="notesList" class="output"></div>
+    <a href="index.html" class="btn-link">⬅ Retour à l'accueil</a>
   </div>
 
   <script>
-    const noteInput = document.getElementById("noteInput");
-    const notesContainer = document.getElementById("notesContainer");
-
-    function loadNotes() {
+    function sauverNote() {
+      const input = document.getElementById("noteInput").value;
+      if (!input) return;
       const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-      notesContainer.innerHTML = notes.length
-        ? notes.map(n => `<div class="note">${n}<br><small>🕒 ${new Date().toLocaleString()}</small></div>`).join("")
-        : "<p>Aucune note enregistrée 😢</p>";
+      notes.push({ text: input, date: new Date().toLocaleString() });
+      localStorage.setItem("notes", JSON.stringify(notes));
+      document.getElementById("noteInput").value = "";
+      afficherNotes();
     }
 
-    function addNote() {
-      const note = noteInput.value.trim();
-      if (note) {
-        const notes = JSON.parse(localStorage.getItem("notes") || "[]");
-        notes.unshift(note);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        noteInput.value = "";
-        loadNotes();
-      }
+    function afficherNotes() {
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      const list = notes.map(note => `
+        <div class="note">
+          <p>${note.text}</p>
+          <small>${note.date}</small>
+        </div>`).join("") || "Aucune note enregistrée 😢";
+      document.getElementById("notesList").innerHTML = list;
     }
 
-    loadNotes();
+    afficherNotes();
   </script>
 </body>
 </html>
