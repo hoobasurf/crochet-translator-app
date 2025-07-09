@@ -1,21 +1,20 @@
 const fetch = require("node-fetch");
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: "Méthode non autorisée" }),
+      body: JSON.stringify({ error: "Méthode non autorisée. Utilisez POST." }),
     };
   }
 
   try {
-    const body = JSON.parse(event.body);
-    const text = body.text;
+    const { text, targetLang } = JSON.parse(event.body);
 
-    if (!text) {
+    if (!text || !targetLang) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Aucun texte fourni pour la traduction." }),
+        body: JSON.stringify({ error: "Texte ou langue cible manquants." }),
       };
     }
 
@@ -24,17 +23,17 @@ exports.handler = async function(event, context) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         q: text,
-        source: "en",
-        target: "fr",
-        format: "text"
+        source: "auto",
+        target: targetLang,
+        format: "text",
       }),
     });
 
     const data = await response.json();
 
-    if (data.error) {
+    if (data.error || !data.translatedText) {
       return {
-        statusCode: 500,
+        statusCode: 502,
         body: JSON.stringify({ error: "Erreur de l'API de traduction." }),
       };
     }
@@ -43,7 +42,6 @@ exports.handler = async function(event, context) {
       statusCode: 200,
       body: JSON.stringify({ translatedText: data.translatedText }),
     };
-
   } catch (error) {
     return {
       statusCode: 500,
