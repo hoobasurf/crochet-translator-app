@@ -1,28 +1,51 @@
 const fetch = require("node-fetch");
 
+const unitsMap = {
+  inch: "pouce",
+  inches: "pouces",
+  in: "po",
+  ft: "pied",
+  feet: "pieds",
+  yard: "yard",
+  yards: "yards",
+  cm: "cm",
+  mm: "mm",
+  kg: "kg",
+  g: "g",
+  oz: "oz",
+  lb: "livre",
+  lbs: "livres",
+  "°F": "degrés Fahrenheit",
+  "°C": "degrés Celsius",
+};
+
+function replaceUnits(text) {
+  return text.replace(
+    /\b(?:inches|inch|in|ft|feet|yard|yards|cm|mm|kg|g|oz|lb|lbs|°F|°C)\b/g,
+    (match) => unitsMap[match] || match
+  );
+}
+
 exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Méthode non autorisée. Utilisez POST." }),
-    };
-  }
-
   try {
-    const { text, targetLang } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+    const inputText = body.text;
+    const targetLang = body.target || "fr";
 
-    if (!text || !targetLang) {
+    if (!inputText) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Texte ou langue cible manquants." }),
+        body: JSON.stringify({ error: "Texte manquant" }),
       };
     }
 
-    const response = await fetch("https://libretranslate.de/translate", {
+    const enrichedText = replaceUnits(inputText);
+
+    const response = await fetch("https://libretranslate.com/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        q: text,
+        q: enrichedText,
         source: "auto",
         target: targetLang,
         format: "text",
@@ -31,13 +54,6 @@ exports.handler = async function (event) {
 
     const data = await response.json();
 
-    if (data.error || !data.translatedText) {
-      return {
-        statusCode: 502,
-        body: JSON.stringify({ error: "Erreur de l'API de traduction." }),
-      };
-    }
-
     return {
       statusCode: 200,
       body: JSON.stringify({ translatedText: data.translatedText }),
@@ -45,7 +61,7 @@ exports.handler = async function (event) {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Erreur serveur : " + error.message }),
+      body: JSON.stringify({ error: "Erreur de traduction", details: error.message }),
     };
   }
 };
