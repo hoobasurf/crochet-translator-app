@@ -1,34 +1,23 @@
-document.getElementById('translateBtn').addEventListener('click', async () => {
-  const text = document.getElementById('sourceText').value.trim();
-  const lang = document.getElementById('targetLang').value;
+function translateImage() {
+  const imageUrl = document.getElementById("imageUrl").value;
+  const imageFile = document.getElementById("imageUpload").files[0];
 
-  if (!text) {
-    alert("Texte manquant.");
-    return;
-  }
+  const formData = new FormData();
+  if (imageUrl) formData.append("imageUrl", imageUrl);
+  if (imageFile) formData.append("imageFile", imageFile);
 
-  const response = await fetch('/.netlify/functions/translate', {
-    method: 'POST',
-    body: JSON.stringify({ text, target: lang }),
+  document.getElementById("translatedText").innerText = "Analyse de l’image…";
+
+  fetch("/.netlify/functions/translate", {
+    method: "POST",
+    body: formData,
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("translatedText").innerText = data.text || "Aucun texte détecté.";
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("translatedText").innerText = "Erreur de traduction.";
   });
-
-  const data = await response.json();
-  document.getElementById('result').innerText = data.translation || "Erreur de traduction.";
-});
-
-document.getElementById('ocrBtn').addEventListener('click', async () => {
-  const file = document.getElementById('imageInput').files[0];
-  if (!file) return alert("Image manquante.");
-
-  const reader = new FileReader();
-  reader.onloadend = async () => {
-    const response = await fetch('/.netlify/functions/translate', {
-      method: 'POST',
-      body: JSON.stringify({
-        imageBase64: reader.result,
-        target: document.getElementById('targetLang').value,
-      }),
-    });
-
-    const data = await response.json();
-    document
+}
