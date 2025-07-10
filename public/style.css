@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Dancing Script', cursive;
-  background-image: url('background.jpg');
+  background-image: url('fond-accueil.jpg');
   background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
@@ -12,56 +12,72 @@ body {
   color: #333;
 }
 
-h1, h2 {
-  font-size: 2.5em;
-  font-weight: 700;
-  background: linear-gradient(90deg, #a678f2, #f89dc3);
+h1, h2, h3 {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #b68add, #f9a1dd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-align: center;
-  margin-bottom: 10px;
 }
 
-textarea, input[type="text"], input[type="file"] {
+textarea, input[type="text"] {
   width: 90%;
   max-width: 600px;
-  padding: 15px;
+  margin: 10px auto;
+  display: block;
   font-size: 1.2em;
-  border-radius: 15px;
-  border: 1px solid #ccc;
-  margin-bottom: 15px;
   font-family: 'Dancing Script', cursive;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
 }
 
 button, .btn-link {
   display: block;
-  width: 90%;
-  max-width: 300px;
-  padding: 12px 20px;
-  font-size: 1.2em;
+  margin: 15px auto;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  font-family: 'Dancing Script', cursive;
   border: none;
-  border-radius: 20px;
-  margin: 10px auto;
-  background: linear-gradient(90deg, #b28afc, #f5a6d6);
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b68add, #f9a1dd);
   color: white;
   cursor: pointer;
-  font-family: 'Dancing Script', cursive;
+  width: 200px;
   text-align: center;
   text-decoration: none;
+  transition: 0.3s ease-in-out;
 }
 
 button:hover, .btn-link:hover {
-  opacity: 0.9;
+  background: linear-gradient(90deg, #a379d2, #f788d2);
 }
 
 .container {
-  text-align: center;
   padding: 20px;
+  text-align: center;
 }
 
-img.preview {
+img {
   max-width: 90%;
-  height: auto;
-  margin-top: 15px;
-  border-radius: 15px;
+  margin: 20px auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.url-box {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 8px 12px;
+  width: 90%;
+  max-width: 600px;
+  margin: 10px auto;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.2em;
+  background: rgba(255,255,255,0.8);
+}
+
+label {
+  font-size: 1.3em;
 }
