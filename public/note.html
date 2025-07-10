@@ -2,217 +2,233 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Mes Notes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <title>Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      min-height: 100vh;
+      color: #fff;
     }
 
-    h1 {
+    header {
       text-align: center;
-      color: deeppink;
-      font-size: 2.2em;
-      margin-top: 30px;
+      font-size: 2.5em;
+      padding: 20px;
+      background: linear-gradient(135deg, pink, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .form-section {
+    .container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form-group {
       text-align: center;
-      margin: 20px;
+      margin-bottom: 20px;
     }
 
-    input[type="file"], input[type="text"] {
-      display: block;
-      margin: 10px auto;
+    textarea,
+    input[type="file"] {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
       font-family: 'Pacifico', cursive;
+      width: 80%;
+    }
+
+    textarea {
+      height: 80px;
+    }
+
+    input[type="file"] {
+      background: white;
+      color: black;
     }
 
     button {
-      font-family: 'Pacifico', cursive;
       padding: 10px 20px;
-      background: deeppink;
-      color: white;
+      background: violet;
       border: none;
+      color: white;
       border-radius: 10px;
+      font-family: 'Pacifico', cursive;
       cursor: pointer;
     }
 
-    .notes-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
       gap: 20px;
-      padding: 20px;
+      width: 90%;
     }
 
-    .note-item {
-      background-color: rgba(255, 240, 250, 0.95);
-      border: 3px solid pink;
+    .note {
+      background: rgba(255, 192, 203, 0.3);
+      border: 2px solid pink;
       border-radius: 15px;
       padding: 10px;
-      width: 45%;
-      box-sizing: border-box;
-      text-align: center;
       position: relative;
+      text-align: center;
     }
 
-    .note-item img {
+    .note img {
       max-width: 100%;
-      height: auto;
       border-radius: 10px;
       cursor: pointer;
     }
 
-    .delete-btn {
+    .note p {
+      margin-top: 10px;
+      font-weight: bold;
+      color: white;
+      white-space: pre-wrap;
+    }
+
+    .delete {
       position: absolute;
       top: 5px;
       right: 10px;
-      background: transparent;
-      color: red;
-      font-size: 1.2em;
+      background: rgba(255, 0, 0, 0.7);
+      color: white;
       border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-    }
-
-    .legend {
-      margin-top: 10px;
-      font-size: 1em;
-      color: #555;
+      font-weight: bold;
     }
 
     .back-btn {
+      margin: 30px auto;
       display: block;
-      margin: 0 auto 30px;
       text-align: center;
-      background-color: violet;
+      background: linear-gradient(135deg, violet, pink);
       color: white;
-      padding: 10px 20px;
-      border-radius: 15px;
+      padding: 12px 20px;
+      font-size: 1em;
       text-decoration: none;
-      font-size: 1.2em;
-      width: fit-content;
+      border-radius: 12px;
+      font-family: 'Pacifico', cursive;
     }
 
-    @media screen and (max-width: 600px) {
-      .note-item {
-        width: 90%;
-      }
-    }
-
-    /* Modal image plein écran */
-    #modal {
+    #fullScreen {
       display: none;
       position: fixed;
-      z-index: 999;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
 
-    #modal img {
-      display: block;
+    #fullScreen img {
       max-width: 90%;
-      max-height: 80%;
-      margin: 5% auto;
-      border: 5px solid white;
-      border-radius: 15px;
-    }
-
-    #modal:target {
-      display: block;
+      max-height: 90%;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>📝 Mes Notes</h1>
-
-  <div class="form-section">
-    <input type="file" id="imageInput" accept="image/*">
-    <input type="text" id="legendInput" placeholder="Note ou légende (facultatif)">
-    <button onclick="saveNote()">Sauvegarder</button>
+  <header>📝 Mes Notes</header>
+  <div class="container">
+    <div class="form-group">
+      <textarea id="noteText" placeholder="Écris ta note ici..."></textarea><br/>
+      <input type="file" id="noteImage" accept="image/*" multiple>
+      <button onclick="addNote()">Sauvegarder</button>
+    </div>
+    <div class="grid" id="noteGrid"></div>
+    <a href="index.html" class="back-btn">⬅ Retour</a>
   </div>
 
-  <div class="notes-grid" id="notesContainer"></div>
-
-  <a class="back-btn" href="index.html">⟵ Retour</a>
-
-  <div id="modal" onclick="closeModal()">
-    <img id="modalImage" src="">
+  <div id="fullScreen" onclick="this.style.display='none'">
+    <img id="fullScreenImg" src="" alt="Grand format">
   </div>
 
   <script>
-    function saveNote() {
-      const fileInput = document.getElementById('imageInput');
-      const legend = document.getElementById('legendInput').value;
-      const file = fileInput.files[0];
+    const noteGrid = document.getElementById('noteGrid');
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
 
-      if (!file) return;
+    function addNote() {
+      const noteText = document.getElementById('noteText').value;
+      const imageFiles = document.getElementById('noteImage').files;
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-        notes.push({ image: e.target.result, legend: legend });
+      if (!noteText && imageFiles.length === 0) return;
+
+      if (imageFiles.length === 0) {
+        notes.push({ text: noteText });
         localStorage.setItem('notes', JSON.stringify(notes));
-        displayNotes();
-        fileInput.value = '';
-        document.getElementById('legendInput').value = '';
-      };
-      reader.readAsDataURL(file);
+        renderNotes();
+      } else {
+        Array.from(imageFiles).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            notes.push({ text: noteText, img: reader.result });
+            localStorage.setItem('notes', JSON.stringify(notes));
+            renderNotes();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      document.getElementById('noteText').value = '';
+      document.getElementById('noteImage').value = '';
     }
 
-    function displayNotes() {
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      const container = document.getElementById('notesContainer');
-      container.innerHTML = '';
-
+    function renderNotes() {
+      noteGrid.innerHTML = '';
       notes.forEach((note, index) => {
         const div = document.createElement('div');
-        div.className = 'note-item';
+        div.className = 'note';
 
-        const img = document.createElement('img');
-        img.src = note.image;
-        img.alt = 'Note';
-        img.onclick = () => openModal(note.image);
+        if (note.img) {
+          const img = document.createElement('img');
+          img.src = note.img;
+          img.alt = 'Image';
+          img.onclick = () => showFullScreen(note.img);
+          div.appendChild(img);
+        }
 
-        const p = document.createElement('p');
-        p.className = 'legend';
-        p.textContent = note.legend || '';
+        if (note.text) {
+          const p = document.createElement('p');
+          p.textContent = note.text;
+          div.appendChild(p);
+        }
 
         const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.innerHTML = '✖';
-        del.onclick = () => deleteNote(index);
+        del.className = 'delete';
+        del.textContent = '✖';
+        del.onclick = () => {
+          notes.splice(index, 1);
+          localStorage.setItem('notes', JSON.stringify(notes));
+          renderNotes();
+        };
 
         div.appendChild(del);
-        div.appendChild(img);
-        div.appendChild(p);
-        container.appendChild(div);
+        noteGrid.appendChild(div);
       });
     }
 
-    function deleteNote(index) {
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      notes.splice(index, 1);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      displayNotes();
+    function showFullScreen(src) {
+      const viewer = document.getElementById('fullScreen');
+      const img = document.getElementById('fullScreenImg');
+      img.src = src;
+      viewer.style.display = 'flex';
     }
 
-    function openModal(src) {
-      document.getElementById('modalImage').src = src;
-      document.getElementById('modal').style.display = 'block';
-    }
-
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-
-    window.onload = displayNotes;
+    renderNotes();
   </script>
 </body>
 </html>
