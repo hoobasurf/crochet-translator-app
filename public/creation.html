@@ -24,28 +24,30 @@
     }
     #imageInput {
       display: block;
-      margin: 0 auto 10px;
+      margin: 0 auto 20px;
+    }
+    #creationList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
     }
     .creation-item {
       border: 4px solid pink;
       border-radius: 10px;
       padding: 10px;
-      margin: 20px auto;
-      width: fit-content;
-      max-width: 90vw;
+      width: 260px;
       background-color: rgba(255,255,255,0.1);
       position: relative;
     }
     .creation-item img {
-      max-width: 250px;
+      max-width: 100%;
       border-radius: 8px;
-      display: block;
-      margin: 0 auto;
       cursor: pointer;
     }
     .caption-input {
       display: block;
-      margin: 10px auto;
+      margin: 10px auto 5px;
       font-family: 'Pacifico', cursive;
       font-size: 1em;
       padding: 5px;
@@ -77,11 +79,6 @@
       height: 24px;
       cursor: pointer;
     }
-    #creationList {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
     .back-btn {
       display: block;
       margin: 20px auto;
@@ -93,7 +90,7 @@
       font-weight: bold;
     }
 
-    /* Modal pour image en grand */
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -110,14 +107,11 @@
       border: 4px solid pink;
       border-radius: 10px;
     }
-    .modal:active {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <h1>🎨 Mes Créations</h1>
-  <input type="file" id="imageInput" accept="image/*" />
+  <input type="file" id="imageInput" accept="image/*" multiple />
   <div id="creationList"></div>
   <a href="index.html" class="back-btn">⬅ Retour</a>
 
@@ -130,6 +124,7 @@
     const creationList = document.getElementById('creationList');
     const modal = document.getElementById('modal');
     const modalImage = document.getElementById('modalImage');
+
     let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 
     const saveCreations = () => {
@@ -175,7 +170,6 @@
 
       files.forEach(file => {
         const reader = new FileReader();
-
         reader.onload = () => {
           const imageData = reader.result;
 
@@ -212,7 +206,6 @@
           container.appendChild(saveBtn);
           creationList.appendChild(container);
         };
-
         reader.readAsDataURL(file);
       });
 
