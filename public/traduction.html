@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traduction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      background: linear-gradient(135deg, violet, pink);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      border: none;
+      padding: 12px;
+      font-family: 'Pacifico', cursive;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.2em;
+      margin: 10px 10px 20px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #translated {
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      min-height: 80px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.2em;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Traduction ✨</h1>
+
+  <label for="inputText">Texte à traduire :</label>
+  <textarea id="inputText" placeholder="Copie ici ton texte..."></textarea>
+
+  <div>
+    <label for="sourceLang">De :</label>
+    <select id="sourceLang">
+      <option value="auto">Auto</option>
+      <option value="fr">Français</option>
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+      <!-- Ajoute d'autres langues ici -->
+    </select>
+
+    <label for="targetLang">Vers :</label>
+    <select id="targetLang">
+      <option value="en">Anglais</option>
+      <option value="fr">Français</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+    </select>
+  </div>
+
+  <button onclick="translateText()">Traduire</button>
+
+  <div id="translated"></div>
+
+  <a href="index.html" class="back-btn">⬅ Retour à l’accueil</a>
+
+  <script>
+    async function translateText() {
+      const text = document.getElementById("inputText").value.trim();
+      const source = document.getElementById("sourceLang").value;
+      const target = document.getElementById("targetLang").value;
+      if (!text) return;
+
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      const translated = data.responseData.translatedText;
+
+      document.getElementById("translated").innerText = translated || "Erreur de traduction.";
+    }
+  </script>
+</body>
+</html>
