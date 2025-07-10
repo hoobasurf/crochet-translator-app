@@ -1,61 +1,131 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Créations</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mes créations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0; padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background: url('fond-accueil.jpg') no-repeat center center/cover;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.2em;
+    }
+    .back-btn {
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      margin-bottom: 20px;
+    }
+    .input-zone {
+      margin-top: 20px;
+    }
+    input[type="file"], input[type="text"] {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1em;
+    }
+    .save-btn {
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 12px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+    }
+    .gallery {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 12px;
+      width: 150px;
+      text-align: center;
+    }
+    .item img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .item p {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: white;
+      word-wrap: break-word;
+    }
+  </style>
 </head>
 <body>
-  <header>Mes Créations 🎨</header>
 
-  <img src="chat.png" class="chat" alt="Chat">
-  <img src="pelote.png" class="pelote" alt="Pelote">
+  <button class="back-btn" onclick="history.back()">← Retour</button>
+  <h1>🎨 Mes créations</h1>
 
-  <div class="btn-container">
-    <input id="title" type="text" placeholder="Titre (facultatif)">
-    <textarea id="description" rows="3" placeholder="Description..."></textarea>
-    
-    <input type="file" id="imageUpload" accept="image/*" />
-    <div class="file-preview" id="preview"></div>
-
-    <button class="btn-link" onclick="saveCreation()">Enregistrer</button>
+  <div class="input-zone">
+    <input type="file" id="imageInput" accept="image/*" />
+    <input type="text" id="captionInput" placeholder="Titre ou légende (facultatif)" />
+    <button class="save-btn" onclick="saveCreation()">📸 Enregistrer la création</button>
   </div>
 
+  <div class="gallery" id="gallery"></div>
+
   <script>
-    const preview = document.getElementById("preview");
-    const fileInput = document.getElementById("imageUpload");
-
-    fileInput.addEventListener("change", () => {
-      const file = fileInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          preview.innerHTML = `<img src="${reader.result}"/>`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
     function saveCreation() {
-      const title = document.getElementById("title").value;
-      const description = document.getElementById("description").value;
-      const img = fileInput.files[0];
+      const imageInput = document.getElementById('imageInput');
+      const caption = document.getElementById('captionInput').value;
 
-      const data = { title, description };
-
-      if (img) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          data.image = reader.result;
-          localStorage.setItem("creation", JSON.stringify(data));
-          alert("Création enregistrée !");
-        };
-        reader.readAsDataURL(img);
-      } else {
-        localStorage.setItem("creation", JSON.stringify(data));
-        alert("Création enregistrée !");
+      if (!imageInput.files[0]) {
+        alert("Merci de choisir une image !");
+        return;
       }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+        creations.push({ image: imageData, caption });
+        localStorage.setItem("creations", JSON.stringify(creations));
+        displayCreations();
+        imageInput.value = '';
+        document.getElementById('captionInput').value = '';
+      };
+      reader.readAsDataURL(imageInput.files[0]);
     }
+
+    function displayCreations() {
+      const container = document.getElementById('gallery');
+      container.innerHTML = '';
+      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+      creations.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <img src="${item.image}" alt="Création ${index + 1}" />
+          <p>${item.caption || ''}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    window.onload = displayCreations;
   </script>
 </body>
 </html>
