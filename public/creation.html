@@ -1,210 +1,228 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mes Créations</title>
+  <meta charset="UTF-8">
+  <title>Mes Créations - Crochet Steph</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
+      margin: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      margin: 0;
+      min-height: 100vh;
       padding: 20px;
-      color: #000;
     }
 
-    h1 {
+    header {
       text-align: center;
-      font-size: 2.5em;
+      font-size: 2.3em;
+      margin-bottom: 30px;
       background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .form-container {
-      text-align: center;
+    .back-button {
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      border: none;
+      font-size: 1em;
+      padding: 10px 20px;
+      border-radius: 25px;
       margin-bottom: 20px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      box-shadow: 0 0 10px pink;
     }
 
-    input[type="file"], input[type="text"] {
-      display: block;
-      margin: 10px auto;
+    .creation-form {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
       font-family: 'Pacifico', cursive;
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin: 10px auto;
+      display: block;
+      border-radius: 10px;
+      border: 2px solid pink;
+      background-color: #fff5fb;
       font-size: 1em;
     }
 
-    #preview {
+    input[type="file"] {
       display: block;
       margin: 10px auto;
-      max-width: 90%;
-      max-height: 300px;
-      border-radius: 12px;
     }
 
-    button {
+    .save-button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
       border: none;
       padding: 10px 20px;
-      border-radius: 12px;
       font-size: 1em;
+      border-radius: 12px;
       cursor: pointer;
-      margin-top: 10px;
+      font-family: 'Pacifico', cursive;
     }
 
-    .gallery {
+    .creations-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
       justify-content: center;
+      gap: 20px;
     }
 
-    .item {
-      position: relative;
-      width: 45%;
-      background-color: rgba(255, 192, 203, 0.4);
+    .creation-item {
+      background-color: rgba(255, 240, 250, 0.95);
       border: 3px solid pink;
-      border-radius: 12px;
+      border-radius: 15px;
       padding: 10px;
-      box-sizing: border-box;
+      width: 160px;
+      text-align: center;
+      position: relative;
     }
 
-    .item img {
+    .creation-item img {
       width: 100%;
-      height: auto;
       border-radius: 10px;
       cursor: pointer;
     }
 
-    .item p {
-      margin-top: 5px;
+    .creation-title {
+      margin-top: 8px;
       font-weight: bold;
-      text-align: center;
+      font-size: 1em;
     }
 
     .delete-btn {
       position: absolute;
       top: 5px;
-      right: 8px;
-      background: rgba(255, 0, 0, 0.8);
-      color: white;
+      right: 7px;
+      background: transparent;
       border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      font-size: 1.2em;
+      color: red;
       cursor: pointer;
-      font-weight: bold;
     }
 
-    .back-btn {
+    .modal {
       position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 0.9em;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
     }
 
-    @media (max-width: 600px) {
-      .item {
-        width: 100%;
-      }
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border: 4px solid white;
+      border-radius: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🎨 Mes Créations</h1>
+  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour à l’accueil</button>
+  <header>🎨 Mes Créations</header>
 
-  <a href="index.html" class="back-btn">⬅️ Retour</a>
-
-  <div class="form-container">
-    <input type="file" id="imageInput" accept="image/*" />
-    <input type="text" id="titleInput" placeholder="Titre ou légende (facultatif)" />
-    <img id="preview" src="#" alt="Aperçu" style="display:none;" />
-    <button onclick="saveCreation()">Sauvegarder</button>
+  <div class="creation-form">
+    <input type="file" id="creation-image" />
+    <input type="text" id="creation-title" placeholder="Titre ou légende (facultatif)">
+    <button class="save-button" onclick="saveCreation()">💾 Sauvegarder</button>
   </div>
 
-  <div class="gallery" id="gallery"></div>
+  <div class="creations-grid" id="creations-list"></div>
+
+  <div class="modal" id="imageModal" onclick="closeModal()">
+    <img id="modalImage" src="" alt="Image en grand">
+  </div>
 
   <script>
-    const imageInput = document.getElementById('imageInput');
-    const titleInput = document.getElementById('titleInput');
-    const preview = document.getElementById('preview');
-    const gallery = document.getElementById('gallery');
+    const imageInput = document.getElementById('creation-image');
+    const titleInput = document.getElementById('creation-title');
+    const creationsList = document.getElementById('creations-list');
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
 
-    let previewData = '';
+    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 
-    imageInput.addEventListener('change', function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-          previewData = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    function saveCreation() {
-      if (!previewData) return;
-
-      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
-      creations.push({
-        image: previewData,
-        title: titleInput.value.trim()
-      });
-      localStorage.setItem('creations', JSON.stringify(creations));
-
-      imageInput.value = '';
-      titleInput.value = '';
-      preview.style.display = 'none';
-      previewData = '';
-
-      renderGallery();
-    }
-
-    function renderGallery() {
-      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
-      gallery.innerHTML = '';
+    function renderCreations() {
+      creationsList.innerHTML = '';
       creations.forEach((item, index) => {
         const div = document.createElement('div');
-        div.className = 'item';
+        div.className = 'creation-item';
 
-        const img = document.createElement('img');
-        img.src = item.image;
-        img.onclick = () => openFullscreen(item.image);
+        if (item.image && item.image.startsWith("data:image")) {
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.onclick = () => openModal(item.image);
+          div.appendChild(img);
+        }
 
-        const p = document.createElement('p');
-        p.textContent = item.title;
+        if (item.title) {
+          const title = document.createElement('div');
+          title.className = 'creation-title';
+          title.textContent = item.title;
+          div.appendChild(title);
+        }
 
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '✖';
-        delBtn.className = 'delete-btn';
-        delBtn.onclick = () => deleteCreation(index);
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.innerHTML = '✖';
+        del.onclick = () => {
+          creations.splice(index, 1);
+          localStorage.setItem('creations', JSON.stringify(creations));
+          renderCreations();
+        };
+        div.appendChild(del);
 
-        div.appendChild(delBtn);
-        div.appendChild(img);
-        if (item.title) div.appendChild(p);
-        gallery.appendChild(div);
+        creationsList.appendChild(div);
       });
     }
 
-    function deleteCreation(index) {
-      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
-      creations.splice(index, 1);
-      localStorage.setItem('creations', JSON.stringify(creations));
-      renderGallery();
+    function saveCreation() {
+      const file = imageInput.files[0];
+      const title = titleInput.value.trim();
+
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const creation = {
+          image: e.target.result,
+          title
+        };
+        creations.push(creation);
+        localStorage.setItem('creations', JSON.stringify(creations));
+        resetForm();
+      };
+      reader.readAsDataURL(file);
     }
 
-    function openFullscreen(src) {
-      const win = window.open('');
-      win.document.write('<img src="' + src + '" style="width:100%;">');
+    function resetForm() {
+      imageInput.value = '';
+      titleInput.value = '';
+      renderCreations();
     }
 
-    renderGallery();
+    function openModal(src) {
+      modalImage.src = src;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    renderCreations();
   </script>
 </body>
 </html>
