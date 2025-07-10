@@ -2,36 +2,18 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes créations</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Mes créations</h1>
-    <input type="file" id="imageInput" accept="image/*" />
-    <button onclick="addCreation()">Ajouter création</button>
+  <div class="background"></div>
+  <header><h1 class="title">Mes Créations</h1></header>
 
-    <div id="creationsContainer"></div>
-    <a class="btn-link" href="index.html">Retour accueil</a>
-  </div>
-
-  <script>
-    const imageInput = document.getElementById("imageInput");
-    const container = document.getElementById("creationsContainer");
-
-    function addCreation() {
-      const file = imageInput.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = document.createElement("img");
-        img.src = reader.result;
-        img.style.maxWidth = "300px";
-        container.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    }
-  </script>
+  <main class="creation">
+    <input type="file" accept="image/*" />
+    <button class="btn-link">Ajouter une création</button>
+    <div class="gallery"></div>
+  </main>
 </body>
 </html>
