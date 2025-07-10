@@ -2,172 +2,29 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mes Notes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: white;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 30px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-size: 1.2em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1em;
-      font-family: 'Pacifico', cursive;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      color: #333;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.2em;
-      margin-right: 10px;
-    }
-
-    .btn:hover {
-      transform: scale(1.05);
-    }
-
-    .note-list {
-      margin-top: 30px;
-    }
-
-    .note {
-      background-color: rgba(255, 255, 255, 0.85);
-      color: #333;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-      position: relative;
-    }
-
-    .note-title {
-      font-weight: bold;
-      font-size: 1.3em;
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: crimson;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .back-btn {
-      display: inline-block;
-      margin-top: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.2em;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-    }
-
-    .back-btn:hover {
-      transform: scale(1.05);
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mes notes</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Mes Notes 📝</h1>
+  <img src="chat.png" alt="Chat" class="chat" />
+  <header>Mes notes 🗒️</header>
 
-  <div class="form-group">
-    <label for="noteTitle">Titre de la note :</label>
-    <input type="text" id="noteTitle" placeholder="Ex : Mes idées de motifs" />
+  <div class="btn-container">
+    <input type="text" id="titre-note" placeholder="Titre (facultatif)" />
+    <textarea id="contenu-note" placeholder="Contenu (facultatif)"></textarea>
+    <button onclick="saveNote()">Sauvegarder</button>
   </div>
-
-  <div class="form-group">
-    <label for="noteContent">Contenu de la note :</label>
-    <textarea id="noteContent" rows="5" placeholder="Écris ici tes notes..."></textarea>
-  </div>
-
-  <button class="btn" onclick="saveNote()">💾 Sauvegarder</button>
-
-  <div class="note-list" id="noteList"></div>
-
-  <a class="back-btn" href="index.html">⬅ Retour à l’accueil</a>
 
   <script>
     function saveNote() {
-      const title = document.getElementById('noteTitle').value.trim();
-      const content = document.getElementById('noteContent').value.trim();
-      if (!title || !content) return;
+      const titre = document.getElementById('titre-note').value;
+      const contenu = document.getElementById('contenu-note').value;
 
-      const notes = JSON.parse(localStorage.getItem('notes')) || [];
-      notes.push({ title, content });
-      localStorage.setItem('notes', JSON.stringify(notes));
-      displayNotes();
-      document.getElementById('noteTitle').value = '';
-      document.getElementById('noteContent').value = '';
+      const note = { titre, contenu };
+      localStorage.setItem('note-' + Date.now(), JSON.stringify(note));
+      alert('Note sauvegardée !');
     }
-
-    function deleteNote(index) {
-      const notes = JSON.parse(localStorage.getItem('notes')) || [];
-      notes.splice(index, 1);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      displayNotes();
-    }
-
-    function displayNotes() {
-      const noteList = document.getElementById('noteList');
-      const notes = JSON.parse(localStorage.getItem('notes')) || [];
-      noteList.innerHTML = notes.map((note, index) => `
-        <div class="note">
-          <button class="delete-btn" onclick="deleteNote(${index})">×</button>
-          <div class="note-title">${note.title}</div>
-          <div class="note-content">${note.content}</div>
-        </div>
-      `).join('');
-    }
-
-    window.onload = displayNotes;
   </script>
 </body>
 </html>
