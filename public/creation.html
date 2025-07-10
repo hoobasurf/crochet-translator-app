@@ -2,205 +2,209 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes Créations</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      overflow-x: hidden;
-      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #000;
     }
-    header {
+
+    h1 {
       text-align: center;
-      padding: 40px 10px 20px;
       font-size: 2.5em;
-      color: hotpink;
-      font-weight: bold;
-      text-shadow: 1px 1px white;
+      background: linear-gradient(135deg, violet, pink);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .btn-container, .input-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      margin: 10px;
+
+    .form-container {
+      text-align: center;
+      margin-bottom: 20px;
     }
-    input[type="file"], input[type="text"], .save-btn, .back-btn {
-      font-family: 'Pacifico', cursive;
-      font-weight: bold;
-    }
+
     input[type="file"], input[type="text"] {
-      padding: 8px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 300px;
-      border: 2px solid pink;
+      display: block;
+      margin: 10px auto;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
     }
-    .save-btn, .back-btn {
+
+    #preview {
+      display: block;
+      margin: 10px auto;
+      max-width: 90%;
+      max-height: 300px;
+      border-radius: 12px;
+    }
+
+    button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
       border: none;
-      padding: 12px 25px;
-      font-size: 1.1em;
+      padding: 10px 20px;
       border-radius: 12px;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
-      font-weight: bold;
-    }
-    .save-btn:hover, .back-btn:hover {
-      transform: scale(1.02);
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
-      gap: 15px;
-      margin: 10px;
-    }
-    .card {
-      position: relative;
-      border: 3px solid hotpink;
-      border-radius: 12px;
-      overflow: hidden;
-      background: white;
-    }
-    .card img {
-      width: 100%;
-      display: block;
-      cursor: pointer;
-    }
-    .legend {
-      background: rgba(255,255,255,0.8);
-      padding: 6px;
       font-size: 1em;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .item {
+      position: relative;
+      width: 45%;
+      background-color: rgba(255, 192, 203, 0.4);
+      border: 3px solid pink;
+      border-radius: 12px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .item img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .item p {
+      margin-top: 5px;
+      font-weight: bold;
       text-align: center;
     }
-    .remove-btn {
+
+    .delete-btn {
       position: absolute;
       top: 5px;
-      right: 5px;
-      background: rgba(255,255,255,0.8);
+      right: 8px;
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
       border: none;
-      font-size: 1.2em;
       border-radius: 50%;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-      width: 28px;
-      height: 28px;
-      line-height: 0.8;
+      font-weight: bold;
     }
-    .modal {
-      display: none;
+
+    .back-btn {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+      top: 10px;
+      left: 10px;
+      font-size: 0.9em;
     }
-    .modal img {
-      max-width: 90%;
-      max-height: 90%;
+
+    @media (max-width: 600px) {
+      .item {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <header>🎨 Mes Créations</header>
+  <h1>🎨 Mes Créations</h1>
 
-  <div class="input-container">
-    <input type="file" id="imageInput" accept="image/*" multiple />
-    <input type="text" id="legendInput" placeholder="Titre ou légende (facultatif)" />
-    <button class="save-btn" onclick="addCreations()">Sauvegarder</button>
-    <a class="back-btn" href="index.html">⬅ Retour</a>
+  <a href="index.html" class="back-btn">⬅️ Retour</a>
+
+  <div class="form-container">
+    <input type="file" id="imageInput" accept="image/*" />
+    <input type="text" id="titleInput" placeholder="Titre ou légende (facultatif)" />
+    <img id="preview" src="#" alt="Aperçu" style="display:none;" />
+    <button onclick="saveCreation()">Sauvegarder</button>
   </div>
 
-  <div class="grid" id="grid"></div>
-
-  <div class="modal" id="modal" onclick="closeModal()">
-    <img id="modalImg" src="" alt="Agrandie"/>
-  </div>
+  <div class="gallery" id="gallery"></div>
 
   <script>
-    const grid = document.getElementById('grid');
-    const inputFile = document.getElementById('imageInput');
-    const legendInput = document.getElementById('legendInput');
-    const modal = document.getElementById('modal');
-    const modalImg = document.getElementById('modalImg');
+    const imageInput = document.getElementById('imageInput');
+    const titleInput = document.getElementById('titleInput');
+    const preview = document.getElementById('preview');
+    const gallery = document.getElementById('gallery');
 
-    // Charger les créations au démarrage
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-    document.addEventListener('DOMContentLoaded', displayCreations);
+    let previewData = '';
 
-    function addCreations() {
-      const files = Array.from(inputFile.files);
-      const legend = legendInput.value.trim();
-
-      if (files.length === 0) return;
-
-      let filesLoaded = 0;
-
-      files.forEach(file => {
+    imageInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          creations.push({ src: e.target.result, legend });
-          filesLoaded++;
-          if (filesLoaded === files.length) {
-            saveAndDisplay();
-          }
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          previewData = e.target.result;
         };
         reader.readAsDataURL(file);
+      }
+    });
+
+    function saveCreation() {
+      if (!previewData) return;
+
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      creations.push({
+        image: previewData,
+        title: titleInput.value.trim()
       });
-
-      inputFile.value = '';
-      legendInput.value = '';
-    }
-
-    function saveAndDisplay() {
       localStorage.setItem('creations', JSON.stringify(creations));
-      displayCreations();
+
+      imageInput.value = '';
+      titleInput.value = '';
+      preview.style.display = 'none';
+      previewData = '';
+
+      renderGallery();
     }
 
-    function displayCreations() {
-      grid.innerHTML = '';
-      creations.forEach((item, idx) => {
-        const card = document.createElement('div');
-        card.className = 'card';
+    function renderGallery() {
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      gallery.innerHTML = '';
+      creations.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'item';
 
         const img = document.createElement('img');
-        img.src = item.src;
-        img.onclick = () => {
-          modalImg.src = item.src;
-          modal.style.display = 'flex';
-        };
+        img.src = item.image;
+        img.onclick = () => openFullscreen(item.image);
 
-        const legendDiv = document.createElement('div');
-        legendDiv.className = 'legend';
-        legendDiv.textContent = item.legend;
+        const p = document.createElement('p');
+        p.textContent = item.title;
 
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-btn';
-        removeBtn.innerText = '×';
-        removeBtn.onclick = () => {
-          creations.splice(idx, 1);
-          saveAndDisplay();
-        };
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '✖';
+        delBtn.className = 'delete-btn';
+        delBtn.onclick = () => deleteCreation(index);
 
-        card.append(removeBtn, img);
-        if (item.legend) card.appendChild(legendDiv);
-        grid.appendChild(card);
+        div.appendChild(delBtn);
+        div.appendChild(img);
+        if (item.title) div.appendChild(p);
+        gallery.appendChild(div);
       });
     }
 
-    function closeModal() {
-      modal.style.display = 'none';
+    function deleteCreation(index) {
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      creations.splice(index, 1);
+      localStorage.setItem('creations', JSON.stringify(creations));
+      renderGallery();
     }
+
+    function openFullscreen(src) {
+      const win = window.open('');
+      win.document.write('<img src="' + src + '" style="width:100%;">');
+    }
+
+    renderGallery();
   </script>
 </body>
 </html>
