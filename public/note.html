@@ -1,98 +1,249 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8">
+  <title>Mes Notes - Crochet Steph</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
+      margin: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
+      min-height: 100vh;
       padding: 20px;
-      color: #fff;
     }
-    h1 {
+
+    header {
       text-align: center;
+      font-size: 2.3em;
+      margin-bottom: 30px;
       background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 2em;
     }
-    textarea {
-      width: 100%;
-      min-height: 100px;
-      border-radius: 10px;
+
+    .back-button {
+      background: pink;
+      border: none;
       font-size: 1em;
-      padding: 10px;
-    }
-    input[type="file"] {
-      margin-top: 10px;
-      background: white;
-      color: black;
-    }
-    .note-container {
-      margin-top: 20px;
-      background: rgba(255, 192, 203, 0.3);
-      border: 2px solid pink;
+      padding: 10px 20px;
       border-radius: 12px;
-      padding: 15px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .note-form {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"], textarea {
+      font-family: 'Pacifico', cursive;
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin: 10px auto;
+      display: block;
+      border-radius: 10px;
+      border: 2px solid pink;
+      background-color: #fff5fb;
+      font-size: 1em;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 10px auto;
+    }
+
+    .save-button {
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .notes-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .note-item {
+      background-color: rgba(255, 240, 250, 0.95);
+      border: 3px solid pink;
+      border-radius: 15px;
+      padding: 10px;
+      width: 160px;
+      text-align: center;
       position: relative;
     }
-    .note-image {
-      max-width: 150px;
-      border-radius: 8px;
+
+    .note-item img {
+      width: 100%;
+      border-radius: 10px;
       cursor: pointer;
     }
+
+    .note-title {
+      margin-top: 8px;
+      font-weight: bold;
+      font-size: 1em;
+    }
+
+    .note-text {
+      font-size: 0.9em;
+    }
+
     .delete-btn {
       position: absolute;
       top: 5px;
-      right: 10px;
-      background: red;
-      color: white;
+      right: 7px;
+      background: transparent;
       border: none;
-      border-radius: 50%;
+      font-size: 1.2em;
+      color: red;
       cursor: pointer;
-      padding: 4px 8px;
     }
-    .back-btn {
-      display: inline-block;
-      margin-top: 20px;
-      background: violet;
-      color: white;
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 10px;
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border: 4px solid white;
+      border-radius: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🗒️ Mes notes</h1>
-  <textarea id="noteText" placeholder="Écris ta note ici..."></textarea>
-  <input type="file" id="noteImage" accept="image/*"/>
-  <button onclick="saveNote()">Sauvegarder</button>
-  <div id="noteDisplay"></div>
-  <a class="back-btn" href="index.html">⬅️ Retour</a>
+  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour</button>
+  <header>🗒️ Mes Notes</header>
+
+  <div class="note-form">
+    <input type="file" id="note-image" accept="image/*" />
+    <input type="text" id="note-title" placeholder="Titre ou légende (facultatif)">
+    <textarea id="note-text" placeholder="Écris ta note ici..." rows="4"></textarea>
+    <button class="save-button" onclick="saveNote()">💾 Sauvegarder</button>
+  </div>
+
+  <div class="notes-grid" id="notes-list"></div>
+
+  <div class="modal" id="imageModal" onclick="closeModal()">
+    <img id="modalImage" src="" alt="Image en grand">
+  </div>
 
   <script>
-    function saveNote() {
-      const text = document.getElementById("noteText").value;
-      const file = document.getElementById("noteImage").files[0];
+    const noteImageInput = document.getElementById('note-image');
+    const noteTitleInput = document.getElementById('note-title');
+    const noteTextInput = document.getElementById('note-text');
+    const notesList = document.getElementById('notes-list');
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
 
-      if (!text && !file) return;
+    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const note = {
-          text,
-          image: file ? e.target.result : null
+    function renderNotes() {
+      notesList.innerHTML = '';
+      notes.forEach((note, index) => {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+        if (note.image) {
+          const img = document.createElement('img');
+          img.src = note.image;
+          img.onclick = () => openModal(note.image);
+          div.appendChild(img);
+        }
+        if (note.title) {
+          const title = document.createElement('div');
+          title.className = 'note-title';
+          title.textContent = note.title;
+          div.appendChild(title);
+        }
+        if (note.text) {
+          const text = document.createElement('div');
+          text.className = 'note-text';
+          text.textContent = note.text;
+          div.appendChild(text);
+        }
+
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.innerHTML = '✖';
+        del.onclick = () => {
+          notes.splice(index, 1);
+          localStorage.setItem('notes', JSON.stringify(notes));
+          renderNotes();
         };
-        localStorage.setItem("note", JSON.stringify(note));
-        showNote();
-        document.getElementById("noteText").value = "";
-        document.getElementById("noteImage").value = "";
+        div.appendChild(del);
+
+        notesList.appendChild(div);
+      });
+    }
+
+    function saveNote() {
+      const file = noteImageInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const imageData = file ? e.target.result : null;
+        const note = {
+          image: imageData,
+          title: noteTitleInput.value.trim(),
+          text: noteTextInput.value.trim()
+        };
+
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        noteImageInput.value = '';
+        noteTitleInput.value = '';
+        noteTextInput.value = '';
+        renderNotes();
       };
 
-      if (file) reader.readAsData
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        const note = {
+          image: null,
+          title: noteTitleInput.value.trim(),
+          text: noteTextInput.value.trim()
+        };
+
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        noteTitleInput.value = '';
+        noteTextInput.value = '';
+        renderNotes();
+      }
+    }
+
+    function openModal(src) {
+      modalImage.src = src;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    renderNotes();
+  </script>
+</body>
+</html>
