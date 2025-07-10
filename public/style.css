@@ -1,79 +1,41 @@
-body, html {
+body {
   margin: 0;
-  padding: 0;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  background-color: transparent;
+  font-family: 'Pacifico', cursive;
+  background: url('fond-accueil.jpg') no-repeat center center fixed;
+  background-size: cover;
   color: #fff;
 }
 
-.background {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url('fond-accueil.jpg');
-  background-size: cover;
-  background-position: center;
-  z-index: -1;
-}
-
-.title {
-  font-size: 2.8em;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 20px;
-  background: linear-gradient(90deg, #a279e0, #fcb3d5);
+h1, h2, h3, label {
+  font-family: 'Pacifico', cursive;
+  background: linear-gradient(90deg, violet, pink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-weight: bold;
 }
 
-.cat-pelote {
-  display: block;
-  margin: 0 auto;
-  max-width: 200px;
-  animation: playPelote 6s ease-in-out infinite;
-}
-
-@keyframes playPelote {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(10px) rotate(5deg); }
-}
-
-.home-buttons {
-  margin: 40px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 80%;
-  max-width: 300px;
-}
-
-.btn-link {
-  display: block;
-  text-align: center;
-  padding: 14px;
-  background-color: #e4a9f3;
-  color: white;
-  font-size: 1.1em;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-textarea, input[type="text"] {
+input, textarea {
   width: 90%;
-  padding: 12px;
-  font-size: 1.1em;
-  margin: 12px auto;
-  display: block;
-  border: 1px solid #ccc;
+  max-width: 500px;
+  font-family: 'Pacifico', cursive;
+  font-size: 1.2em;
+  padding: 10px;
   border-radius: 10px;
-  resize: vertical;
+  border: none;
+  margin: 10px 0;
 }
 
-.result-area {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 1.1em;
+button, .btn-link {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.2em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #b266ff, #ff66b2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
 }
