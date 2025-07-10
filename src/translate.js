@@ -1,23 +1,44 @@
-function translateImage() {
-  const imageUrl = document.getElementById("imageUrl").value;
-  const imageFile = document.getElementById("imageUpload").files[0];
+async function translateText() {
+  const text = document.getElementById('textToTranslate').value;
+  if (!text.trim()) {
+    alert('Veuillez entrer un texte à traduire.');
+    return;
+  }
+
+  const res = await fetch('/.netlify/functions/translate', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+
+  const data = await res.json();
+  document.getElementById('translatedText').innerText = data.translation || 'Erreur de traduction.';
+}
+
+async function translateFromURL() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return alert('Veuillez entrer une URL.');
+
+  const res = await fetch('/.netlify/functions/ocr', {
+    method: 'POST',
+    body: JSON.stringify({ imageUrl: url }),
+  });
+
+  const data = await res.json();
+  document.getElementById('resultContainer').innerText = data.translation || 'Erreur.';
+}
+
+async function translateImage() {
+  const file = document.getElementById('imageInput').files[0];
+  if (!file) return alert('Veuillez choisir une image.');
 
   const formData = new FormData();
-  if (imageUrl) formData.append("imageUrl", imageUrl);
-  if (imageFile) formData.append("imageFile", imageFile);
+  formData.append('image', file);
 
-  document.getElementById("translatedText").innerText = "Analyse de l’image…";
-
-  fetch("/.netlify/functions/translate", {
-    method: "POST",
+  const res = await fetch('/.netlify/functions/ocr', {
+    method: 'POST',
     body: formData,
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("translatedText").innerText = data.text || "Aucun texte détecté.";
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById("translatedText").innerText = "Erreur de traduction.";
   });
+
+  const data = await res.json();
+  document.getElementById('resultContainer').innerText = data.translation || 'Erreur.';
 }
