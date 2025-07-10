@@ -1,31 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mes notes</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Mes notes</h1>
-    <textarea id="noteArea" rows="10" placeholder="Écris ta note ici..."></textarea>
-    <button onclick="saveNote()">Sauvegarder</button>
-    <a class="btn-link" href="index.html">Retour accueil</a>
-  </div>
+  <div class="background"></div>
+  <header><h1 class="title">Mes Notes</h1></header>
 
-  <script>
-    const noteArea = document.getElementById("noteArea");
-
-    function saveNote() {
-      const note = noteArea.value;
-      localStorage.setItem("mesNotes", note);
-      alert("Note sauvegardée !");
-    }
-
-    window.onload = () => {
-      const savedNote = localStorage.getItem("mesNotes");
-      if (savedNote) noteArea.value = savedNote;
-    };
-  </script>
+  <main class="note">
+    <textarea placeholder="Écris ici tes idées, notes, ou listes..."></textarea>
+    <button class="btn-link">Sauvegarder</button>
+  </main>
 </body>
 </html>
