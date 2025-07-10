@@ -1,101 +1,98 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes notes</title>
+  <title>Notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0; padding: 20px;
       font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') no-repeat center center/cover;
-      color: white;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 20px;
+      color: #fff;
     }
     h1 {
       text-align: center;
-      font-size: 2.2em;
-    }
-    .back-btn {
       background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      margin-bottom: 20px;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2em;
     }
     textarea {
       width: 100%;
-      height: 200px;
-      font-size: 1em;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      resize: vertical;
-    }
-    .image-preview {
-      margin-top: 20px;
-    }
-    .image-preview img {
-      max-width: 150px;
+      min-height: 100px;
       border-radius: 10px;
+      font-size: 1em;
+      padding: 10px;
     }
     input[type="file"] {
+      margin-top: 10px;
+      background: white;
+      color: black;
+    }
+    .note-container {
       margin-top: 20px;
+      background: rgba(255, 192, 203, 0.3);
+      border: 2px solid pink;
+      border-radius: 12px;
+      padding: 15px;
+      position: relative;
+    }
+    .note-image {
+      max-width: 150px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: violet;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-
-  <button class="back-btn" onclick="history.back()">← Retour</button>
   <h1>🗒️ Mes notes</h1>
-
-  <textarea id="noteArea" placeholder="Écris ta note ici..."></textarea>
-  <input type="file" id="noteImage" accept="image/*" />
-  <div class="image-preview" id="previewContainer"></div>
+  <textarea id="noteText" placeholder="Écris ta note ici..."></textarea>
+  <input type="file" id="noteImage" accept="image/*"/>
+  <button onclick="saveNote()">Sauvegarder</button>
+  <div id="noteDisplay"></div>
+  <a class="back-btn" href="index.html">⬅️ Retour</a>
 
   <script>
-    const noteArea = document.getElementById('noteArea');
-    const noteImage = document.getElementById('noteImage');
-    const previewContainer = document.getElementById('previewContainer');
+    function saveNote() {
+      const text = document.getElementById("noteText").value;
+      const file = document.getElementById("noteImage").files[0];
 
-    // Charger données
-    window.onload = function() {
-      const savedNote = localStorage.getItem('noteText');
-      const savedImage = localStorage.getItem('noteImage');
-      if (savedNote) noteArea.value = savedNote;
-      if (savedImage) {
-        const img = document.createElement('img');
-        img.src = savedImage;
-        previewContainer.innerHTML = '';
-        previewContainer.appendChild(img);
-      }
-    };
+      if (!text && !file) return;
 
-    // Sauvegarder automatiquement le texte
-    noteArea.addEventListener('input', () => {
-      localStorage.setItem('noteText', noteArea.value);
-    });
-
-    // Sauvegarder l'image
-    noteImage.addEventListener('change', () => {
-      const file = noteImage.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          localStorage.setItem('noteImage', e.target.result);
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          previewContainer.innerHTML = '';
-          previewContainer.appendChild(img);
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const note = {
+          text,
+          image: file ? e.target.result : null
         };
-        reader.readAsDataURL(file);
-      }
-    });
-  </script>
+        localStorage.setItem("note", JSON.stringify(note));
+        showNote();
+        document.getElementById("noteText").value = "";
+        document.getElementById("noteImage").value = "";
+      };
 
-</body>
-</html>
+      if (file) reader.readAsData
