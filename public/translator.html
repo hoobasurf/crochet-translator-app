@@ -2,30 +2,26 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduction</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="translate.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Traduction</h1>
+  <div class="background"></div>
+  <header><h1 class="title">Traduction</h1></header>
 
-    <label for="urlInput">Traduire depuis une URL :</label>
-    <input class="url-box" id="urlInput" type="text" placeholder="Colle une URL ici" />
-    <button onclick="translateFromURL()">Traduire l’URL</button>
+  <main class="translator">
+    <textarea id="text-input" placeholder="Copier-coller un texte à traduire..."></textarea>
+    <button onclick="translateText()" class="btn-link">Traduire le texte</button>
 
-    <label for="imageInput">Traduire depuis une image :</label>
-    <input type="file" id="imageInput" accept="image/*" />
-    <button onclick="translateFromImage()">Traduire l’image</button>
+    <input type="text" id="url-input" placeholder="URL d’image à traduire..." />
+    <button onclick="translateImageURL()" class="btn-link">Traduire l’image via URL</button>
 
-    <label for="textInput">Traduire un texte :</label>
-    <textarea id="textInput" rows="5" placeholder="Écris ou colle un texte ici…"></textarea>
-    <button onclick="translateText()">Traduire le texte</button>
+    <input type="file" id="image-file" accept="image/*" />
+    <button onclick="translateImageFile()" class="btn-link">Traduire une image</button>
 
-    <div id="output"></div>
-
-    <a class="btn-link" href="index.html">Retour accueil</a>
-  </div>
-
-  <script src="translate.js"></script>
+    <div id="result" class="result-area"></div>
+  </main>
 </body>
 </html>
