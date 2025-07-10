@@ -3,97 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crochet Steph - Mes notes</title>
+  <title>Mes notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
-    /* Même style que dans index.html */
     body {
-      margin: 0; padding: 0;
+      margin: 0; padding: 20px;
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      overflow-x: hidden;
-      min-height: 100vh;
+      background: url('fond-accueil.jpg') no-repeat center center/cover;
+      color: white;
     }
-    header {
+    h1 {
       text-align: center;
-      padding: 40px 10px 20px;
-      font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
+      font-size: 2.2em;
     }
-    .btn-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 40px;
-    }
-    .btn-link {
+    .back-btn {
       background: linear-gradient(135deg, violet, pink);
       color: white;
-      padding: 15px 25px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.2em;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-size: 1em;
+      padding: 12px;
       border-radius: 12px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      border: none;
+      resize: vertical;
     }
-    .btn-link:hover { transform: scale(1.05); }
-    .chat, .pelote {
-      position: fixed;
-      top: 10px;
-      width: 80px;
-      animation: jump 2s ease-in-out infinite;
-      z-index: 999;
+    .image-preview {
+      margin-top: 20px;
     }
-    .chat { left: 20px; }
-    .pelote { left: 120px; }
-    @keyframes jump {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
+    .image-preview img {
+      max-width: 150px;
+      border-radius: 10px;
     }
-    /* Style pour la page de notes */
-    .btn-container h2 {
-      color: white;
-      text-align: center;
-    }
-    .btn-container p {
-      color: white;
-      text-align: center;
-      width: 80%;
-      max-width: 600px;
-    }
-    .btn-container ul {
-      width: 80%;
-      max-width: 600px;
-      background: rgba(255,255,255,0.85);
-      padding: 10px 15px;
-      list-style: none;
-      border-radius: 8px;
-    }
-    .btn-container ul li {
-      margin: 8px 0;
-      color: #333;
+    input[type="file"] {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <img src="chat.png" alt="Chat" class="chat" />
-  <img src="pelote.png" alt="Pelote" class="pelote" />
-  <header>Crochet Steph 🧶</header>
-  <div class="btn-container">
-    <h2>🗒️ Mes notes</h2>
-    <p>Bienvenue sur ma page Mes notes ! Ici je partage mes réflexions et astuces de crochet :</p>
-    <ul>
-      <li><strong>Note 1 :</strong> La laine mohair est légère et chaude, idéale pour les écharpes d'hiver.</li>
-      <li><strong>Note 2 :</strong> J'ai récemment appris un nouveau point de crochet : le point de coquille.</li>
-      <li><strong>Note 3 :</strong> Prochain projet inspirant : une couverture multicolore pour bébé.</li>
-    </ul>
-  </div>
+
+  <button class="back-btn" onclick="history.back()">← Retour</button>
+  <h1>🗒️ Mes notes</h1>
+
+  <textarea id="noteArea" placeholder="Écris ta note ici..."></textarea>
+  <input type="file" id="noteImage" accept="image/*" />
+  <div class="image-preview" id="previewContainer"></div>
+
+  <script>
+    const noteArea = document.getElementById('noteArea');
+    const noteImage = document.getElementById('noteImage');
+    const previewContainer = document.getElementById('previewContainer');
+
+    // Charger données
+    window.onload = function() {
+      const savedNote = localStorage.getItem('noteText');
+      const savedImage = localStorage.getItem('noteImage');
+      if (savedNote) noteArea.value = savedNote;
+      if (savedImage) {
+        const img = document.createElement('img');
+        img.src = savedImage;
+        previewContainer.innerHTML = '';
+        previewContainer.appendChild(img);
+      }
+    };
+
+    // Sauvegarder automatiquement le texte
+    noteArea.addEventListener('input', () => {
+      localStorage.setItem('noteText', noteArea.value);
+    });
+
+    // Sauvegarder l'image
+    noteImage.addEventListener('change', () => {
+      const file = noteImage.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          localStorage.setItem('noteImage', e.target.result);
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          previewContainer.innerHTML = '';
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+
 </body>
 </html>
