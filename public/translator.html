@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Traduire image / fichier</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traduction</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>Traduire image / fichier</h2>
-    <input type="file" id="imageUpload" accept="image/*">
-    <button class="button" onclick="analyzeImage()">Analyser et traduire</button>
-    <div id="detected" class="output"></div>
-    <div id="translated" class="output"></div>
-    <a class="btn-link" href="index.html">← Retour</a>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
-  <script>
-async function analyzeImage() {
-  const inp = document.getElementById("imageUpload");
-  const outD = document.getElementById("detected");
-  const outT = document.getElementById("translated");
-  outD.textContent = "Analyse de l’image...";
-  outT.textContent = "";
-  if (!inp.files[0]) { outD.textContent="Aucune image sélectionnée !"; return; }
-  try {
-    const { data: { text }} = await Tesseract.recognize(inp.files[0], 'eng');
-    outD.textContent = text || "(aucun texte trouvé)";
-    const resp = await fetch('/.netlify/functions/translate', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text })
-    });
-    const js = await resp.json();
-    outT.textContent = js.translatedText || "(erreur traduction)";
-  } catch(e) {
-    outD.textContent = "Erreur OCR/Trad : " + e.message;
-  }
-}
-  </script>
+  <header>
+    <button onclick="window.location.href='index.html'" class="btn-back">← Retour</button>
+    <h1>Traduire un texte</h1>
+  </header>
+
+  <main>
+    <textarea id="sourceText" placeholder="Texte à traduire..."></textarea>
+    <select id="targetLang">
+      <option value="fr">Français</option>
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+    </select>
+    <button id="translateBtn" class="btn-save">Traduire</button>
+    <div id="result"></div>
+
+    <h2>Ou traduire une image</h2>
+    <input type="file" id="imageInput" accept="image/*" />
+    <button id="ocrBtn" class="btn-save">Analyser l'image</button>
+    <p id="ocrResult"></p>
+  </main>
+
+  <script src="translate.js"></script>
 </body>
 </html>
