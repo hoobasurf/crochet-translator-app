@@ -1,74 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Notes - Crochet Steph</title>
+  <meta charset="UTF-8" />
+  <title>Mes Notes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
+      margin: 0; padding: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
       min-height: 100vh;
-      padding: 20px;
     }
 
-    header {
+    h1 {
       text-align: center;
-      font-size: 2.3em;
-      margin-bottom: 30px;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: deeppink;
+      font-size: 2.2em;
+      margin-top: 30px;
     }
 
-    .back-button {
-      background: linear-gradient(to right, #ff9a9e, #fad0c4);
-      border: none;
-      font-size: 1em;
+    .form-section {
+      text-align: center;
+      margin: 20px;
+    }
+
+    input[type="file"], input[type="text"] {
+      display: block;
+      margin: 10px auto;
+      font-family: 'Pacifico', cursive;
+    }
+
+    button {
+      font-family: 'Pacifico', cursive;
       padding: 10px 20px;
-      border-radius: 25px;
-      margin-bottom: 20px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      box-shadow: 0 0 10px pink;
-    }
-
-    .note-form {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    input[type="text"], textarea {
-      font-family: 'Pacifico', cursive;
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      margin: 10px auto;
-      display: block;
-      border-radius: 10px;
-      border: 2px solid pink;
-      background-color: #fff5fb;
-      font-size: 1em;
-    }
-
-    input[type="file"] {
-      display: block;
-      margin: 10px auto;
-    }
-
-    .save-button {
-      background: linear-gradient(135deg, violet, pink);
+      background: deeppink;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-family: 'Pacifico', cursive;
     }
 
     .notes-grid {
@@ -76,6 +48,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
+      padding: 20px;
     }
 
     .note-item {
@@ -83,170 +56,163 @@
       border: 3px solid pink;
       border-radius: 15px;
       padding: 10px;
-      width: 160px;
+      width: 45%;
+      box-sizing: border-box;
       text-align: center;
       position: relative;
     }
 
     .note-item img {
-      width: 100%;
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
       cursor: pointer;
-    }
-
-    .note-title {
-      margin-top: 8px;
-      font-weight: bold;
-      font-size: 1em;
-    }
-
-    .note-text {
-      font-size: 0.9em;
     }
 
     .delete-btn {
       position: absolute;
       top: 5px;
-      right: 7px;
+      right: 10px;
       background: transparent;
-      border: none;
-      font-size: 1.2em;
       color: red;
+      font-size: 1.2em;
+      border: none;
       cursor: pointer;
     }
 
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+    .legend {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #555;
     }
 
-    .modal img {
+    .back-btn {
+      display: block;
+      margin: 0 auto 30px;
+      text-align: center;
+      background-color: violet;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 15px;
+      text-decoration: none;
+      font-size: 1.2em;
+      width: fit-content;
+    }
+
+    @media screen and (max-width: 600px) {
+      .note-item {
+        width: 90%;
+      }
+    }
+
+    /* Modal image plein écran */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+    }
+
+    #modal img {
+      display: block;
       max-width: 90%;
-      max-height: 90%;
-      border: 4px solid white;
-      border-radius: 20px;
+      max-height: 80%;
+      margin: 5% auto;
+      border: 5px solid white;
+      border-radius: 15px;
+    }
+
+    #modal:target {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour à l’accueil</button>
-  <header>🗒️ Mes Notes</header>
+  <h1>📝 Mes Notes</h1>
 
-  <div class="note-form">
-    <input type="file" id="note-image" />
-    <input type="text" id="note-title" placeholder="Titre ou légende (facultatif)">
-    <textarea id="note-text" placeholder="Écris ta note ici..." rows="4"></textarea>
-    <button class="save-button" onclick="saveNote()">💾 Sauvegarder</button>
+  <div class="form-section">
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="legendInput" placeholder="Note ou légende (facultatif)">
+    <button onclick="saveNote()">Sauvegarder</button>
   </div>
 
-  <div class="notes-grid" id="notes-list"></div>
+  <div class="notes-grid" id="notesContainer"></div>
 
-  <div class="modal" id="imageModal" onclick="closeModal()">
-    <img id="modalImage" src="" alt="Image en grand">
+  <a class="back-btn" href="index.html">⟵ Retour</a>
+
+  <div id="modal" onclick="closeModal()">
+    <img id="modalImage" src="">
   </div>
 
   <script>
-    const noteImageInput = document.getElementById('note-image');
-    const noteTitleInput = document.getElementById('note-title');
-    const noteTextInput = document.getElementById('note-text');
-    const notesList = document.getElementById('notes-list');
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
+    function saveNote() {
+      const fileInput = document.getElementById('imageInput');
+      const legend = document.getElementById('legendInput').value;
+      const file = fileInput.files[0];
 
-    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      if (!file) return;
 
-    function renderNotes() {
-      notesList.innerHTML = '';
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+        notes.push({ image: e.target.result, legend: legend });
+        localStorage.setItem('notes', JSON.stringify(notes));
+        displayNotes();
+        fileInput.value = '';
+        document.getElementById('legendInput').value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function displayNotes() {
+      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      const container = document.getElementById('notesContainer');
+      container.innerHTML = '';
+
       notes.forEach((note, index) => {
         const div = document.createElement('div');
         div.className = 'note-item';
-        if (note.image && note.image.startsWith("data:image")) {
-          const img = document.createElement('img');
-          img.src = note.image;
-          img.onclick = () => openModal(note.image);
-          div.appendChild(img);
-        }
 
-        if (note.title) {
-          const title = document.createElement('div');
-          title.className = 'note-title';
-          title.textContent = note.title;
-          div.appendChild(title);
-        }
+        const img = document.createElement('img');
+        img.src = note.image;
+        img.alt = 'Note';
+        img.onclick = () => openModal(note.image);
 
-        if (note.text) {
-          const text = document.createElement('div');
-          text.className = 'note-text';
-          text.textContent = note.text;
-          div.appendChild(text);
-        }
+        const p = document.createElement('p');
+        p.className = 'legend';
+        p.textContent = note.legend || '';
 
         const del = document.createElement('button');
         del.className = 'delete-btn';
         del.innerHTML = '✖';
-        del.onclick = () => {
-          notes.splice(index, 1);
-          localStorage.setItem('notes', JSON.stringify(notes));
-          renderNotes();
-        };
-        div.appendChild(del);
+        del.onclick = () => deleteNote(index);
 
-        notesList.appendChild(div);
+        div.appendChild(del);
+        div.appendChild(img);
+        div.appendChild(p);
+        container.appendChild(div);
       });
     }
 
-    function saveNote() {
-      const file = noteImageInput.files[0];
-      const title = noteTitleInput.value.trim();
-      const text = noteTextInput.value.trim();
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const note = {
-            image: e.target.result,
-            title,
-            text
-          };
-          notes.push(note);
-          localStorage.setItem('notes', JSON.stringify(notes));
-          resetForm();
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const note = {
-          image: null,
-          title,
-          text
-        };
-        notes.push(note);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        resetForm();
-      }
-    }
-
-    function resetForm() {
-      noteImageInput.value = '';
-      noteTitleInput.value = '';
-      noteTextInput.value = '';
-      renderNotes();
+    function deleteNote(index) {
+      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      notes.splice(index, 1);
+      localStorage.setItem('notes', JSON.stringify(notes));
+      displayNotes();
     }
 
     function openModal(src) {
-      modalImage.src = src;
-      modal.style.display = 'flex';
+      document.getElementById('modalImage').src = src;
+      document.getElementById('modal').style.display = 'block';
     }
 
     function closeModal() {
-      modal.style.display = 'none';
+      document.getElementById('modal').style.display = 'none';
     }
 
-    renderNotes();
+    window.onload = displayNotes;
   </script>
 </body>
 </html>
