@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes notes</title>
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <style>
+    body{margin:0;padding:0;font-family:'Pacifico',cursive;background:url('fond-accueil.jpg') center/cover no-repeat;overflow-x:hidden;min-height:100vh;}
+    header{margin-top:80px;text-align:center;font-size:2em;background:linear-gradient(135deg,violet,pink);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .chat,.pelote{position:fixed;top:10px;width:80px;animation:jump 2s ease-in-out infinite;z-index:999;}
+    .chat{left:20px;} .pelote{left:120px;}
+    @keyframes jump{0%,100%{transform:translateY(0);}50%{transform:translateY(-20px);}}
+    .content{display:flex;flex-direction:column;align-items:center;gap:20px;margin-top:40px;}
+    .content input,.content textarea{width:80%;padding:10px;font-size:1em;border-radius:6px;border:none;}
+    .content button{padding:12px 20px;font-size:1.1em;border:none;border-radius:12px;background:violet;color:white;cursor:pointer;}
+    .content button:hover{opacity:0.9;}
+  </style>
 </head>
 <body>
-  <img src="chat.png" alt="Chat" class="chat" />
+  <img src="chat.png" class="chat"/>
+  <img src="pelote.png" class="pelote"/>
   <header>Mes notes 🗒️</header>
-
-  <div class="btn-container">
-    <input type="text" id="titre-note" placeholder="Titre (facultatif)" />
-    <textarea id="contenu-note" placeholder="Contenu (facultatif)"></textarea>
+  <div class="content">
+    <input type="text" id="titreNote" placeholder="Titre (optionnel)">
+    <textarea id="contenuNote" placeholder="Contenu (optionnel)"></textarea>
     <button onclick="saveNote()">Sauvegarder</button>
+    <a class="btn-link" href="index.html">← Retour</a>
   </div>
-
   <script>
-    function saveNote() {
-      const titre = document.getElementById('titre-note').value;
-      const contenu = document.getElementById('contenu-note').value;
-
-      const note = { titre, contenu };
-      localStorage.setItem('note-' + Date.now(), JSON.stringify(note));
-      alert('Note sauvegardée !');
+    function saveNote(){
+      const t=document.getElementById('titreNote').value;
+      const c=document.getElementById('contenuNote').value;
+      if(!t&&!c){alert('Rien à sauvegarder.');return;}
+      const n={titre:t||null, contenu:c||null};
+      localStorage.setItem('note_'+Date.now(),JSON.stringify(n));
+      alert('Note enregistrée !');
     }
   </script>
 </body>
