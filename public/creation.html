@@ -2,69 +2,36 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes créations</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <button onclick="window.location.href='index.html'" class="btn-back">← Retour</button>
+  <div class="container">
     <h1>Mes créations</h1>
-  </header>
+    <input type="file" id="imageInput" accept="image/*" />
+    <button onclick="addCreation()">Ajouter création</button>
 
-  <main>
-    <form id="creationForm">
-      <input type="text" id="creationTitle" placeholder="Titre de la création" required />
-      <input type="file" id="creationImage" accept="image/*" required />
-      <textarea id="creationDescription" placeholder="Décris ta création..."></textarea>
-      <button type="submit" class="btn-save">Sauvegarder</button>
-    </form>
-
-    <div id="creationsList"></div>
-  </main>
+    <div id="creationsContainer"></div>
+    <a class="btn-link" href="index.html">Retour accueil</a>
+  </div>
 
   <script>
-    const form = document.getElementById("creationForm");
-    const list = document.getElementById("creationsList");
+    const imageInput = document.getElementById("imageInput");
+    const container = document.getElementById("creationsContainer");
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const title = document.getElementById("creationTitle").value;
-      const imageFile = document.getElementById("creationImage").files[0];
-      const description = document.getElementById("creationDescription").value;
+    function addCreation() {
+      const file = imageInput.files[0];
+      if (!file) return;
 
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const data = {
-          title,
-          image: reader.result,
-          description
-        };
-        const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-        creations.push(data);
-        localStorage.setItem("creations", JSON.stringify(creations));
-        displayCreations();
-        form.reset();
+      reader.onload = () => {
+        const img = document.createElement("img");
+        img.src = reader.result;
+        img.style.maxWidth = "300px";
+        container.appendChild(img);
       };
-      if (imageFile) reader.readAsDataURL(imageFile);
-    });
-
-    function displayCreations() {
-      const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-      list.innerHTML = "";
-      creations.forEach((c) => {
-        const div = document.createElement("div");
-        div.className = "creation-item";
-        div.innerHTML = `
-          <h3>${c.title}</h3>
-          <img src="${c.image}" alt="Création" />
-          <p>${c.description}</p>
-        `;
-        list.appendChild(div);
-      });
+      reader.readAsDataURL(file);
     }
-
-    displayCreations();
   </script>
 </body>
 </html>
