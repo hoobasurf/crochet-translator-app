@@ -26,14 +26,15 @@
     }
 
     .back-button {
-      background: pink;
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
       border: none;
       font-size: 1em;
       padding: 10px 20px;
-      border-radius: 12px;
+      border-radius: 25px;
       margin-bottom: 20px;
       cursor: pointer;
       font-family: 'Pacifico', cursive;
+      box-shadow: 0 0 10px pink;
     }
 
     .note-form {
@@ -133,11 +134,11 @@
   </style>
 </head>
 <body>
-  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour</button>
+  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour à l’accueil</button>
   <header>🗒️ Mes Notes</header>
 
   <div class="note-form">
-    <input type="file" id="note-image" accept="image/*" />
+    <input type="file" id="note-image" />
     <input type="text" id="note-title" placeholder="Titre ou légende (facultatif)">
     <textarea id="note-text" placeholder="Écris ta note ici..." rows="4"></textarea>
     <button class="save-button" onclick="saveNote()">💾 Sauvegarder</button>
@@ -164,18 +165,20 @@
       notes.forEach((note, index) => {
         const div = document.createElement('div');
         div.className = 'note-item';
-        if (note.image) {
+        if (note.image && note.image.startsWith("data:image")) {
           const img = document.createElement('img');
           img.src = note.image;
           img.onclick = () => openModal(note.image);
           div.appendChild(img);
         }
+
         if (note.title) {
           const title = document.createElement('div');
           title.className = 'note-title';
           title.textContent = note.title;
           div.appendChild(title);
         }
+
         if (note.text) {
           const text = document.createElement('div');
           text.className = 'note-text';
@@ -199,39 +202,39 @@
 
     function saveNote() {
       const file = noteImageInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        const imageData = file ? e.target.result : null;
-        const note = {
-          image: imageData,
-          title: noteTitleInput.value.trim(),
-          text: noteTextInput.value.trim()
-        };
-
-        notes.push(note);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        noteImageInput.value = '';
-        noteTitleInput.value = '';
-        noteTextInput.value = '';
-        renderNotes();
-      };
+      const title = noteTitleInput.value.trim();
+      const text = noteTextInput.value.trim();
 
       if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const note = {
+            image: e.target.result,
+            title,
+            text
+          };
+          notes.push(note);
+          localStorage.setItem('notes', JSON.stringify(notes));
+          resetForm();
+        };
         reader.readAsDataURL(file);
       } else {
         const note = {
           image: null,
-          title: noteTitleInput.value.trim(),
-          text: noteTextInput.value.trim()
+          title,
+          text
         };
-
         notes.push(note);
         localStorage.setItem('notes', JSON.stringify(notes));
-        noteTitleInput.value = '';
-        noteTextInput.value = '';
-        renderNotes();
+        resetForm();
       }
+    }
+
+    function resetForm() {
+      noteImageInput.value = '';
+      noteTitleInput.value = '';
+      noteTextInput.value = '';
+      renderNotes();
     }
 
     function openModal(src) {
