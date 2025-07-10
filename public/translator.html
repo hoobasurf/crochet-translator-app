@@ -2,31 +2,22 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traduction - Crochet Steph</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <button onclick="window.location.href='index.html'" class="btn-back">← Retour</button>
-    <h1>Traduire un texte</h1>
-  </header>
+  <h1 class="main-title">Traduction</h1>
 
-  <main>
-    <textarea id="sourceText" placeholder="Texte à traduire..."></textarea>
-    <select id="targetLang">
-      <option value="fr">Français</option>
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-    </select>
-    <button id="translateBtn" class="btn-save">Traduire</button>
-    <div id="result"></div>
+  <div class="translator-container">
+    <input type="text" id="imageUrl" placeholder="URL de l'image à traduire" class="input-url"/>
 
-    <h2>Ou traduire une image</h2>
-    <input type="file" id="imageInput" accept="image/*" />
-    <button id="ocrBtn" class="btn-save">Analyser l'image</button>
-    <p id="ocrResult"></p>
-  </main>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <div id="imagePreview"></div>
+
+    <button onclick="translateImage()" class="btn-action">Traduire l'image</button>
+    <div id="translatedText" class="result-box"></div>
+  </div>
 
   <script src="translate.js"></script>
 </body>
