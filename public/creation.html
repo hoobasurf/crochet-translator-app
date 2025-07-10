@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes Créations</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Création</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
@@ -33,8 +33,8 @@
     }
 
     .form-group {
-      margin-bottom: 20px;
       text-align: center;
+      margin-bottom: 20px;
     }
 
     input[type="file"],
@@ -44,6 +44,11 @@
       border-radius: 10px;
       border: none;
       font-family: 'Pacifico', cursive;
+    }
+
+    input[type="file"] {
+      background: #fff;
+      color: black;
     }
 
     button {
@@ -61,7 +66,6 @@
       grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
       gap: 20px;
       width: 90%;
-      margin-top: 20px;
     }
 
     .item {
@@ -112,7 +116,6 @@
       font-family: 'Pacifico', cursive;
     }
 
-    /* Grand format image */
     #fullScreen {
       display: none;
       position: fixed;
@@ -136,9 +139,9 @@
   <header>🎨 Mes Créations</header>
   <div class="container">
     <div class="form-group">
-      <input type="file" id="imageInput" accept="image/*">
+      <input type="file" id="imageInput" accept="image/*" multiple>
       <input type="text" id="captionInput" placeholder="Titre ou légende (facultatif)">
-      <button onclick="addCreation()">Sauvegarder</button>
+      <button onclick="addCreations()">Sauvegarder</button>
     </div>
     <div class="grid" id="creationGrid"></div>
     <a href="index.html" class="back-btn">⬅ Retour</a>
@@ -152,22 +155,25 @@
     const grid = document.getElementById('creationGrid');
     let creations = JSON.parse(localStorage.getItem('creations')) || [];
 
-    function addCreation() {
+    function addCreations() {
       const input = document.getElementById('imageInput');
       const caption = document.getElementById('captionInput').value;
+      const files = input.files;
 
-      if (!input.files.length) return;
+      if (!files.length) return;
 
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        creations.push({ src: reader.result, caption });
-        localStorage.setItem('creations', JSON.stringify(creations));
-        renderCreations();
-        input.value = '';
-        document.getElementById('captionInput').value = '';
-      };
-      reader.readAsDataURL(file);
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          creations.push({ src: reader.result, caption });
+          localStorage.setItem('creations', JSON.stringify(creations));
+          renderCreations();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      input.value = '';
+      document.getElementById('captionInput').value = '';
     }
 
     function renderCreations() {
