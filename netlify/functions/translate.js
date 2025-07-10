@@ -1,67 +1,36 @@
-const fetch = require("node-fetch");
+const vision = require('@google-cloud/vision');
+const client = new vision.ImageAnnotatorClient();
 
-const unitsMap = {
-  inch: "pouce",
-  inches: "pouces",
-  in: "po",
-  ft: "pied",
-  feet: "pieds",
-  yard: "yard",
-  yards: "yards",
-  cm: "cm",
-  mm: "mm",
-  kg: "kg",
-  g: "g",
-  oz: "oz",
-  lb: "livre",
-  lbs: "livres",
-  "°F": "degrés Fahrenheit",
-  "°C": "degrés Celsius",
-};
+exports.handler = async (event) => {
+  const multiparty = require('multiparty');
+  const form = new multiparty.Form();
 
-function replaceUnits(text) {
-  return text.replace(
-    /\b(?:inches|inch|in|ft|feet|yard|yards|cm|mm|kg|g|oz|lb|lbs|°F|°C)\b/g,
-    (match) => unitsMap[match] || match
-  );
-}
+  return new Promise((resolve, reject) => {
+    form.parse(event, async (err, fields, files) => {
+      if (err) return reject({ statusCode: 500, body: "Erreur form" });
 
-exports.handler = async function (event) {
-  try {
-    const body = JSON.parse(event.body);
-    const inputText = body.text;
-    const targetLang = body.target || "fr";
+      const imageUrl = fields.imageUrl?.[0];
+      const imageFile = files.imageFile?.[0];
 
-    if (!inputText) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Texte manquant" }),
-      };
-    }
+      let request;
+      if (imageUrl) {
+        request = { image: { source: { imageUri: imageUrl } } };
+      } else if (imageFile) {
+        const fs = require('fs');
+        const imageBuffer = fs.readFileSync(imageFile.path);
+        request = { image: { content: imageBuffer.toString("base64") } };
+      } else {
+        return resolve({ statusCode: 400, body: "Aucune image reçue" });
+      }
 
-    const enrichedText = replaceUnits(inputText);
+      const [result] = await client.textDetection(request);
+      const detections = result.textAnnotations;
+      const text = detections.length ? detections[0].description : "Aucun texte détecté";
 
-    const response = await fetch("https://libretranslate.com/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: enrichedText,
-        source: "auto",
-        target: targetLang,
-        format: "text",
-      }),
+      resolve({
+        statusCode: 200,
+        body: JSON.stringify({ text }),
+      });
     });
-
-    const data = await response.json();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ translatedText: data.translatedText }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Erreur de traduction", details: error.message }),
-    };
-  }
+  });
 };
