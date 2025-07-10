@@ -1,36 +1,50 @@
-const vision = require('@google-cloud/vision');
-const client = new vision.ImageAnnotatorClient();
+const fetch = require('node-fetch');
+const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const multer = require('multer');
+const upload = multer({ dest: '/tmp' });
 
-exports.handler = async (event) => {
-  const multiparty = require('multiparty');
-  const form = new multiparty.Form();
+const DEEPL_KEY = process.env.DEEPL_KEY; 
+const DEEPL_URL = 'https://api-free.deepl.com/v2/translate';
 
-  return new Promise((resolve, reject) => {
-    form.parse(event, async (err, fields, files) => {
-      if (err) return reject({ statusCode: 500, body: "Erreur form" });
-
-      const imageUrl = fields.imageUrl?.[0];
-      const imageFile = files.imageFile?.[0];
-
-      let request;
-      if (imageUrl) {
-        request = { image: { source: { imageUri: imageUrl } } };
-      } else if (imageFile) {
-        const fs = require('fs');
-        const imageBuffer = fs.readFileSync(imageFile.path);
-        request = { image: { content: imageBuffer.toString("base64") } };
-      } else {
-        return resolve({ statusCode: 400, body: "Aucune image reçue" });
-      }
-
-      const [result] = await client.textDetection(request);
-      const detections = result.textAnnotations;
-      const text = detections.length ? detections[0].description : "Aucun texte détecté";
-
-      resolve({
-        statusCode: 200,
-        body: JSON.stringify({ text }),
-      });
-    });
-  });
+const tesseract = require('tesseract.js');
+const OCR = async (buffer) => {
+  const { data: { text } } = await tesseract.recognize(buffer, 'eng');
+  return text;
 };
+
+exports.handler = (event, context) => new Promise((resolve, reject)=> {
+  const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+  if (contentType?.startsWith('multipart/form-data')) {
+    // Handle file upload
+    upload.single('file')( { headers:event.headers, body:event.body }, {}, async ()=>{
+      const file = event.body.file;
+      const buffer = fs.readFileSync(file.path);
+      const text = await OCR(buffer);
+      const t = await translate(text);
+      resolve({ statusCode:200, body: JSON.stringify({ translatedText: t }) });
+    });
+  } else {
+    // JSON body
+    const d = JSON.parse(event.body);
+    if (d.type==='text') return translate(d.text).then(t=>resolve({statusCode:200,body:JSON.stringify({translatedText:t})}));
+    if (d.type==='url') {
+      const res = await fetch(d.url);
+      const buf = await res.buffer();
+      const text = await OCR(buf);
+      const t = await translate(text);
+      return resolve({statusCode:200,body:JSON.stringify({translatedText:t})});
+    }
+    resolve({statusCode:400,body:'{"error":"type manquant"}'});
+  }
+
+  async function translate(text){
+    const params = new URLSearchParams();
+    params.append('auth_key', DEEPL_KEY);
+    params.append('text', text);
+    params.append('target_lang', 'FR');
+    const r = await fetch(DEEPL_URL, { method:'POST', body: params });
+    const js = await r.json();
+    return js.translations[0].text;
+  }
+});
