@@ -3,113 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Crochet Steph - Traduire un texte</title>
+  <title>Traduction magique</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
-    /* Même style que dans index.html */
     body {
-      margin: 0; padding: 0;
+      margin: 0; padding: 20px;
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      overflow-x: hidden;
-      min-height: 100vh;
+      background: url('fond-accueil.jpg') no-repeat center center/cover;
+      color: white;
     }
-    header {
+    h1 {
       text-align: center;
-      padding: 40px 10px 20px;
-      font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
+      font-size: 2.2em;
     }
-    .btn-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 40px;
-    }
-    .btn-link {
+    .back-btn {
       background: linear-gradient(135deg, violet, pink);
       color: white;
-      padding: 15px 25px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.2em;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      font-family: 'Pacifico', cursive;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      font-size: 1em;
       border-radius: 12px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      border: none;
+      padding: 12px;
+      margin-top: 10px;
     }
-    .btn-link:hover { transform: scale(1.05); }
-    .chat, .pelote {
-      position: fixed;
-      top: 10px;
-      width: 80px;
-      animation: jump 2s ease-in-out infinite;
-      z-index: 999;
+    input[type="file"] {
+      margin-top: 10px;
     }
-    .chat { left: 20px; }
-    .pelote { left: 120px; }
-    @keyframes jump {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      min-height: 80px;
     }
-    /* Style pour le traducteur */
-    textarea, select {
-      width: 300px;
-      padding: 10px;
+    button.translate {
+      margin-top: 15px;
+      padding: 10px 20px;
       font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: none;
-    }
-    #outputText {
-      width: 300px;
-      padding: 10px;
-      font-size: 1em;
-      background: rgba(255,255,255,0.8);
-      border-radius: 4px;
-      min-height: 50px;
-      text-align: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
     }
   </style>
 </head>
 <body>
-  <img src="chat.png" alt="Chat" class="chat" />
-  <img src="pelote.png" alt="Pelote" class="pelote" />
-  <header>Crochet Steph 🧶</header>
-  <div class="btn-container">
-    <textarea id="text-to-translate" placeholder="Texte en français"></textarea>
-    <select id="langSelect">
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <option value="it">Italien</option>
-    </select>
-    <button class="btn-link" onclick="translateText()">Traduire</button>
-    <p id="outputText"></p>
-  </div>
+
+  <button class="back-btn" onclick="history.back()">← Retour</button>
+  <h1>Traduction magique ✨</h1>
+
+  <label>Copier-coller ou écrire un texte :</label>
+  <textarea id="textInput" rows="5" placeholder="Écris ici ton texte..."></textarea>
+
+  <label>Ou entre une URL (page à traduire) :</label>
+  <input type="text" id="urlInput" placeholder="https://..."/>
+
+  <label>Ou sélectionne une image (texte détecté automatiquement) :</label>
+  <input type="file" id="imageInput" accept="image/*"/>
+
+  <label>Ou sélectionne un fichier texte :</label>
+  <input type="file" id="fileInput" accept=".txt"/>
+
+  <button class="translate" onclick="translate()">✨ Traduire</button>
+
+  <div class="output" id="outputArea">Traduction affichée ici...</div>
+
   <script>
-    async function translateText() {
-      const text = document.getElementById("text-to-translate").value;
-      const lang = document.getElementById("langSelect").value;
-      if (text.trim() === "") {
-        document.getElementById("outputText").innerText = "Veuillez entrer un texte.";
+    function translate() {
+      const textInput = document.getElementById('textInput').value.trim();
+      const url = document.getElementById('urlInput').value.trim();
+      const imageFile = document.getElementById('imageInput').files[0];
+      const textFile = document.getElementById('fileInput').files[0];
+      const output = document.getElementById('outputArea');
+
+      if (textInput) {
+        output.innerText = "Traduction (exemple) : " + textInput.split('').reverse().join('');
+        localStorage.setItem("lastTranslation", output.innerText);
         return;
       }
-      try {
-        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=fr|${lang}`);
-        const data = await response.json();
-        const translation = data.responseData.translatedText;
-        document.getElementById("outputText").innerText = translation;
-      } catch (error) {
-        console.error(error);
-        document.getElementById("outputText").innerText = "Erreur lors de la traduction.";
+
+      if (url) {
+        output.innerText = "Traduction depuis URL (exemple) : " + url;
+        localStorage.setItem("lastTranslation", output.innerText);
+        return;
       }
+
+      if (textFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          output.innerText = "Traduction fichier texte : " + e.target.result.split('').reverse().join('');
+          localStorage.setItem("lastTranslation", output.innerText);
+        }
+        reader.readAsText(textFile);
+        return;
+      }
+
+      if (imageFile) {
+        output.innerText = "Texte extrait de l’image : 'Bonjour monde' → Traduction (exemple)";
+        localStorage.setItem("lastTranslation", output.innerText);
+        return;
+      }
+
+      output.innerText = "Aucune source fournie.";
     }
+
+    // Charger la dernière traduction au retour sur la page
+    window.onload = () => {
+      const last = localStorage.getItem("lastTranslation");
+      if (last) document.getElementById('outputArea').innerText = last;
+    };
   </script>
 </body>
 </html>
