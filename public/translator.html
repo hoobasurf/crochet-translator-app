@@ -1,27 +1,43 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="translate.js"></script>
-</head>
-<body>
-  <div class="background"></div>
-  <header><h1 class="title">Traduction</h1></header>
+// /public/translate.js
 
-  <main class="translator">
-    <textarea id="text-input" placeholder="Copier-coller un texte à traduire..."></textarea>
-    <button onclick="translateText()" class="btn-link">Traduire le texte</button>
+async function callFunction(name, init) {
+  const r = await fetch(`/.netlify/functions/${name}`, init);
+  return r.ok ? r.json() : Promise.reject(await r.text());
+}
 
-    <input type="text" id="url-input" placeholder="URL d’image à traduire..." />
-    <button onclick="translateImageURL()" class="btn-link">Traduire l’image via URL</button>
+async function translateText() {
+  const text = document.getElementById('text-input').value;
+  if (!text.trim()) return alert('Merci d’entrer un texte.');
+  const res = await callFunction('translate', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({type:'text', text})
+  });
+  document.getElementById('result').innerText = res.translatedText;
+}
 
-    <input type="file" id="image-file" accept="image/*" />
-    <button onclick="translateImageFile()" class="btn-link">Traduire une image</button>
+async function translateImageURL() {
+  const url = document.getElementById('url-input').value;
+  if (!url.trim()) return alert('Merci d’entrer une URL.');
+  const res = await callFunction('translate', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({type:'url', url})
+  });
+  document.getElementById('result').innerText = res.translatedText;
+}
 
-    <div id="result" class="result-area"></div>
-  </main>
-</body>
-</html>
+async function translateImageFile() {
+  const file = document.getElementById('image-file').files[0];
+  if (!file) return alert('Merci de sélectionner une image.');
+
+  const form = new FormData();
+  form.append('type','file');
+  form.append('file', file);
+
+  const res = await callFunction('translate', {
+    method: 'POST',
+    body: form
+  });
+  document.getElementById('result').innerText = res.translatedText;
+}
