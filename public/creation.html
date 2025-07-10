@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mes Créations</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
-      font-family: 'Pacifico', cursive;
+      font-family: 'Arial', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
+      margin: 0;
       padding: 20px;
-      color: #fff;
+      color: white;
     }
     h1 {
       text-align: center;
       font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
+      background: linear-gradient(to right, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -27,8 +26,8 @@
       margin: 0 auto 20px;
     }
     #creationList {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 15px;
       justify-content: center;
     }
@@ -36,19 +35,18 @@
       border: 4px solid pink;
       border-radius: 10px;
       padding: 10px;
-      width: 260px;
       background-color: rgba(255,255,255,0.1);
       position: relative;
     }
     .creation-item img {
-      max-width: 100%;
+      width: 100%;
       border-radius: 8px;
       cursor: pointer;
     }
     .caption-input {
       display: block;
-      margin: 10px auto 5px;
-      font-family: 'Pacifico', cursive;
+      margin: 10px auto;
+      font-family: 'Arial', cursive;
       font-size: 1em;
       padding: 5px;
       width: 90%;
@@ -56,7 +54,7 @@
     }
     .save-btn {
       display: block;
-      margin: 0 auto;
+      margin: 5px auto;
       padding: 6px 14px;
       background: pink;
       color: black;
@@ -67,9 +65,9 @@
     }
     .delete-btn {
       position: absolute;
-      top: 4px;
+      top: 6px;
       right: 6px;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.8);
       color: red;
       border: none;
       font-weight: bold;
@@ -89,17 +87,16 @@
       border-radius: 10px;
       font-weight: bold;
     }
-
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
-      z-index: 1000;
       top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.9);
       justify-content: center;
       align-items: center;
+      z-index: 999;
     }
     .modal img {
       max-width: 90vw;
@@ -110,7 +107,7 @@
   </style>
 </head>
 <body>
-  <h1>🎨 Mes Créations</h1>
+  <h1>🌸 Mes Créations</h1>
   <input type="file" id="imageInput" accept="image/*" multiple />
   <div id="creationList"></div>
   <a href="index.html" class="back-btn">⬅ Retour</a>
@@ -127,88 +124,83 @@
 
     let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 
-    const saveCreations = () => {
+    function saveCreations() {
       localStorage.setItem('creations', JSON.stringify(creations));
-    };
+    }
 
-    const displayCreations = () => {
+    function displayCreations() {
       creationList.innerHTML = '';
       creations.forEach((creation, index) => {
-        const container = document.createElement('div');
-        container.className = 'creation-item';
+        const item = document.createElement('div');
+        item.className = 'creation-item';
 
         const img = document.createElement('img');
         img.src = creation.data;
-        img.alt = creation.caption || 'Création';
+        img.alt = creation.caption || '';
         img.onclick = () => {
           modal.style.display = 'flex';
           modalImage.src = creation.data;
         };
 
         const caption = document.createElement('p');
-        caption.textContent = creation.caption || '';
         caption.className = 'caption-input';
+        caption.textContent = creation.caption || '';
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = '×';
-        deleteBtn.onclick = () => {
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.textContent = '×';
+        del.onclick = () => {
           creations.splice(index, 1);
           saveCreations();
           displayCreations();
         };
 
-        container.appendChild(deleteBtn);
-        container.appendChild(img);
-        container.appendChild(caption);
-        creationList.appendChild(container);
+        item.appendChild(del);
+        item.appendChild(img);
+        item.appendChild(caption);
+        creationList.appendChild(item);
       });
-    };
+    }
 
     imageInput.addEventListener('change', () => {
-      const files = [...imageInput.files];
-
+      const files = Array.from(imageInput.files);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = () => {
-          const imageData = reader.result;
-
-          const container = document.createElement('div');
-          container.className = 'creation-item';
+          const newItem = document.createElement('div');
+          newItem.className = 'creation-item';
 
           const img = document.createElement('img');
-          img.src = imageData;
-          img.alt = 'Nouvelle création';
+          img.src = reader.result;
+          img.alt = 'nouvelle image';
           img.onclick = () => {
             modal.style.display = 'flex';
-            modalImage.src = imageData;
+            modalImage.src = reader.result;
           };
 
-          const captionInput = document.createElement('input');
-          captionInput.className = 'caption-input';
-          captionInput.placeholder = 'Titre ou légende (facultatif)';
+          const input = document.createElement('input');
+          input.className = 'caption-input';
+          input.placeholder = 'Titre ou légende (facultatif)';
 
-          const saveBtn = document.createElement('button');
-          saveBtn.className = 'save-btn';
-          saveBtn.textContent = 'Sauvegarder';
-          saveBtn.onclick = () => {
-            const newCreation = {
-              data: imageData,
-              caption: captionInput.value.trim()
-            };
-            creations.push(newCreation);
+          const save = document.createElement('button');
+          save.className = 'save-btn';
+          save.textContent = 'Sauvegarder';
+          save.onclick = () => {
+            creations.push({
+              data: reader.result,
+              caption: input.value.trim()
+            });
             saveCreations();
             displayCreations();
           };
 
-          container.appendChild(img);
-          container.appendChild(captionInput);
-          container.appendChild(saveBtn);
-          creationList.appendChild(container);
+          newItem.appendChild(img);
+          newItem.appendChild(input);
+          newItem.appendChild(save);
+          creationList.appendChild(newItem);
         };
         reader.readAsDataURL(file);
       });
-
       imageInput.value = '';
     });
 
