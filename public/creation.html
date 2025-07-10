@@ -3,33 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Création</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <title>Mes Créations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      color: #fff;
+      margin: 0;
+      padding: 20px;
+      color: #333;
     }
 
-    header {
+    h1 {
       text-align: center;
       font-size: 2.5em;
-      padding: 20px;
       background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-
-    .container {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin-bottom: 30px;
     }
 
     .form-group {
@@ -39,181 +32,173 @@
 
     input[type="file"],
     input[type="text"] {
-      margin: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
+      margin: 10px auto;
+      display: block;
       font-family: 'Pacifico', cursive;
-    }
-
-    input[type="file"] {
-      background: #fff;
-      color: black;
     }
 
     button {
-      padding: 10px 20px;
-      background: violet;
-      border: none;
-      color: white;
-      border-radius: 10px;
       font-family: 'Pacifico', cursive;
+      background-color: violet;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 8px;
       cursor: pointer;
     }
 
-    .grid {
+    .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
       gap: 20px;
-      width: 90%;
+      margin-top: 30px;
     }
 
-    .item {
-      background: rgba(255, 192, 203, 0.3);
-      border: 2px solid pink;
-      border-radius: 15px;
+    .card {
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 3px solid pink;
+      border-radius: 10px;
       padding: 10px;
       position: relative;
       text-align: center;
     }
 
-    .item img {
-      width: 100%;
+    .card img {
+      max-width: 100%;
       border-radius: 10px;
       cursor: pointer;
     }
 
-    .item p {
-      margin-top: 10px;
-      font-weight: bold;
-      color: white;
-    }
-
-    .delete {
+    .delete-btn {
       position: absolute;
       top: 5px;
       right: 10px;
-      background: rgba(255, 0, 0, 0.7);
-      color: white;
+      font-size: 20px;
+      color: #c00;
+      background: none;
       border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
       cursor: pointer;
+    }
+
+    .legend {
+      margin-top: 10px;
       font-weight: bold;
     }
 
-    .back-btn {
-      margin: 30px auto;
-      display: block;
-      text-align: center;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      font-size: 1em;
-      text-decoration: none;
-      border-radius: 12px;
-      font-family: 'Pacifico', cursive;
-    }
-
-    #fullScreen {
-      display: none;
+    .fullscreen-img {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 1000;
     }
 
-    #fullScreen img {
+    .fullscreen-img img {
       max-width: 90%;
       max-height: 90%;
       border-radius: 10px;
     }
+
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: violet;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-family: 'Pacifico', cursive;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1001;
+    }
   </style>
 </head>
 <body>
-  <header>🎨 Mes Créations</header>
-  <div class="container">
-    <div class="form-group">
-      <input type="file" id="imageInput" accept="image/*" multiple>
-      <input type="text" id="captionInput" placeholder="Titre ou légende (facultatif)">
-      <button onclick="addCreations()">Sauvegarder</button>
-    </div>
-    <div class="grid" id="creationGrid"></div>
-    <a href="index.html" class="back-btn">⬅ Retour</a>
+
+  <button class="back-btn" onclick="window.location.href='index.html'">← Retour</button>
+  <h1>🎨 Mes Créations</h1>
+
+  <div class="form-group">
+    <input type="file" id="imageInput" accept="image/*,application/pdf" multiple />
+    <input type="text" id="legendInput" placeholder="Titre ou légende (facultatif)" />
+    <button onclick="saveCreation()">Sauvegarder</button>
   </div>
 
-  <div id="fullScreen" onclick="this.style.display='none'">
-    <img id="fullScreenImg" src="" alt="Grand format">
+  <div class="gallery" id="gallery"></div>
+
+  <div id="fullscreen" class="fullscreen-img" style="display:none;" onclick="this.style.display='none'">
+    <img id="fullscreen-img" src="" alt="Agrandissement" />
   </div>
 
   <script>
-    const grid = document.getElementById('creationGrid');
-    let creations = JSON.parse(localStorage.getItem('creations')) || [];
+    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+    const gallery = document.getElementById('gallery');
 
-    function addCreations() {
-      const input = document.getElementById('imageInput');
-      const caption = document.getElementById('captionInput').value;
-      const files = input.files;
+    function displayCreations() {
+      gallery.innerHTML = '';
+      creations.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.onclick = () => showFullscreen(item.image);
+        card.appendChild(img);
+
+        if (item.legend) {
+          const legend = document.createElement('div');
+          legend.className = 'legend';
+          legend.textContent = item.legend;
+          card.appendChild(legend);
+        }
+
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.textContent = '✖';
+        del.onclick = () => deleteCreation(index);
+        card.appendChild(del);
+
+        gallery.appendChild(card);
+      });
+    }
+
+    function saveCreation() {
+      const files = document.getElementById('imageInput').files;
+      const legend = document.getElementById('legendInput').value;
 
       if (!files.length) return;
 
       Array.from(files).forEach(file => {
         const reader = new FileReader();
-        reader.onload = () => {
-          creations.push({ src: reader.result, caption });
+        reader.onload = function (e) {
+          creations.push({ image: e.target.result, legend });
           localStorage.setItem('creations', JSON.stringify(creations));
-          renderCreations();
+          displayCreations();
         };
         reader.readAsDataURL(file);
       });
 
-      input.value = '';
-      document.getElementById('captionInput').value = '';
+      document.getElementById('imageInput').value = '';
+      document.getElementById('legendInput').value = '';
     }
 
-    function renderCreations() {
-      grid.innerHTML = '';
-      creations.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'item';
-
-        const img = document.createElement('img');
-        img.src = item.src;
-        img.alt = item.caption || 'Création';
-        img.onclick = () => showFullScreen(item.src);
-
-        const p = document.createElement('p');
-        p.textContent = item.caption || '';
-
-        const del = document.createElement('button');
-        del.className = 'delete';
-        del.textContent = '✖';
-        del.onclick = () => {
-          creations.splice(index, 1);
-          localStorage.setItem('creations', JSON.stringify(creations));
-          renderCreations();
-        };
-
-        div.appendChild(img);
-        div.appendChild(p);
-        div.appendChild(del);
-        grid.appendChild(div);
-      });
+    function deleteCreation(index) {
+      creations.splice(index, 1);
+      localStorage.setItem('creations', JSON.stringify(creations));
+      displayCreations();
     }
 
-    function showFullScreen(src) {
-      const viewer = document.getElementById('fullScreen');
-      const img = document.getElementById('fullScreenImg');
-      img.src = src;
-      viewer.style.display = 'flex';
+    function showFullscreen(src) {
+      document.getElementById('fullscreen-img').src = src;
+      document.getElementById('fullscreen').style.display = 'flex';
     }
 
-    renderCreations();
+    displayCreations();
   </script>
 </body>
 </html>
