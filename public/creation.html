@@ -3,126 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mes créations</title>
+  <title>Créations</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0; padding: 20px;
       font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') no-repeat center center/cover;
-      color: white;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      padding: 20px;
+      color: #fff;
     }
     h1 {
       text-align: center;
-      font-size: 2.2em;
-    }
-    .back-btn {
       background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-      cursor: pointer;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2em;
+    }
+    input, textarea, button {
       font-family: 'Pacifico', cursive;
-      margin-bottom: 20px;
-    }
-    .input-zone {
-      margin-top: 20px;
-    }
-    input[type="file"], input[type="text"] {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
+      margin: 10px 0;
+      padding: 10px;
       font-size: 1em;
-    }
-    .save-btn {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
+      border-radius: 8px;
       border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 12px;
-      margin-top: 15px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
     }
-    .gallery {
-      margin-top: 30px;
+    input[type="file"] {
+      background: #fff;
+      color: #000;
+    }
+    .preview {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
+      margin-top: 20px;
     }
-    .item {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 10px;
+    .preview-item {
+      background: rgba(255, 192, 203, 0.3);
+      border: 2px solid pink;
       border-radius: 12px;
-      width: 150px;
-      text-align: center;
+      padding: 10px;
+      position: relative;
     }
-    .item img {
-      max-width: 100%;
-      border-radius: 10px;
+    .preview-item img {
+      max-width: 150px;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    .item p {
+    .legend {
+      color: #fff;
       margin-top: 5px;
-      font-size: 0.9em;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: red;
       color: white;
-      word-wrap: break-word;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: violet;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-
-  <button class="back-btn" onclick="history.back()">← Retour</button>
   <h1>🎨 Mes créations</h1>
-
-  <div class="input-zone">
-    <input type="file" id="imageInput" accept="image/*" />
-    <input type="text" id="captionInput" placeholder="Titre ou légende (facultatif)" />
-    <button class="save-btn" onclick="saveCreation()">📸 Enregistrer la création</button>
-  </div>
-
-  <div class="gallery" id="gallery"></div>
+  <input type="file" id="image" accept="image/*">
+  <input type="text" id="legend" placeholder="Titre ou légende (facultatif)">
+  <button onclick="addCreation()">Sauvegarder</button>
+  <div class="preview" id="preview"></div>
+  <a class="back-btn" href="index.html">⬅️ Retour</a>
 
   <script>
-    function saveCreation() {
-      const imageInput = document.getElementById('imageInput');
-      const caption = document.getElementById('captionInput').value;
+    const imageInput = document.getElementById("image");
+    const legendInput = document.getElementById("legend");
+    const preview = document.getElementById("preview");
 
-      if (!imageInput.files[0]) {
-        alert("Merci de choisir une image !");
-        return;
-      }
+    function addCreation() {
+      const file = imageInput.files[0];
+      const legend = legendInput.value;
+      if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const imageData = e.target.result;
         const creations = JSON.parse(localStorage.getItem("creations") || "[]");
-        creations.push({ image: imageData, caption });
+        creations.push({ src: e.target.result, legend });
         localStorage.setItem("creations", JSON.stringify(creations));
         displayCreations();
-        imageInput.value = '';
-        document.getElementById('captionInput').value = '';
+        imageInput.value = "";
+        legendInput.value = "";
       };
-      reader.readAsDataURL(imageInput.files[0]);
+      reader.readAsDataURL(file);
     }
 
     function displayCreations() {
-      const container = document.getElementById('gallery');
-      container.innerHTML = '';
+      preview.innerHTML = "";
       const creations = JSON.parse(localStorage.getItem("creations") || "[]");
       creations.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <img src="${item.image}" alt="Création ${index + 1}" />
-          <p>${item.caption || ''}</p>
-        `;
-        container.appendChild(div);
+        const div = document.createElement("div");
+        div.className = "preview-item";
+
+        const img = document.createElement("img");
+        img.src = item.src;
+        img.onclick = () => showFullScreen(item.src);
+
+        const p = document.createElement("p");
+        p.className = "legend";
+        p.textContent = item.legend || "";
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "🗑️";
+        del.onclick = () => {
+          creations.splice(index, 1);
+          localStorage.setItem("creations", JSON.stringify(creations));
+          displayCreations();
+        };
+
+        div.appendChild(del);
+        div.appendChild(img);
+        div.appendChild(p);
+        preview.appendChild(div);
       });
+    }
+
+    function showFullScreen(src) {
+      const win = window.open();
+      win.document.write(`<img src="${src}" style="width:100%">`);
     }
 
     window.onload = displayCreations;
