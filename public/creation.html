@@ -1,214 +1,173 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Mes Créations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Arial', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
+      font-family: 'Pacifico', cursive;
+      background: url('fond-accueil.jpg') center/cover no-repeat fixed;
       margin: 0;
       padding: 20px;
-      color: white;
+      color: #333;
     }
     h1 {
       text-align: center;
       font-size: 2.5em;
-      background: linear-gradient(to right, violet, pink);
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    #imageInput {
-      display: block;
-      margin: 0 auto 20px;
+    .upload-container {
+      text-align: center;
+      margin-bottom: 30px;
     }
-    #creationList {
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      justify-content: center;
+      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+      gap: 20px;
     }
-    .creation-item {
-      border: 4px solid pink;
-      border-radius: 10px;
+    .card {
+      background: #ffe6f7;
+      border: 3px solid hotpink;
+      border-radius: 12px;
       padding: 10px;
-      background-color: rgba(255,255,255,0.1);
       position: relative;
+      text-align: center;
     }
-    .creation-item img {
-      width: 100%;
-      border-radius: 8px;
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
       cursor: pointer;
     }
-    .caption-input {
-      display: block;
-      margin: 10px auto;
-      font-family: 'Arial', cursive;
-      font-size: 1em;
-      padding: 5px;
+    .card textarea {
       width: 90%;
-      border-radius: 5px;
-    }
-    .save-btn {
-      display: block;
-      margin: 5px auto;
-      padding: 6px 14px;
-      background: pink;
-      color: black;
-      font-weight: bold;
-      border: none;
+      margin-top: 10px;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      border: 2px solid pink;
       border-radius: 8px;
-      cursor: pointer;
+      resize: none;
     }
     .delete-btn {
       position: absolute;
-      top: 6px;
-      right: 6px;
-      background: rgba(255,255,255,0.8);
-      color: red;
+      top: 5px;
+      right: 10px;
+      background: transparent;
       border: none;
-      font-weight: bold;
       font-size: 1.2em;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      color: crimson;
+      cursor: pointer;
+    }
+    .save-btn {
+      display: block;
+      margin: 15px auto;
+      padding: 10px 25px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
       cursor: pointer;
     }
     .back-btn {
+      margin-top: 30px;
       display: block;
-      margin: 20px auto;
-      padding: 10px 18px;
-      background: violet;
-      color: white;
+      text-align: center;
       text-decoration: none;
-      border-radius: 10px;
-      font-weight: bold;
+      color: white;
+      background: hotpink;
+      padding: 12px 25px;
+      border-radius: 20px;
+      font-size: 1em;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
     }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    .modal img {
-      max-width: 90vw;
-      max-height: 90vh;
-      border: 4px solid pink;
-      border-radius: 10px;
+    #preview img:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <h1>🌸 Mes Créations</h1>
-  <input type="file" id="imageInput" accept="image/*" multiple />
-  <div id="creationList"></div>
-  <a href="index.html" class="back-btn">⬅ Retour</a>
+  <h1>🎨 Mes Créations</h1>
 
-  <div class="modal" id="modal">
-    <img id="modalImage" src="" alt="Agrandie">
+  <div class="upload-container">
+    <input type="file" id="imageInput" accept="image/*">
   </div>
 
-  <script>
-    const imageInput = document.getElementById('imageInput');
-    const creationList = document.getElementById('creationList');
-    const modal = document.getElementById('modal');
-    const modalImage = document.getElementById('modalImage');
+  <div class="grid" id="preview"></div>
 
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+  <button class="save-btn" onclick="saveCreations()">Sauvegarder</button>
+
+  <a href="index.html" class="back-btn">⬅ Retour</a>
+
+  <script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+
+    function loadCreations() {
+      const saved = JSON.parse(localStorage.getItem("creations")) || [];
+      saved.forEach(item => {
+        addCard(item.src, item.caption);
+      });
+    }
+
+    function addCard(imgSrc, captionText = '') {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.src = imgSrc;
+      img.onclick = () => openFullscreen(imgSrc);
+
+      const caption = document.createElement("textarea");
+      caption.placeholder = "Titre ou légende (facultatif)";
+      caption.value = captionText;
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerHTML = "❌";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.onclick = () => card.remove();
+
+      card.appendChild(deleteBtn);
+      card.appendChild(img);
+      card.appendChild(caption);
+
+      preview.appendChild(card);
+    }
+
+    function openFullscreen(src) {
+      const win = window.open();
+      win.document.write(`<img src="${src}" style="width:100%;height:auto">`);
+    }
+
+    imageInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        addCard(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
 
     function saveCreations() {
-      localStorage.setItem('creations', JSON.stringify(creations));
+      const cards = document.querySelectorAll(".card");
+      const data = [];
+      cards.forEach(card => {
+        const img = card.querySelector("img").src;
+        const caption = card.querySelector("textarea").value;
+        data.push({ src: img, caption: caption });
+      });
+      localStorage.setItem("creations", JSON.stringify(data));
+      alert("Créations sauvegardées !");
     }
 
-    function displayCreations() {
-      creationList.innerHTML = '';
-      creations.forEach((creation, index) => {
-        const item = document.createElement('div');
-        item.className = 'creation-item';
-
-        const img = document.createElement('img');
-        img.src = creation.data;
-        img.alt = creation.caption || '';
-        img.onclick = () => {
-          modal.style.display = 'flex';
-          modalImage.src = creation.data;
-        };
-
-        const caption = document.createElement('p');
-        caption.className = 'caption-input';
-        caption.textContent = creation.caption || '';
-
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = '×';
-        del.onclick = () => {
-          creations.splice(index, 1);
-          saveCreations();
-          displayCreations();
-        };
-
-        item.appendChild(del);
-        item.appendChild(img);
-        item.appendChild(caption);
-        creationList.appendChild(item);
-      });
-    }
-
-    imageInput.addEventListener('change', () => {
-      const files = Array.from(imageInput.files);
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const newItem = document.createElement('div');
-          newItem.className = 'creation-item';
-
-          const img = document.createElement('img');
-          img.src = reader.result;
-          img.alt = 'nouvelle image';
-          img.onclick = () => {
-            modal.style.display = 'flex';
-            modalImage.src = reader.result;
-          };
-
-          const input = document.createElement('input');
-          input.className = 'caption-input';
-          input.placeholder = 'Titre ou légende (facultatif)';
-
-          const save = document.createElement('button');
-          save.className = 'save-btn';
-          save.textContent = 'Sauvegarder';
-          save.onclick = () => {
-            creations.push({
-              data: reader.result,
-              caption: input.value.trim()
-            });
-            saveCreations();
-            displayCreations();
-          };
-
-          newItem.appendChild(img);
-          newItem.appendChild(input);
-          newItem.appendChild(save);
-          creationList.appendChild(newItem);
-        };
-        reader.readAsDataURL(file);
-      });
-      imageInput.value = '';
-    });
-
-    modal.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-
-    displayCreations();
+    window.onload = loadCreations;
   </script>
 </body>
 </html>
