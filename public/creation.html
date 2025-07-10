@@ -1,74 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Créations - Crochet Steph</title>
+  <meta charset="UTF-8" />
+  <title>Mes Créations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
+      margin: 0; padding: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
       min-height: 100vh;
-      padding: 20px;
     }
 
-    header {
+    h1 {
       text-align: center;
-      font-size: 2.3em;
-      margin-bottom: 30px;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: deeppink;
+      font-size: 2.2em;
+      margin-top: 30px;
     }
 
-    .back-button {
-      background: linear-gradient(to right, #ff9a9e, #fad0c4);
-      border: none;
-      font-size: 1em;
+    .form-section {
+      text-align: center;
+      margin: 20px;
+    }
+
+    input[type="file"], input[type="text"] {
+      display: block;
+      margin: 10px auto;
+      font-family: 'Pacifico', cursive;
+    }
+
+    button {
+      font-family: 'Pacifico', cursive;
       padding: 10px 20px;
-      border-radius: 25px;
-      margin-bottom: 20px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      box-shadow: 0 0 10px pink;
-    }
-
-    .creation-form {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    input[type="text"] {
-      font-family: 'Pacifico', cursive;
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      margin: 10px auto;
-      display: block;
-      border-radius: 10px;
-      border: 2px solid pink;
-      background-color: #fff5fb;
-      font-size: 1em;
-    }
-
-    input[type="file"] {
-      display: block;
-      margin: 10px auto;
-    }
-
-    .save-button {
-      background: linear-gradient(135deg, violet, pink);
+      background: deeppink;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-family: 'Pacifico', cursive;
     }
 
     .creations-grid {
@@ -76,6 +48,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
+      padding: 20px;
     }
 
     .creation-item {
@@ -83,146 +56,164 @@
       border: 3px solid pink;
       border-radius: 15px;
       padding: 10px;
-      width: 160px;
+      width: 45%;
+      box-sizing: border-box;
       text-align: center;
       position: relative;
     }
 
     .creation-item img {
-      width: 100%;
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
       cursor: pointer;
-    }
-
-    .creation-title {
-      margin-top: 8px;
-      font-weight: bold;
-      font-size: 1em;
     }
 
     .delete-btn {
       position: absolute;
       top: 5px;
-      right: 7px;
+      right: 10px;
       background: transparent;
-      border: none;
-      font-size: 1.2em;
       color: red;
+      font-size: 1.2em;
+      border: none;
       cursor: pointer;
     }
 
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+    .legend {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #555;
     }
 
-    .modal img {
+    .back-btn {
+      display: block;
+      margin: 0 auto 30px;
+      text-align: center;
+      background-color: violet;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 15px;
+      text-decoration: none;
+      font-size: 1.2em;
+      width: fit-content;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .creation-item {
+        width: 90%;
+      }
+    }
+
+    /* Modal pour image plein écran */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+    }
+
+    #modal img {
+      display: block;
       max-width: 90%;
-      max-height: 90%;
-      border: 4px solid white;
-      border-radius: 20px;
+      max-height: 80%;
+      margin: 5% auto;
+      border: 5px solid white;
+      border-radius: 15px;
+    }
+
+    #modal:target {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <button class="back-button" onclick="window.location.href='index.html'">⬅ Retour à l’accueil</button>
-  <header>🎨 Mes Créations</header>
+  <h1>🎨 Mes Créations</h1>
 
-  <div class="creation-form">
-    <input type="file" id="creation-image" />
-    <input type="text" id="creation-title" placeholder="Titre ou légende (facultatif)">
-    <button class="save-button" onclick="saveCreation()">💾 Sauvegarder</button>
+  <div class="form-section">
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="legendInput" placeholder="Titre ou légende (facultatif)">
+    <button onclick="saveCreation()">Sauvegarder</button>
   </div>
 
-  <div class="creations-grid" id="creations-list"></div>
+  <div class="creations-grid" id="creationsContainer"></div>
 
-  <div class="modal" id="imageModal" onclick="closeModal()">
-    <img id="modalImage" src="" alt="Image en grand">
+  <a class="back-btn" href="index.html">⟵ Retour</a>
+
+  <div id="modal" onclick="closeModal()">
+    <img id="modalImage" src="">
   </div>
 
   <script>
-    const imageInput = document.getElementById('creation-image');
-    const titleInput = document.getElementById('creation-title');
-    const creationsList = document.getElementById('creations-list');
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
-
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-
-    function renderCreations() {
-      creationsList.innerHTML = '';
-      creations.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'creation-item';
-
-        if (item.image && item.image.startsWith("data:image")) {
-          const img = document.createElement('img');
-          img.src = item.image;
-          img.onclick = () => openModal(item.image);
-          div.appendChild(img);
-        }
-
-        if (item.title) {
-          const title = document.createElement('div');
-          title.className = 'creation-title';
-          title.textContent = item.title;
-          div.appendChild(title);
-        }
-
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.innerHTML = '✖';
-        del.onclick = () => {
-          creations.splice(index, 1);
-          localStorage.setItem('creations', JSON.stringify(creations));
-          renderCreations();
-        };
-        div.appendChild(del);
-
-        creationsList.appendChild(div);
-      });
-    }
-
     function saveCreation() {
-      const file = imageInput.files[0];
-      const title = titleInput.value.trim();
+      const fileInput = document.getElementById('imageInput');
+      const legend = document.getElementById('legendInput').value;
+      const file = fileInput.files[0];
 
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function (e) {
-        const creation = {
-          image: e.target.result,
-          title
-        };
-        creations.push(creation);
+        const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+        creations.push({ image: e.target.result, legend: legend });
         localStorage.setItem('creations', JSON.stringify(creations));
-        resetForm();
+        displayCreations();
+        fileInput.value = '';
+        document.getElementById('legendInput').value = '';
       };
       reader.readAsDataURL(file);
     }
 
-    function resetForm() {
-      imageInput.value = '';
-      titleInput.value = '';
-      renderCreations();
+    function displayCreations() {
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      const container = document.getElementById('creationsContainer');
+      container.innerHTML = '';
+
+      creations.forEach((creation, index) => {
+        const div = document.createElement('div');
+        div.className = 'creation-item';
+
+        const img = document.createElement('img');
+        img.src = creation.image;
+        img.alt = 'Création';
+        img.onclick = () => openModal(creation.image);
+
+        const p = document.createElement('p');
+        p.className = 'legend';
+        p.textContent = creation.legend || '';
+
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.innerHTML = '✖';
+        del.onclick = () => deleteCreation(index);
+
+        div.appendChild(del);
+        div.appendChild(img);
+        div.appendChild(p);
+        container.appendChild(div);
+      });
+    }
+
+    function deleteCreation(index) {
+      const creations = JSON.parse(localStorage.getItem('creations') || '[]');
+      creations.splice(index, 1);
+      localStorage.setItem('creations', JSON.stringify(creations));
+      displayCreations();
     }
 
     function openModal(src) {
-      modalImage.src = src;
-      modal.style.display = 'flex';
+      document.getElementById('modalImage').src = src;
+      document.getElementById('modal').style.display = 'block';
     }
 
     function closeModal() {
-      modal.style.display = 'none';
+      document.getElementById('modal').style.display = 'none';
     }
 
-    renderCreations();
+    window.onload = displayCreations;
   </script>
 </body>
 </html>
