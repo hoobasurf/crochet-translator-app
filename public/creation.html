@@ -3,187 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Créer une Création</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: white;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 30px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 1.2em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1em;
-      border-radius: 10px;
-      border: none;
-      font-family: 'Pacifico', cursive;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    input[type="file"] {
-      font-size: 1em;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.2em;
-      margin-right: 10px;
-    }
-
-    .btn:hover {
-      transform: scale(1.05);
-    }
-
-    .creations {
-      margin-top: 30px;
-    }
-
-    .creation {
-      background-color: rgba(255, 255, 255, 0.85);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      color: #333;
-      position: relative;
-    }
-
-    .creation img {
-      max-width: 100%;
-      max-height: 300px;
-      display: block;
-      margin-top: 10px;
-      border-radius: 10px;
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: crimson;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .back-btn {
-      display: inline-block;
-      margin-top: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.2em;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-    }
-
-    .back-btn:hover {
-      transform: scale(1.05);
-    }
-  </style>
+  <title>Mes créations</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Créer une Création 🎨</h1>
+  <img src="chat.png" alt="Chat" class="chat" />
+  <header>Mes créations 🎨</header>
 
-  <label for="creationTitle">Titre :</label>
-  <input type="text" id="creationTitle" placeholder="Nom de ta création" />
-
-  <label for="creationDescription">Légende :</label>
-  <textarea id="creationDescription" rows="3" placeholder="Une petite description..."></textarea>
-
-  <label for="creationImage">Choisir une image :</label>
-  <input type="file" id="creationImage" accept="image/*" />
-
-  <button class="btn" onclick="addCreation()">➕ Ajouter la création</button>
-
-  <div class="creations" id="creationsContainer"></div>
-
-  <a href="index.html" class="back-btn">⬅ Retour à l’accueil</a>
+  <div class="btn-container">
+    <input type="text" id="titre" placeholder="Titre (facultatif)" />
+    <input type="url" id="image" placeholder="Lien image (facultatif)" />
+    <textarea id="description" placeholder="Description (facultatif)"></textarea>
+    <button onclick="saveCreation()">Sauvegarder</button>
+  </div>
 
   <script>
-    function addCreation() {
-      const title = document.getElementById('creationTitle').value.trim();
-      const description = document.getElementById('creationDescription').value.trim();
-      const fileInput = document.getElementById('creationImage');
-      const file = fileInput.files[0];
+    function saveCreation() {
+      const titre = document.getElementById('titre').value;
+      const image = document.getElementById('image').value;
+      const desc = document.getElementById('description').value;
 
-      if (!title || !description || !file) return;
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const creations = JSON.parse(localStorage.getItem('creations')) || [];
-        creations.push({
-          title,
-          description,
-          image: e.target.result
-        });
-        localStorage.setItem('creations', JSON.stringify(creations));
-        displayCreations();
-        document.getElementById('creationTitle').value = '';
-        document.getElementById('creationDescription').value = '';
-        fileInput.value = '';
-      };
-      reader.readAsDataURL(file);
+      const data = { titre, image, desc };
+      localStorage.setItem('creation-' + Date.now(), JSON.stringify(data));
+      alert('Création sauvegardée !');
     }
-
-    function deleteCreation(index) {
-      const creations = JSON.parse(localStorage.getItem('creations')) || [];
-      creations.splice(index, 1);
-      localStorage.setItem('creations', JSON.stringify(creations));
-      displayCreations();
-    }
-
-    function displayCreations() {
-      const container = document.getElementById('creationsContainer');
-      const creations = JSON.parse(localStorage.getItem('creations')) || [];
-      container.innerHTML = creations.map((c, index) => `
-        <div class="creation">
-          <button class="delete-btn" onclick="deleteCreation(${index})">×</button>
-          <h3>${c.title}</h3>
-          <p>${c.description}</p>
-          <img src="${c.image}" alt="Création ${index + 1}" />
-        </div>
-      `).join('');
-    }
-
-    window.onload = displayCreations;
   </script>
 </body>
 </html>
