@@ -1,2 +1,8 @@
 [build]
+  publish = "public"  # remplace "public" selon ton dossier de sortie
   functions = "functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
