@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Traduction - Crochet Steph</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Traduction</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Traducteur magique</h1>
+    <h1>Traduction</h1>
 
-    <!-- Texte à traduire (champ copier/coller) -->
-    <textarea id="textToTranslate" rows="6" placeholder="Collez un texte ici à traduire..."></textarea>
+    <label for="urlInput">Traduire depuis une URL :</label>
+    <input class="url-box" id="urlInput" type="text" placeholder="Colle une URL ici" />
+    <button onclick="translateFromURL()">Traduire l’URL</button>
+
+    <label for="imageInput">Traduire depuis une image :</label>
+    <input type="file" id="imageInput" accept="image/*" />
+    <button onclick="translateFromImage()">Traduire l’image</button>
+
+    <label for="textInput">Traduire un texte :</label>
+    <textarea id="textInput" rows="5" placeholder="Écris ou colle un texte ici…"></textarea>
     <button onclick="translateText()">Traduire le texte</button>
-    <div id="translatedText"></div>
 
-    <!-- Traduction URL -->
-    <input type="text" id="urlInput" placeholder="Collez une URL d’image ici">
-    <button onclick="translateFromURL()">Traduire l’image depuis l’URL</button>
+    <div id="output"></div>
 
-    <!-- Traduction image locale -->
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="translateImage()">Traduire une image depuis votre appareil</button>
-
-    <div id="resultContainer"></div>
-
-    <a class="btn-link" href="index.html">Retour à l'accueil</a>
+    <a class="btn-link" href="index.html">Retour accueil</a>
   </div>
 
   <script src="translate.js"></script>
