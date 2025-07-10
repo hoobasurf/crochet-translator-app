@@ -1,43 +1,21 @@
-// /public/translate.js
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traduction</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <img src="chat.png" alt="Chat" class="chat" />
+  <header>Traduction 📝</header>
 
-async function callFunction(name, init) {
-  const r = await fetch(`/.netlify/functions/${name}`, init);
-  return r.ok ? r.json() : Promise.reject(await r.text());
-}
+  <div class="btn-container">
+    <input type="text" id="textToTranslate" placeholder="Texte à traduire">
+    <button onclick="translateText()">Traduire</button>
+    <div id="result"></div>
+  </div>
 
-async function translateText() {
-  const text = document.getElementById('text-input').value;
-  if (!text.trim()) return alert('Merci d’entrer un texte.');
-  const res = await callFunction('translate', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({type:'text', text})
-  });
-  document.getElementById('result').innerText = res.translatedText;
-}
-
-async function translateImageURL() {
-  const url = document.getElementById('url-input').value;
-  if (!url.trim()) return alert('Merci d’entrer une URL.');
-  const res = await callFunction('translate', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({type:'url', url})
-  });
-  document.getElementById('result').innerText = res.translatedText;
-}
-
-async function translateImageFile() {
-  const file = document.getElementById('image-file').files[0];
-  if (!file) return alert('Merci de sélectionner une image.');
-
-  const form = new FormData();
-  form.append('type','file');
-  form.append('file', file);
-
-  const res = await callFunction('translate', {
-    method: 'POST',
-    body: form
-  });
-  document.getElementById('result').innerText = res.translatedText;
-}
+  <script src="translate.js"></script>
+</body>
+</html>
