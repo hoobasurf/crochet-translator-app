@@ -2,51 +2,25 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accueil</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: 'Arial', sans-serif;
-    }
-    .container {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 40px;
-      border-radius: 20px;
-      text-align: center;
-    }
-    h1 {
-      color: #fff;
-      font-size: 3em;
-      margin-bottom: 30px;
-    }
-    a.button {
-      display: inline-block;
-      padding: 15px 30px;
-      margin: 10px;
-      font-size: 1.2em;
-      text-decoration: none;
-      color: white;
-      background-color: #ff5e57;
-      border-radius: 10px;
-      transition: background 0.3s;
-    }
-    a.button:hover {
-      background-color: #ff2e2e;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crochet Steph</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Bienvenue</h1>
-    <a href="creation.html" class="button">Création</a>
-  </div>
+  <header>
+    <h1 class="title-animated">
+      <img src="pelote.png" alt="Pelote de laine" class="pelote-title" />
+      Crochet Steph
+      <img src="chat.png" alt="Chat animé" class="chat-animated" />
+    </h1>
+  </header>
+
+  <main class="home-buttons">
+    <a class="btn-link" href="translator.html">Traduction</a>
+    <a class="btn-link" href="creation.html">Mes créations</a>
+    <a class="btn-link" href="note.html">Notes</a>
+  </main>
+
+  <script src="translate.js"></script>
 </body>
 </html>
