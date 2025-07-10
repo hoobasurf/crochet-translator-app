@@ -1,83 +1,79 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
-
-body {
+body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Dancing Script', cursive;
-  background-image: url('fond-accueil.jpg');
-  background-size: cover;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-position: center;
-  color: #333;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background-color: transparent;
+  color: #fff;
 }
 
-h1, h2, h3 {
-  text-align: center;
-  font-size: 2em;
+.background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('fond-accueil.jpg');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+
+.title {
+  font-size: 2.8em;
   font-weight: bold;
-  background: linear-gradient(90deg, #b68add, #f9a1dd);
+  text-align: center;
+  margin-top: 20px;
+  background: linear-gradient(90deg, #a279e0, #fcb3d5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+.cat-pelote {
+  display: block;
+  margin: 0 auto;
+  max-width: 200px;
+  animation: playPelote 6s ease-in-out infinite;
+}
+
+@keyframes playPelote {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px) rotate(5deg); }
+}
+
+.home-buttons {
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+  max-width: 300px;
+}
+
+.btn-link {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  background-color: #e4a9f3;
+  color: white;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 textarea, input[type="text"] {
   width: 90%;
-  max-width: 600px;
-  margin: 10px auto;
-  display: block;
-  font-size: 1.2em;
-  font-family: 'Dancing Script', cursive;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-}
-
-button, .btn-link {
-  display: block;
-  margin: 15px auto;
-  padding: 10px 20px;
+  padding: 12px;
   font-size: 1.1em;
-  font-family: 'Dancing Script', cursive;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #b68add, #f9a1dd);
-  color: white;
-  cursor: pointer;
-  width: 200px;
-  text-align: center;
-  text-decoration: none;
-  transition: 0.3s ease-in-out;
-}
-
-button:hover, .btn-link:hover {
-  background: linear-gradient(90deg, #a379d2, #f788d2);
-}
-
-.container {
-  padding: 20px;
-  text-align: center;
-}
-
-img {
-  max-width: 90%;
-  margin: 20px auto;
+  margin: 12px auto;
   display: block;
-  border-radius: 12px;
-}
-
-.url-box {
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 8px 12px;
-  width: 90%;
-  max-width: 600px;
-  margin: 10px auto;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.2em;
-  background: rgba(255,255,255,0.8);
+  resize: vertical;
 }
 
-label {
-  font-size: 1.3em;
+.result-area {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 1.1em;
 }
