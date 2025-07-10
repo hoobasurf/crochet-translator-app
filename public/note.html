@@ -1,38 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Notes</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>Mes notes</h2>
-    <textarea id="noteText" placeholder="Écris une note..."></textarea>
-    <input type="file" id="noteImg" accept="image/*">
-    <button class="button" onclick="addNote()">Ajouter</button>
-    <div id="notesList"></div>
-    <a class="btn-link" href="index.html">← Retour</a>
-  </div>
+  <header>
+    <button onclick="window.location.href='index.html'" class="btn-back">← Retour</button>
+    <h1>Mes notes</h1>
+  </header>
+
+  <main>
+    <form id="noteForm">
+      <textarea id="noteText" placeholder="Écris ta note..."></textarea>
+      <input type="file" id="noteImage" accept="image/*" />
+      <button type="submit" class="btn-save">Sauvegarder</button>
+    </form>
+
+    <div id="noteList"></div>
+  </main>
+
   <script>
-function addNote() {
-  const t = document.getElementById("noteText").value.trim();
-  const f = document.getElementById("noteImg").files[0];
-  const L = document.getElementById("notesList");
-  const d = document.createElement("div"); d.className="note-card";
-  if (t) d.appendChild(Object.assign(document.createElement("p"), { textContent: t }));
-  if (f) {
-    const img = document.createElement("img");
-    const r = new FileReader();
-    r.onload = () => img.src = r.result;
-    r.readAsDataURL(f);
-    d.appendChild(img);
-  }
-  d.appendChild(Object.assign(document.createElement("small"), { textContent: new Date().toLocaleString() }));
-  L.prepend(d);
-  document.getElementById("noteText").value="";
-  document.getElementById("noteImg").value="";
-}
+    const form = document.getElementById("noteForm");
+    const list = document.getElementById("noteList");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = document.getElementById("noteText").value;
+      const imageFile = document.getElementById("noteImage").files[0];
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const data = {
+          text,
+          image: reader.result
+        };
+        const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+        notes.push(data);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        displayNotes();
+        form.reset();
+      };
+      if (imageFile) reader.readAsDataURL(imageFile);
+    });
+
+    function displayNotes() {
+      const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+      list.innerHTML = "";
+      notes.forEach((n) => {
+        const div = document.createElement("div");
+        div.className = "note-item";
+        div.innerHTML = `
+          <p>${n.text}</p>
+          ${n.image ? `<img src="${n.image}" alt="Note Image" />` : ""}
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    displayNotes();
   </script>
 </body>
 </html>
