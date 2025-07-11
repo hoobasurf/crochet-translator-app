@@ -3,145 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Créer une Note</title>
+  <title>Créations</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Pacifico', cursive;
       margin: 0;
-      background: #fefefe;
+      padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
       color: #333;
+      overflow-x: hidden;
     }
 
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 30px;
     }
 
-    .column {
-      flex: 1;
-      min-width: 300px;
+    .section {
+      background: transparent;
+      border-radius: 10px;
+      padding: 20px;
     }
 
     h1 {
-      font-size: 24px;
+      margin-top: 0;
+      text-align: center;
+      font-size: 1.8em;
     }
 
-    textarea {
+    input[type="file"] {
       width: 100%;
-      height: 150px;
       font-family: 'Pacifico', cursive;
-      font-size: 16px;
+      font-size: 1em;
       padding: 10px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      border: 2px solid #ddd;
       border-radius: 8px;
+      background: rgba(255,255,255,0.5);
     }
 
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
+    input::file-selector-button {
       font-family: 'Pacifico', cursive;
-      font-size: 16px;
-      background: #ffd1dc;
+      background: #e59bd8;
       border: none;
+      color: white;
+      padding: 10px;
       border-radius: 8px;
       cursor: pointer;
     }
 
-    .back-button {
-      display: inline-block;
-      margin-top: 20px;
-      color: #555;
+    button, .back-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      font-family: 'Pacifico', cursive;
+      font-size: 1.1em;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
       text-decoration: none;
-      font-size: 18px;
     }
 
-    .image-preview img {
-      height: 100px;
-      margin: 10px;
-      cursor: pointer;
+    button:hover, .back-btn:hover {
+      opacity: 0.9;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+
+    .gallery-item {
+      background: rgba(255,255,255,0.6);
       border-radius: 8px;
+      overflow: hidden;
+      position: relative;
     }
 
-    .lightbox {
-      display: none;
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      color: #c00;
+    }
+
+    #zoom {
       position: fixed;
       top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.8);
-      justify-content: center;
+      display: none;
       align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
 
-    .lightbox img {
+    #zoom img {
       max-width: 90%;
       max-height: 90%;
       border-radius: 10px;
-    }
-
-    @media screen and (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div class="column">
-      <h1>Créer une Note</h1>
-      <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
-      <button onclick="addNote()">Ajouter</button><br>
-      <a href="notes.html" class="back-button">← Voir mes notes</a>
+    <div class="section">
+      <h1>Ajouter une Création</h1>
+      <input type="file" id="creationInput" accept="image/*" multiple title="Choisir fichier ou image" />
+      <button onclick="addCreation()">Sauvegarder</button>
+      <a href="index.html" class="back-btn">← Retour</a>
     </div>
 
-    <div class="column">
-      <h1>Galerie d’Images</h1>
-      <input type="file" id="imageInput" accept="image/*" multiple>
-      <div id="imagePreview" class="image-preview"></div>
+    <div class="section">
+      <h1>Mes Créations</h1>
+      <div id="creationGallery" class="gallery"></div>
     </div>
   </div>
 
-  <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
-    <img id="lightbox-img" src="" alt="Zoom" />
+  <div id="zoom" onclick="zoom.style.display='none'">
+    <img id="zoomImg" src="" alt="Zoomed"/>
   </div>
 
   <script>
-    function addNote() {
-      const note = document.getElementById("noteInput").value.trim();
-      if (note !== "") {
-        let notes = JSON.parse(localStorage.getItem("notes") || "[]");
-        notes.push(note);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        document.getElementById("noteInput").value = "";
-        alert("Note ajoutée !");
-      }
+    const creationGallery = document.getElementById('creationGallery');
+    const zoom = document.getElementById('zoom');
+    const zoomImg = document.getElementById('zoomImg');
+
+    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+
+    function renderCreations() {
+      creationGallery.innerHTML = '';
+      creations.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.onclick = () => {
+          zoomImg.src = src;
+          zoom.style.display = 'flex';
+        };
+
+        const btn = document.createElement('button');
+        btn.className = 'delete-btn';
+        btn.textContent = '✕';
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          creations.splice(i, 1);
+          localStorage.setItem('creations', JSON.stringify(creations));
+          renderCreations();
+        };
+
+        item.appendChild(img);
+        item.appendChild(btn);
+        creationGallery.appendChild(item);
+      });
     }
 
-    const input = document.getElementById("imageInput");
-    const preview = document.getElementById("imagePreview");
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightbox-img");
+    function addCreation() {
+      const files = document.getElementById('creationInput').files;
+      if (files.length === 0) return alert('Merci de sélectionner au moins une image.');
 
-    input.addEventListener("change", function () {
-      for (const file of this.files) {
+      let loaded = 0;
+      const total = files.length;
+
+      Array.from(files).forEach(file => {
         const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = document.createElement("img");
-          img.src = e.target.result;
-          img.onclick = () => {
-            lightbox.style.display = "flex";
-            lightboxImg.src = img.src;
-          };
-          preview.appendChild(img);
+        reader.onload = () => {
+          creations.push(reader.result);
+          loaded++;
+          if (loaded === total) {
+            localStorage.setItem('creations', JSON.stringify(creations));
+            renderCreations();
+            document.getElementById('creationInput').value = '';
+          }
         };
         reader.readAsDataURL(file);
-      }
-    });
+      });
+    }
+
+    renderCreations();
   </script>
+
 </body>
 </html>
