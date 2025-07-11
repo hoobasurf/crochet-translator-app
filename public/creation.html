@@ -118,38 +118,22 @@
 </div>
 
 <script>
-  let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-  const grid = document.getElementById('creationGrid');
+  let db;
+  const request = indexedDB.open("CreationsDB", 1);
 
-  function render() {
-    grid.innerHTML = '';
-    creations.forEach((c, i) => {
-      const card = document.createElement('div');
-      card.className = 'card';
+  request.onupgradeneeded = function(event) {
+    db = event.target.result;
+    db.createObjectStore("creations", { keyPath: "id", autoIncrement: true });
+  };
 
-      const img = document.createElement('img');
-      img.src = c.src;
-      img.onclick = () => {
-        document.querySelector('#fullscreen img').src = c.src;
-        document.getElementById('fullscreen').style.display = 'flex';
-      };
+  request.onsuccess = function(event) {
+    db = event.target.result;
+    render();
+  };
 
-      const p = document.createElement('p');
-      p.textContent = c.title || '';
-
-      const del = document.createElement('button');
-      del.className = 'del-btn';
-      del.textContent = '✖';
-      del.onclick = () => {
-        creations.splice(i, 1);
-        localStorage.setItem('creations', JSON.stringify(creations));
-        render();
-      };
-
-      card.append(del, img, p);
-      grid.append(card);
-    });
-  }
+  request.onerror = function() {
+    alert("Erreur lors de l'ouverture de la base de données.");
+  };
 
   function addCreations() {
     const files = document.getElementById('fileInput').files;
@@ -162,10 +146,11 @@
 
     Array.from(files).forEach(file => {
       const reader = new FileReader();
-      reader.onload = e => {
-        creations.push({ src: e.target.result, title: title });
-        localStorage.setItem('creations', JSON.stringify(creations));
-        render();
+      reader.onload = function(e) {
+        const tx = db.transaction("creations", "readwrite");
+        const store = tx.objectStore("creations");
+        store.add({ src: e.target.result, title: title });
+        tx.oncomplete = render;
       };
       reader.readAsDataURL(file);
     });
@@ -174,7 +159,39 @@
     document.getElementById('titleInput').value = '';
   }
 
-  render();
+  function render() {
+    const grid = document.getElementById('creationGrid');
+    grid.innerHTML = '';
+
+    const tx = db.transaction("creations", "readonly");
+    const store = tx.objectStore("creations");
+    const request = store.openCursor();
+
+    request.onsuccess = function(event) {
+      const cursor = event.target.result;
+      if (cursor) {
+        const c = cursor.value;
+        const card = document.createElement('div'); card.className = 'card';
+        const img = document.createElement('img');
+        img.src = c.src;
+        img.onclick = () => {
+          document.querySelector('#fullscreen img').src = c.src;
+          document.getElementById('fullscreen').style.display = 'flex';
+        };
+        const p = document.createElement('p'); p.textContent = c.title;
+        const del = document.createElement('button');
+        del.className = 'del-btn'; del.textContent = '✖';
+        del.onclick = () => {
+          const txDel = db.transaction("creations", "readwrite");
+          txDel.objectStore("creations").delete(cursor.key);
+          txDel.oncomplete = render;
+        };
+        card.append(del, img, p);
+        grid.append(card);
+        cursor.continue();
+      }
+    };
+  }
 </script>
 
 </body>
