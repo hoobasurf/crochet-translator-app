@@ -1,91 +1,106 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Mes Notes</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Pacifico', cursive;
       background-image: url('fond-note.jpg');
       background-size: cover;
       margin: 0;
-      padding: 20px;
+      padding: 10px;
     }
+
     h1 {
       text-align: center;
       color: #fff;
+      font-size: 28px;
     }
+
     .btn-retour {
       background-color: #ffb6c1;
       border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
       cursor: pointer;
+      margin-bottom: 10px;
       font-family: 'Pacifico', cursive;
     }
+
     form {
-      margin: 20px auto;
       text-align: center;
+      margin-bottom: 10px;
     }
-    input[type="text"], textarea {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 10px;
+
+    input[type="text"] {
+      width: 95%;
+      padding: 6px;
+      border-radius: 8px;
       border: none;
+      margin: 5px 0;
+      font-family: 'Pacifico', cursive;
     }
-    input[type="file"] {
-      margin: 10px 0;
-    }
+
     button[type="submit"] {
       background-color: violet;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
+      padding: 6px 15px;
+      border-radius: 8px;
+      font-family: 'Pacifico', cursive;
       cursor: pointer;
     }
+
     .notes-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
       justify-content: center;
+      gap: 12px;
     }
+
     .note-item {
-      width: 45%;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 240, 250, 0.95);
+      width: 160px;
       border-radius: 12px;
       padding: 10px;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
       position: relative;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      word-break: break-word;
     }
-    .note-item img {
-      width: 100%;
-      border-radius: 10px;
-      cursor: pointer;
+
+    .note-item p {
+      margin: 0;
+      font-size: 13px;
     }
+
     .delete-btn {
       position: absolute;
-      top: 5px;
-      right: 10px;
-      background-color: transparent;
+      top: 3px;
+      right: 6px;
+      background: transparent;
       border: none;
-      font-size: 20px;
-      cursor: pointer;
+      font-size: 16px;
       color: #ff69b4;
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .note-item {
+        width: 45%;
+      }
     }
   </style>
 </head>
 <body>
-  <button class="btn-retour" onclick="window.location.href='index.html'">← Retour</button>
+
+  <button onclick="history.back()" class="btn-retour">← Retour</button>
   <h1>Mes Notes</h1>
+
   <form id="noteForm">
-    <input type="text" id="noteTitle" placeholder="Titre (facultatif)" /><br />
-    <textarea id="noteText" placeholder="Ta note..."></textarea><br />
-    <input type="file" id="noteFiles" multiple /><br />
-    <button type="submit">Enregistrer</button>
+    <input type="text" id="noteInput" placeholder="Écris ta note ici">
+    <button type="submit">Sauvegarder</button>
   </form>
 
   <div class="notes-grid" id="notesList"></div>
@@ -93,69 +108,47 @@
   <script>
     const form = document.getElementById('noteForm');
     const notesList = document.getElementById('notesList');
+    const noteInput = document.getElementById('noteInput');
 
-    let notes = JSON.parse(localStorage.getItem('notes')) || [];
-
-    function saveNotes() {
-      localStorage.setItem('notes', JSON.stringify(notes));
-      renderNotes();
-    }
+    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
 
     function renderNotes() {
       notesList.innerHTML = '';
       notes.forEach((note, index) => {
-        const noteDiv = document.createElement('div');
-        noteDiv.className = 'note-item';
-        if (note.title) noteDiv.innerHTML += `<h3>${note.title}</h3>`;
-        if (note.text) noteDiv.innerHTML += `<p>${note.text}</p>`;
-        if (note.images) {
-          note.images.forEach(src => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.onclick = () => window.open(src, '_blank');
-            noteDiv.appendChild(img);
-          });
-        }
-        const delBtn = document.createElement('button');
-        delBtn.innerHTML = '✖';
-        delBtn.className = 'delete-btn';
-        delBtn.onclick = () => {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+
+        const p = document.createElement('p');
+        p.textContent = note;
+
+        const btn = document.createElement('button');
+        btn.innerHTML = '✖';
+        btn.className = 'delete-btn';
+        btn.onclick = () => {
           notes.splice(index, 1);
-          saveNotes();
+          localStorage.setItem('notes', JSON.stringify(notes));
+          renderNotes();
         };
-        noteDiv.appendChild(delBtn);
-        notesList.appendChild(noteDiv);
+
+        div.appendChild(btn);
+        div.appendChild(p);
+        notesList.appendChild(div);
       });
     }
 
-    form.onsubmit = async (e) => {
+    form.onsubmit = (e) => {
       e.preventDefault();
-      const title = document.getElementById('noteTitle').value;
-      const text = document.getElementById('noteText').value;
-      const files = document.getElementById('noteFiles').files;
-      const images = [];
-
-      for (let file of files) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          images.push(reader.result);
-          if (images.length === files.length) {
-            notes.push({ title, text, images });
-            saveNotes();
-            form.reset();
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-
-      if (files.length === 0) {
-        notes.push({ title, text, images });
-        saveNotes();
+      const note = noteInput.value.trim();
+      if (note !== '') {
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        renderNotes();
         form.reset();
       }
     };
 
     renderNotes();
   </script>
+
 </body>
 </html>
