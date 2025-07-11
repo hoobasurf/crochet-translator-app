@@ -3,212 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Créations</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <title>Création</title>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
+      margin: 0;
+      padding: 0;
+      background-image: url('fond.jpg');
       background-size: cover;
-      background-position: center;
-      color: #333;
-      overflow-x: hidden;
+      background-attachment: fixed;
+      color: #fff;
     }
 
     .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-    }
-
-    .section {
-      background: transparent;
-      border-radius: 10px;
+      max-width: 900px;
+      margin: auto;
       padding: 20px;
     }
 
     h1 {
-      margin-top: 0;
       text-align: center;
-      font-size: 1.8em;
+      color: #ff69b4;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Pacifico', cursive;
     }
 
     input[type="file"] {
-      width: 100%;
+      margin: 10px 0;
       font-family: 'Pacifico', cursive;
-      font-size: 1em;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.5);
     }
 
-    input::file-selector-button {
-      font-family: 'Pacifico', cursive;
-      background: #e59bd8;
-      border: none;
+    button {
+      padding: 10px 20px;
+      background-color: #ff69b4;
       color: white;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button, .back-btn {
-      display: block;
-      width: 100%;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      font-family: 'Pacifico', cursive;
-      font-size: 1.1em;
-      padding: 12px;
-      margin-bottom: 10px;
       border: none;
-      border-radius: 12px;
+      border-radius: 5px;
+      font-family: 'Pacifico', cursive;
       cursor: pointer;
-      text-align: center;
-      text-decoration: none;
+      margin-top: 10px;
     }
 
-    button:hover, .back-btn:hover {
-      opacity: 0.9;
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      gap: 10px;
     }
 
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-    }
-
-    .gallery-item {
-      background: rgba(255,255,255,0.6);
-      border-radius: 8px;
-      overflow: hidden;
+    .image-container {
       position: relative;
+      width: 120px;
     }
 
-    .gallery-item img {
+    .image-container img {
       width: 100%;
+      border-radius: 5px;
+    }
+
+    .image-container span {
       display: block;
-      border-radius: 6px;
-      cursor: pointer;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      margin-top: 5px;
     }
 
-    .delete-btn {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      background: none;
-      border: none;
-      font-size: 20px;
-      color: #666;
-      cursor: pointer;
-    }
-
-    .delete-btn:hover {
-      color: #c00;
-    }
-
-    #zoom {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    #zoom img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 10px;
+    @media (max-width: 600px) {
+      .preview {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <div class="section">
-      <h1>Ajouter une Création</h1>
-      <input type="file" id="creationInput" accept="image/*" multiple title="Choisir fichier ou image" />
-      <button onclick="addCreation()">Sauvegarder</button>
-      <a href="index.html" class="back-btn">← Retour</a>
-    </div>
+    <h1>Création</h1>
+    
+    <label for="fileInput">Choisir fichier ou image :</label>
+    <input type="file" id="fileInput" multiple accept="image/*">
 
-    <div class="section">
-      <h1>Mes Créations</h1>
-      <div id="creationGallery" class="gallery"></div>
-    </div>
-  </div>
+    <input type="text" id="imageTitle" placeholder="Titre (facultatif)" />
 
-  <div id="zoom" onclick="zoom.style.display='none'">
-    <img id="zoomImg" src="" alt="Zoomed"/>
+    <select id="genreSelect">
+      <option value="">Genre (facultatif)</option>
+      <option value="Amitié">Amitié</option>
+      <option value="Amour">Amour</option>
+      <option value="Famille">Famille</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <button onclick="saveImages()">Sauvegarder</button>
+
+    <div class="preview" id="previewContainer"></div>
   </div>
 
   <script>
-    const creationGallery = document.getElementById('creationGallery');
-    const zoom = document.getElementById('zoom');
-    const zoomImg = document.getElementById('zoomImg');
+    let savedImages = [];
 
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+    function saveImages() {
+      const files = document.getElementById("fileInput").files;
+      const title = document.getElementById("imageTitle").value;
+      const genre = document.getElementById("genreSelect").value;
 
-    function renderCreations() {
-      creationGallery.innerHTML = '';
-      creations.forEach((src, i) => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
+      if (files.length === 0) {
+        alert("Veuillez choisir au moins un fichier.");
+        return;
+      }
 
-        const img = document.createElement('img');
-        img.src = src;
-        img.onclick = () => {
-          zoomImg.src = src;
-          zoom.style.display = 'flex';
-        };
-
-        const btn = document.createElement('button');
-        btn.className = 'delete-btn';
-        btn.textContent = '✕';
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          creations.splice(i, 1);
-          localStorage.setItem('creations', JSON.stringify(creations));
-          renderCreations();
-        };
-
-        item.appendChild(img);
-        item.appendChild(btn);
-        creationGallery.appendChild(item);
-      });
-    }
-
-    function addCreation() {
-      const files = document.getElementById('creationInput').files;
-      if (files.length === 0) return alert('Merci de sélectionner au moins une image.');
-
-      let loaded = 0;
-      const total = files.length;
-
-      Array.from(files).forEach(file => {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         const reader = new FileReader();
-        reader.onload = () => {
-          creations.push(reader.result);
-          loaded++;
-          if (loaded === total) {
-            localStorage.setItem('creations', JSON.stringify(creations));
-            renderCreations();
-            document.getElementById('creationInput').value = '';
-          }
+
+        reader.onload = function(e) {
+          savedImages.push({
+            src: e.target.result,
+            title: title || "Sans titre",
+            genre: genre || "Sans genre"
+          });
+          renderPreview();
         };
         reader.readAsDataURL(file);
-      });
+      }
+
+      // Réinitialisation
+      document.getElementById("fileInput").value = "";
+      document.getElementById("imageTitle").value = "";
+      document.getElementById("genreSelect").value = "";
     }
 
-    renderCreations();
+    function renderPreview() {
+      const container = document.getElementById("previewContainer");
+      container.innerHTML = "";
+      savedImages.forEach(img => {
+        const div = document.createElement("div");
+        div.className = "image-container";
+        div.innerHTML = `
+          <img src="${img.src}" alt="photo">
+          <span>${img.title}</span>
+          <span style="font-size:12px;">${img.genre}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
   </script>
-
 </body>
 </html>
