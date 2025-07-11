@@ -1,138 +1,181 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Création</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      background-image: url('fond.jpg');
-      background-size: cover;
-      font-family: 'Pacifico', cursive;
-      margin: 0;
-      padding: 20px;
-      color: #fff;
+      margin:0; padding:20px;
+      font-family:'Pacifico', cursive;
+      background-image:url('fond-accueil.jpg');
+      background-size:cover;
+      background-position:center;
+      color:#fff;
+      min-height:100vh;
     }
     h1 {
-      text-align: center;
-      color: #ff69b4;
-      font-size: 2.2em;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    .form-section {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 10px;
-      backdrop-filter: blur(5px);
-      width: 100%;
-      max-width: 600px;
-    }
-    label {
-      font-size: 1.2em;
-      display: block;
-      margin-top: 10px;
-    }
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 10px;
-      font-family: 'Pacifico', cursive;
-      border-radius: 8px;
-      border: none;
-      margin-top: 5px;
-    }
-    input[type="file"] {
-      font-family: 'Pacifico', cursive;
-      font-size: 1em;
-      margin-top: 10px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-family: 'Pacifico', cursive;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 10px;
-      background-color: #ff69b4;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #ff85c1;
+      text-align:center;
+      color:#ff69b4;
+      margin-bottom:20px;
     }
     .back-btn {
-      margin-top: 30px;
-      text-align: center;
+      display:inline-block;
+      margin-bottom:20px;
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:10px 15px;
+      border-radius:12px;
+      text-decoration:none;
+      font-family:'Pacifico',cursive;
     }
-    .preview {
-      margin-top: 15px;
+    .form {
+      text-align:center;
+      margin-bottom:20px;
     }
-    .preview img {
-      max-width: 100px;
-      border-radius: 8px;
-      margin: 5px;
+    input[type=file],
+    input[type=text] {
+      font-family:'Pacifico',cursive;
+      display:block;
+      width:80%;
+      margin:10px auto;
+      padding:10px;
+      border:none;
+      border-radius:8px;
+    }
+    button {
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:12px 20px;
+      border:none;
+      border-radius:12px;
+      font-family:'Pacifico',cursive;
+      font-size:1em;
+      cursor:pointer;
+    }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(45%,1fr));
+      gap:15px;
+    }
+    .card {
+      position:relative;
+      background: rgba(255,255,255,0.1);
+      padding:10px;
+      border-radius:12px;
+      text-align:center;
+    }
+    .card img {
+      width:100%;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .card p {
+      margin-top:8px;
+      font-weight:bold;
+    }
+    .del-btn {
+      position:absolute;
+      top:8px; right:8px;
+      background:none;
+      border:none;
+      font-size:18px;
+      color:white;
+      cursor:pointer;
+    }
+    .fullscreen {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100vw; height:100vh;
+      background:rgba(0,0,0,0.8);
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+    }
+    .fullscreen img {
+      max-width:90%; max-height:90%;
+      border-radius:12px;
     }
   </style>
 </head>
 <body>
-  <h1>Création</h1>
-  <div class="container">
-    <div class="form-section">
-      <form id="creationForm">
-        <label for="titre">Titre :</label>
-        <input type="text" id="titre" name="titre" placeholder="Titre...">
 
-        <label for="genre">Genre :</label>
-        <input type="text" id="genre" name="genre" placeholder="Genre...">
+<a href="index.html" class="back-btn">⬅ Retour</a>
+<h1>🎨 Création</h1>
 
-        <label for="fichiers">Choisir fichier ou image :</label>
-        <input type="file" id="fichiers" name="fichiers" multiple accept="image/*">
+<div class="form">
+  <input type="file" id="fileInput" multiple accept="image/*">
+  <input type="text" id="titleInput" placeholder="Titre (facultatif)">
+  <button onclick="addCreations()">Sauvegarder</button>
+</div>
 
-        <div class="preview" id="preview"></div>
+<div class="grid" id="creationGrid"></div>
 
-        <label for="description">Description :</label>
-        <textarea id="description" name="description" rows="4" placeholder="Écris ici..."></textarea>
+<div id="fullscreen" class="fullscreen" onclick="this.style.display='none'">
+  <img src="" alt="">
+</div>
 
-        <button type="submit">Sauvegarder</button>
-      </form>
-    </div>
-  </div>
+<script>
+  let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+  const grid = document.getElementById('creationGrid');
 
-  <div class="back-btn">
-    <a href="index.html">
-      <button>Retour</button>
-    </a>
-  </div>
+  function render() {
+    grid.innerHTML = '';
+    creations.forEach((c, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-  <script>
-    const input = document.getElementById('fichiers');
-    const preview = document.getElementById('preview');
+      const img = document.createElement('img');
+      img.src = c.src;
+      img.onclick = () => {
+        document.querySelector('#fullscreen img').src = c.src;
+        document.getElementById('fullscreen').style.display = 'flex';
+      };
 
-    input.addEventListener('change', () => {
-      preview.innerHTML = '';
-      Array.from(input.files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = e => {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            preview.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+      const p = document.createElement('p');
+      p.textContent = c.title || '';
+
+      const del = document.createElement('button');
+      del.className = 'del-btn';
+      del.textContent = '✖';
+      del.onclick = () => {
+        creations.splice(i, 1);
+        localStorage.setItem('creations', JSON.stringify(creations));
+        render();
+      };
+
+      card.append(del, img, p);
+      grid.append(card);
+    });
+  }
+
+  function addCreations() {
+    const files = document.getElementById('fileInput').files;
+    const title = document.getElementById('titleInput').value;
+
+    if (files.length === 0) {
+      alert('Veuillez choisir au moins une image.');
+      return;
+    }
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        creations.push({ src: e.target.result, title: title });
+        localStorage.setItem('creations', JSON.stringify(creations));
+        render();
+      };
+      reader.readAsDataURL(file);
     });
 
-    document.getElementById('creationForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Création sauvegardée avec succès ✅');
-      // Ici, tu peux ajouter le code pour envoyer les données en backend si tu veux.
-    });
-  </script>
+    document.getElementById('fileInput').value = '';
+    document.getElementById('titleInput').value = '';
+  }
+
+  render();
+</script>
+
 </body>
 </html>
