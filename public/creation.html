@@ -1,110 +1,137 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Création</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Pacifico', cursive;
-      background-image: url('background.jpg');
+      background-image: url('fond.jpg');
       background-size: cover;
-      background-position: center;
-      color: #f8a2d5;
-      text-align: center;
-      padding: 2em;
-      margin: 0;
-    }
-
-    h1 {
-      color: #f36bb2;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1em;
-    }
-
-    input[type="text"], textarea, select {
-      background-color: transparent;
-      border: none;
-      border-bottom: 2px solid #f8a2d5;
-      padding: 0.5em;
-      width: 80%;
-      max-width: 400px;
-      color: #f8a2d5;
       font-family: 'Pacifico', cursive;
-      font-size: 1em;
+      margin: 0;
+      padding: 20px;
+      color: #fff;
     }
-
+    h1 {
+      text-align: center;
+      color: #ff69b4;
+      font-size: 2.2em;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .form-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      width: 100%;
+      max-width: 600px;
+    }
+    label {
+      font-size: 1.2em;
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      font-family: 'Pacifico', cursive;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+    }
     input[type="file"] {
       font-family: 'Pacifico', cursive;
       font-size: 1em;
-      color: #f8a2d5;
-      background: transparent;
-      border: 2px dashed #f8a2d5;
-      padding: 1em;
-      border-radius: 10px;
-      cursor: pointer;
+      margin-top: 10px;
     }
-
     button {
+      margin-top: 20px;
+      padding: 10px 20px;
       font-family: 'Pacifico', cursive;
-      font-size: 1.1em;
-      padding: 0.7em 2em;
-      background-color: #f8a2d5;
-      color: white;
+      font-size: 1.2em;
       border: none;
       border-radius: 10px;
+      background-color: #ff69b4;
+      color: white;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #f36bb2;
+      background-color: #ff85c1;
     }
-
-    @media (max-width: 600px) {
-      form {
-        width: 100%;
-      }
+    .back-btn {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .preview {
+      margin-top: 15px;
+    }
+    .preview img {
+      max-width: 100px;
+      border-radius: 8px;
+      margin: 5px;
     }
   </style>
 </head>
 <body>
   <h1>Création</h1>
+  <div class="container">
+    <div class="form-section">
+      <form id="creationForm">
+        <label for="titre">Titre :</label>
+        <input type="text" id="titre" name="titre" placeholder="Titre...">
 
-  <form id="creation-form">
-    <input type="text" placeholder="Titre (optionnel)">
-    
-    <select name="genre">
-      <option value="">Choisir un genre</option>
-      <option value="Amusant">Amusant</option>
-      <option value="Triste">Triste</option>
-      <option value="Aventure">Aventure</option>
-      <option value="Magique">Magique</option>
-    </select>
+        <label for="genre">Genre :</label>
+        <input type="text" id="genre" name="genre" placeholder="Genre...">
 
-    <textarea placeholder="Écris quelque chose..."></textarea>
-    
-    <input type="file" id="fileInput" name="images" accept="image/*" multiple title="Choisir fichier ou image">
+        <label for="fichiers">Choisir fichier ou image :</label>
+        <input type="file" id="fichiers" name="fichiers" multiple accept="image/*">
 
-    <button type="submit">Sauvegarder</button>
-  </form>
+        <div class="preview" id="preview"></div>
+
+        <label for="description">Description :</label>
+        <textarea id="description" name="description" rows="4" placeholder="Écris ici..."></textarea>
+
+        <button type="submit">Sauvegarder</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="back-btn">
+    <a href="index.html">
+      <button>Retour</button>
+    </a>
+  </div>
 
   <script>
-    document.getElementById("creation-form").addEventListener("submit", function(e) {
+    const input = document.getElementById('fichiers');
+    const preview = document.getElementById('preview');
+
+    input.addEventListener('change', () => {
+      preview.innerHTML = '';
+      Array.from(input.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            preview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    document.getElementById('creationForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const files = document.getElementById("fileInput").files;
-
-      if (files.length === 0) {
-        alert("Merci de choisir au moins une image !");
-        return;
-      }
-
-      alert(files.length + " image(s) sélectionnée(s) et formulaire sauvegardé !");
-      // Ici tu peux envoyer les données à un serveur ou les stocker localement
+      alert('Création sauvegardée avec succès ✅');
+      // Ici, tu peux ajouter le code pour envoyer les données en backend si tu veux.
     });
   </script>
 </body>
