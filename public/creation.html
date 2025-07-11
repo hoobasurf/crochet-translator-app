@@ -2,164 +2,110 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Création</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      margin:0; padding:20px;
-      font-family:'Pacifico', cursive;
-      background-image:url('fond-accueil.jpg');
-      background-size:cover;
-      background-position:center;
-      color:#fff;
-      min-height:100vh;
+      font-family: 'Pacifico', cursive;
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #f8a2d5;
+      text-align: center;
+      padding: 2em;
+      margin: 0;
     }
+
     h1 {
-      text-align:center;
-      color:#ff69b4;
-      margin-bottom:20px;
+      color: #f36bb2;
     }
-    .back-btn {
-      display:inline-block;
-      margin-bottom:20px;
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:10px 15px;
-      border-radius:12px;
-      text-decoration:none;
-      font-family:'Pacifico',cursive;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1em;
     }
-    .form {
-      text-align:center;
-      margin-bottom:20px;
+
+    input[type="text"], textarea, select {
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid #f8a2d5;
+      padding: 0.5em;
+      width: 80%;
+      max-width: 400px;
+      color: #f8a2d5;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
     }
-    input[type=file],
-    input[type=text] {
-      font-family:'Pacifico',cursive;
-      display:block;
-      width:80%;
-      margin:10px auto;
-      padding:10px;
-      border:none;
-      border-radius:8px;
+
+    input[type="file"] {
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      color: #f8a2d5;
+      background: transparent;
+      border: 2px dashed #f8a2d5;
+      padding: 1em;
+      border-radius: 10px;
+      cursor: pointer;
     }
+
     button {
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:12px 20px;
-      border:none;
-      border-radius:12px;
-      font-family:'Pacifico',cursive;
-      font-size:1em;
-      cursor:pointer;
+      font-family: 'Pacifico', cursive;
+      font-size: 1.1em;
+      padding: 0.7em 2em;
+      background-color: #f8a2d5;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
     }
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(45%,1fr));
-      gap:15px;
+
+    button:hover {
+      background-color: #f36bb2;
     }
-    .card {
-      position:relative;
-      background: rgba(255,255,255,0.1);
-      padding:10px;
-      border-radius:12px;
-      text-align:center;
-    }
-    .card img {
-      width:100%;
-      border-radius:8px;
-      cursor:pointer;
-    }
-    .card p {
-      margin-top:8px;
-      font-weight:bold;
-    }
-    .del-btn {
-      position:absolute;
-      top:8px; right:8px;
-      background:none;
-      border:none;
-      font-size:18px;
-      color:white;
-      cursor:pointer;
-    }
-    .fullscreen {
-      display:none;
-      position:fixed;
-      top:0; left:0;
-      width:100vw; height:100vh;
-      background:rgba(0,0,0,0.8);
-      justify-content:center;
-      align-items:center;
-      z-index:1000;
-    }
-    .fullscreen img {
-      max-width:90%; max-height:90%;
-      border-radius:12px;
+
+    @media (max-width: 600px) {
+      form {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
+  <h1>Création</h1>
 
-<a href="index.html" class="back-btn">⬅ Retour</a>
-<h1>🎨 Création</h1>
+  <form id="creation-form">
+    <input type="text" placeholder="Titre (optionnel)">
+    
+    <select name="genre">
+      <option value="">Choisir un genre</option>
+      <option value="Amusant">Amusant</option>
+      <option value="Triste">Triste</option>
+      <option value="Aventure">Aventure</option>
+      <option value="Magique">Magique</option>
+    </select>
 
-<div class="form">
-  <input type="file" id="fileInput" multiple accept="image/*">
-  <input type="text" id="titleInput" placeholder="Titre (facultatif)">
-  <button onclick="addCreations()">Sauvegarder</button>
-</div>
+    <textarea placeholder="Écris quelque chose..."></textarea>
+    
+    <input type="file" id="fileInput" name="images" accept="image/*" multiple title="Choisir fichier ou image">
 
-<div class="grid" id="creationGrid"></div>
+    <button type="submit">Sauvegarder</button>
+  </form>
 
-<div id="fullscreen" class="fullscreen" onclick="this.style.display='none'">
-  <img src="" alt="">
-</div>
+  <script>
+    document.getElementById("creation-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const files = document.getElementById("fileInput").files;
 
-<script>
-  let creations = JSON.parse(localStorage.getItem('creations')||'[]');
-  const grid = document.getElementById('creationGrid');
+      if (files.length === 0) {
+        alert("Merci de choisir au moins une image !");
+        return;
+      }
 
-  function render() {
-    grid.innerHTML = '';
-    creations.forEach((c,i)=>{
-      const card=document.createElement('div'); card.className='card';
-      const img=document.createElement('img');
-      img.src=c.src;
-      img.onclick=()=>{ document.querySelector('#fullscreen img').src=c.src; document.getElementById('fullscreen').style.display='flex' };
-      const p=document.createElement('p'); p.textContent=c.title;
-      const del=document.createElement('button');
-      del.className='del-btn'; del.textContent='✖';
-      del.onclick=()=>{
-        creations.splice(i,1);
-        localStorage.setItem('creations',JSON.stringify(creations));
-        render();
-      };
-      card.append(del,img,p);
-      grid.append(card);
+      alert(files.length + " image(s) sélectionnée(s) et formulaire sauvegardé !");
+      // Ici tu peux envoyer les données à un serveur ou les stocker localement
     });
-  }
-
-  function addCreations(){
-    const files=document.getElementById('fileInput').files;
-    const title=document.getElementById('titleInput').value;
-    if(files.length===0){ alert('Veuillez choisir au moins une image.'); return; }
-    Array.from(files).forEach(f=>{
-      const r=new FileReader();
-      r.onload=e=>{
-        creations.push({src:e.target.result, title:title});
-        localStorage.setItem('creations',JSON.stringify(creations));
-        render();
-      };
-      r.readAsDataURL(f);
-    });
-    document.getElementById('fileInput').value='';
-    document.getElementById('titleInput').value='';
-  }
-
-  render();
-</script>
-
+  </script>
 </body>
 </html>
