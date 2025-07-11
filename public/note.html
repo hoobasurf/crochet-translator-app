@@ -1,153 +1,88 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mes Notes</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-note.jpg');
-      background-size: cover;
       margin: 0;
-      padding: 10px;
+      background: #fefefe;
+      color: #333;
+      padding: 20px;
     }
 
     h1 {
-      text-align: center;
-      color: #fff;
-      font-size: 28px;
+      font-size: 24px;
     }
 
-    .btn-retour {
-      background-color: #ffb6c1;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f9f9f9;
       margin-bottom: 10px;
-      font-family: 'Pacifico', cursive;
-    }
-
-    form {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    input[type="text"] {
-      width: 95%;
-      padding: 6px;
-      border-radius: 8px;
-      border: none;
-      margin: 5px 0;
-      font-family: 'Pacifico', cursive;
-    }
-
-    button[type="submit"] {
-      background-color: violet;
-      color: white;
-      border: none;
-      padding: 6px 15px;
-      border-radius: 8px;
-      font-family: 'Pacifico', cursive;
-      cursor: pointer;
-    }
-
-    .notes-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .note-item {
-      background-color: rgba(255, 240, 250, 0.95);
-      width: 160px;
-      border-radius: 12px;
-      padding: 10px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+      padding: 12px 18px;
+      border-radius: 10px;
       position: relative;
-      word-break: break-word;
-    }
-
-    .note-item p {
-      margin: 0;
-      font-size: 13px;
     }
 
     .delete-btn {
       position: absolute;
-      top: 3px;
-      right: 6px;
-      background: transparent;
-      border: none;
-      font-size: 16px;
-      color: #ff69b4;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
       cursor: pointer;
+      font-size: 18px;
+      text-decoration: none;
+      background: none;
+      border: none;
     }
 
-    @media (max-width: 500px) {
-      .note-item {
-        width: 45%;
-      }
+    .delete-btn:hover {
+      color: red;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      color: #555;
+      text-decoration: none;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
-  <button onclick="history.back()" class="btn-retour">← Retour</button>
   <h1>Mes Notes</h1>
-
-  <form id="noteForm">
-    <input type="text" id="noteInput" placeholder="Écris ta note ici">
-    <button type="submit">Sauvegarder</button>
-  </form>
-
-  <div class="notes-grid" id="notesList"></div>
+  <ul id="notesList"></ul>
+  <a href="creation.html" class="back-button">← Retour</a>
 
   <script>
-    const form = document.getElementById('noteForm');
-    const notesList = document.getElementById('notesList');
-    const noteInput = document.getElementById('noteInput');
+    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+    const list = document.getElementById("notesList");
 
-    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
+    notes.forEach((note, index) => {
+      const li = document.createElement("li");
+      li.textContent = note;
 
-    function renderNotes() {
-      notesList.innerHTML = '';
-      notes.forEach((note, index) => {
-        const div = document.createElement('div');
-        div.className = 'note-item';
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "✕";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.onclick = () => {
+        notes.splice(index, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        location.reload();
+      };
 
-        const p = document.createElement('p');
-        p.textContent = note;
-
-        const btn = document.createElement('button');
-        btn.innerHTML = '✖';
-        btn.className = 'delete-btn';
-        btn.onclick = () => {
-          notes.splice(index, 1);
-          localStorage.setItem('notes', JSON.stringify(notes));
-          renderNotes();
-        };
-
-        div.appendChild(btn);
-        div.appendChild(p);
-        notesList.appendChild(div);
-      });
-    }
-
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const note = noteInput.value.trim();
-      if (note !== '') {
-        notes.push(note);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        renderNotes();
-        form.reset();
-      }
-    };
-
-    renderNotes();
+      li.appendChild(deleteBtn);
+      list.appendChild(li);
+    });
   </script>
 
 </body>
