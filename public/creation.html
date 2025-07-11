@@ -1,190 +1,147 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Créations</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Créer une Note</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-creation.jpg');
-      background-size: cover;
       margin: 0;
-      padding: 10px;
+      background: #fefefe;
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 30px;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 300px;
     }
 
     h1 {
-      text-align: center;
-      color: #fff;
-      font-size: 28px;
+      font-size: 24px;
     }
 
-    .btn-retour {
-      background-color: #ffb6c1;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 10px;
-      font-family: 'Pacifico', cursive;
-    }
-
-    form {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    input[type="text"],
-    input[type="file"] {
-      width: 95%;
-      padding: 6px;
-      border-radius: 8px;
-      border: none;
-      margin: 5px 0;
-      font-family: 'Pacifico', cursive;
-    }
-
-    button[type="submit"] {
-      background-color: violet;
-      color: white;
-      border: none;
-      padding: 6px 15px;
-      border-radius: 8px;
-      font-family: 'Pacifico', cursive;
-      cursor: pointer;
-    }
-
-    .creations-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .creation-item {
-      background-color: rgba(255, 240, 250, 0.95);
-      width: 160px;
-      border-radius: 12px;
-      padding: 6px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
-      position: relative;
-      text-align: center;
-    }
-
-    .creation-item img {
+    textarea {
       width: 100%;
-      height: auto;
-      max-height: 120px;
-      border-radius: 6px;
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    .creation-item p {
-      margin: 5px 0;
-      font-size: 13px;
-      word-break: break-word;
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: 3px;
-      right: 6px;
-      background: transparent;
-      border: none;
+      height: 150px;
+      font-family: 'Pacifico', cursive;
       font-size: 16px;
-      color: #ff69b4;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-family: 'Pacifico', cursive;
+      font-size: 16px;
+      background: #ffd1dc;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
 
-    @media (max-width: 500px) {
-      .creation-item {
-        width: 45%;
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      color: #555;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .image-preview img {
+      height: 100px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .container {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
 
-  <button onclick="history.back()" class="btn-retour">← Retour</button>
-  <h1>Mes Créations</h1>
+  <div class="container">
+    <div class="column">
+      <h1>Créer une Note</h1>
+      <textarea id="noteInput" placeholder="Écris ta note ici..."></textarea>
+      <button onclick="addNote()">Ajouter</button><br>
+      <a href="notes.html" class="back-button">← Voir mes notes</a>
+    </div>
 
-  <form id="creationForm">
-    <input type="text" id="titre" placeholder="Titre ou légende (facultatif)">
-    <input type="file" id="image" accept="image/*,video/*,application/pdf">
-    <button type="submit">Sauvegarder</button>
-  </form>
+    <div class="column">
+      <h1>Galerie d’Images</h1>
+      <input type="file" id="imageInput" accept="image/*" multiple>
+      <div id="imagePreview" class="image-preview"></div>
+    </div>
+  </div>
 
-  <div class="creations-grid" id="creationsList"></div>
+  <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+    <img id="lightbox-img" src="" alt="Zoom" />
+  </div>
 
   <script>
-    const form = document.getElementById('creationForm');
-    const creationsList = document.getElementById('creationsList');
-
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-
-    function renderCreations() {
-      creationsList.innerHTML = '';
-      creations.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'creation-item';
-
-        let media;
-        if (item.type.startsWith('image/')) {
-          media = document.createElement('img');
-          media.src = item.data;
-          media.alt = item.titre || '';
-          media.onclick = () => window.open(item.data, '_blank');
-        } else if (item.type.startsWith('video/')) {
-          media = document.createElement('video');
-          media.src = item.data;
-          media.controls = true;
-          media.style.width = '100%';
-        } else {
-          media = document.createElement('a');
-          media.href = item.data;
-          media.textContent = 'Voir le fichier';
-          media.target = '_blank';
-        }
-
-        const p = document.createElement('p');
-        p.textContent = item.titre || '';
-
-        const btn = document.createElement('button');
-        btn.innerHTML = '✖';
-        btn.className = 'delete-btn';
-        btn.onclick = () => {
-          creations.splice(index, 1);
-          localStorage.setItem('creations', JSON.stringify(creations));
-          renderCreations();
-        };
-
-        div.appendChild(btn);
-        div.appendChild(media);
-        if (item.titre) div.appendChild(p);
-        creationsList.appendChild(div);
-      });
+    function addNote() {
+      const note = document.getElementById("noteInput").value.trim();
+      if (note !== "") {
+        let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+        notes.push(note);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        document.getElementById("noteInput").value = "";
+        alert("Note ajoutée !");
+      }
     }
 
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('image');
-      const titre = document.getElementById('titre').value;
-      const file = fileInput.files[0];
+    const input = document.getElementById("imageInput");
+    const preview = document.getElementById("imagePreview");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
 
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        creations.push({ titre, data: reader.result, type: file.type });
-        localStorage.setItem('creations', JSON.stringify(creations));
-        renderCreations();
-        form.reset();
-      };
-      reader.readAsDataURL(file);
-    };
-
-    renderCreations();
+    input.addEventListener("change", function () {
+      for (const file of this.files) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.onclick = () => {
+            lightbox.style.display = "flex";
+            lightboxImg.src = img.src;
+          };
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
   </script>
 </body>
 </html>
