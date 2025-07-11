@@ -22,10 +22,9 @@
       margin-bottom: 30px;
     }
     .section {
-      background: rgba(255,255,255,0.8);
+      background: transparent;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     h1 {
       margin-top: 0;
@@ -42,6 +41,16 @@
       border-radius: 8px;
       box-sizing: border-box;
       resize: vertical;
+      background: rgba(255,255,255,0.5);
+    }
+    input::file-selector-button {
+      font-family: 'Pacifico', cursive;
+      background: #e59bd8;
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
     }
     button, .back-btn {
       display: block;
@@ -67,7 +76,7 @@
       gap: 15px;
     }
     .note-card {
-      background: white;
+      background: rgba(255,255,255,0.6);
       border-radius: 8px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       position: relative;
@@ -75,7 +84,9 @@
       cursor: pointer;
     }
     .note-card img {
-      width: 100%; display: block;
+      width: 100%;
+      display: block;
+      border-radius: 6px 6px 0 0;
     }
     .note-card p {
       margin: 10px;
@@ -84,7 +95,8 @@
     }
     .delete-btn {
       position: absolute;
-      top: 6px; right: 6px;
+      top: 6px;
+      right: 6px;
       background: none;
       border: none;
       font-size: 20px;
@@ -105,7 +117,8 @@
       z-index: 999;
     }
     #zoom img {
-      max-width: 90%; max-height: 90%;
+      max-width: 90%;
+      max-height: 90%;
       border-radius: 10px;
     }
   </style>
@@ -116,7 +129,7 @@
     <div class="section">
       <h1>Ajouter une Note</h1>
       <textarea id="noteText" rows="4" placeholder="Écris ta note ici…"></textarea>
-      <input type="file" id="noteImages" accept="image/*" multiple />
+      <input type="file" id="noteImages" accept="image/*" multiple title="Choisir fichier ou image" />
       <button onclick="saveNote()">Sauvegarder</button>
       <a href="index.html" class="back-btn">← Retour</a>
     </div>
@@ -136,36 +149,43 @@
     const zoom = document.getElementById('zoom');
     const zoomImg = document.getElementById('zoomImg');
 
-    let notes = JSON.parse(localStorage.getItem('notes')|| '[]');
+    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
 
     function renderNotes() {
       container.innerHTML = '';
       notes.forEach((note, i) => {
         const div = document.createElement('div');
         div.className = 'note-card';
-        if (note.imgs) note.imgs.forEach(src => {
-          const img = document.createElement('img');
-          img.src = src;
-          img.onclick = () => {
-            zoomImg.src = src; zoom.style.display = 'flex';
-          };
-          div.appendChild(img);
-        });
+
+        if (note.imgs) {
+          note.imgs.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.onclick = () => {
+              zoomImg.src = src;
+              zoom.style.display = 'flex';
+            };
+            div.appendChild(img);
+          });
+        }
+
         if (note.text) {
           const p = document.createElement('p');
           p.textContent = note.text;
           div.appendChild(p);
         }
+
         const btn = document.createElement('button');
         btn.className = 'delete-btn';
         btn.textContent = '✕';
         btn.onclick = (e) => {
           e.stopPropagation();
-          notes.splice(i,1);
+          notes.splice(i, 1);
           localStorage.setItem('notes', JSON.stringify(notes));
           renderNotes();
         };
         div.appendChild(btn);
+
         container.appendChild(div);
       });
     }
@@ -173,14 +193,27 @@
     function saveNote() {
       const text = document.getElementById('noteText').value.trim();
       const files = document.getElementById('noteImages').files;
+      const note = { text: text || '', imgs: [] };
+
       if (!text && files.length === 0) return alert('Merci d’ajouter un texte ou une image.');
 
-      const note = { text: text || '', imgs: [] };
-      Array.from(files).forEach(file => {
+      const fileArray = Array.from(files);
+      let imagesLoaded = 0;
+
+      if (fileArray.length === 0) {
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        renderNotes();
+        document.getElementById('noteText').value = '';
+        return;
+      }
+
+      fileArray.forEach(file => {
         const fr = new FileReader();
         fr.onload = () => {
           note.imgs.push(fr.result);
-          if (note.imgs.length === files.length) {
+          imagesLoaded++;
+          if (imagesLoaded === fileArray.length) {
             notes.push(note);
             localStorage.setItem('notes', JSON.stringify(notes));
             renderNotes();
@@ -190,12 +223,6 @@
         };
         fr.readAsDataURL(file);
       });
-      if (files.length===0) {
-        notes.push(note);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        renderNotes();
-        document.getElementById('noteText').value = '';
-      }
     }
 
     renderNotes();
