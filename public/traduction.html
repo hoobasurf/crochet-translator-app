@@ -1,112 +1,134 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Traduction Crochet</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Traduction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      color: #fff;
-      min-height: 100vh;
+      margin:0;
+      padding:20px;
+      font-family:'Pacifico', cursive;
+      background-image:url('fond-traduction.jpg');
+      background-size:cover;
+      background-position:center;
+      color:#fff;
+      min-height:100vh;
     }
-
     h1 {
-      text-align: center;
-      color: #ff69b4;
-      margin-bottom: 20px;
+      text-align:center;
+      color:#ff69b4;
+      margin-bottom:20px;
     }
-
+    .back-btn {
+      display:inline-block;
+      margin-bottom:20px;
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:10px 15px;
+      border-radius:12px;
+      text-decoration:none;
+    }
     .container {
-      max-width: 800px;
-      margin: 0 auto;
+      background:rgba(0,0,0,0.5);
+      border-radius:12px;
+      padding:20px;
+      max-width:800px;
+      margin:auto;
     }
-
-    textarea {
-      width: 100%;
-      height: 150px;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 1em;
-      font-family: 'Pacifico', cursive;
+    select, input[type=file], textarea, button {
+      width:100%;
+      padding:10px;
+      margin:10px 0;
+      border-radius:8px;
+      border:none;
+      font-family:'Pacifico', cursive;
+      font-size:1em;
     }
-
-    .output {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 12px;
-      min-height: 100px;
-      white-space: pre-wrap;
-    }
-
     button {
-      margin-top: 15px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Pacifico', cursive;
-      font-size: 1em;
-      cursor: pointer;
-      display: block;
-      width: 100%;
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      cursor:pointer;
+    }
+    #result {
+      white-space:pre-wrap;
+      background:rgba(255,255,255,0.1);
+      padding:15px;
+      border-radius:12px;
+      margin-top:20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🧶 Traduction Crochet</h1>
-    <textarea id="inputText" placeholder="Colle ici ton texte en anglais ou américain..."></textarea>
-    <button onclick="translateText()">Traduire automatiquement en français</button>
-    <div class="output" id="output"></div>
-  </div>
+<a href="index.html" class="back-btn">⬅ Retour</a>
+<h1>🌐 Traduction</h1>
 
-  <script>
-    const crochetMap = {
-      // 🇺🇸 US -> 🇫🇷
-      "single crochet": "maille serrée",
-      "double crochet": "bride",
-      "half double crochet": "demi-bride",
-      "treble crochet": "double bride",
-      "slip stitch": "maille coulée",
-      "chain stitch": "maille en l'air",
-      "magic ring": "cercle magique",
+<div class="container">
+  <select id="inputType">
+    <option value="text">✍️ Entrer du texte</option>
+    <option value="file">📁 Fichier .txt</option>
+    <option value="image">🖼️ Image (OCR)</option>
+    <option value="url">🔗 URL</option>
+  </select>
 
-      // 🇬🇧 UK -> 🇫🇷
-      "double crochet (UK)": "maille serrée",
-      "treble crochet (UK)": "bride",
-      "half treble (UK)": "demi-bride",
-      "double treble (UK)": "double bride",
-      "slip stitch (UK)": "maille coulée",
-      "chain stitch (UK)": "maille en l'air"
-    };
+  <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
+  <input type="file" id="fileInput" style="display:none;">
+  <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display:none;">
 
-    function translateText() {
-      const input = document.getElementById('inputText').value;
-      if (!input.trim()) {
-        document.getElementById('output').textContent = "Merci d’entrer un texte à traduire.";
-        return;
-      }
+  <button onclick="handleTranslate()">Traduire</button>
 
-      let translated = input.toLowerCase();
+  <div id="result"></div>
+</div>
 
-      for (const [key, val] of Object.entries(crochetMap)) {
-        const regex = new RegExp(key, "gi");
-        translated = translated.replace(regex, val);
-      }
+<script>
+  const inputTypeSelect = document.getElementById('inputType');
+  const manualText = document.getElementById('manualText');
+  const fileInput = document.getElementById('fileInput');
+  const urlInput = document.getElementById('urlInput');
+  const resultDiv = document.getElementById('result');
 
-      // Affiche le texte avec la casse d'origine conservée
-      document.getElementById('output').textContent = translated;
+  inputTypeSelect.addEventListener('change', () => {
+    const type = inputTypeSelect.value;
+    manualText.style.display = type === 'text' ? 'block' : 'none';
+    fileInput.style.display = (type === 'file' || type === 'image') ? 'block' : 'none';
+    urlInput.style.display = type === 'url' ? 'block' : 'none';
+  });
+
+  async function translateText(text) {
+    try {
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|fr`);
+      const data = await res.json();
+      resultDiv.textContent = data.responseData.translatedText || "Erreur de traduction.";
+    } catch (e) {
+      resultDiv.textContent = "Erreur de traduction.";
     }
-  </script>
+  }
+
+  function handleTranslate() {
+    const type = inputTypeSelect.value;
+
+    if (type === 'text') {
+      translateText(manualText.value);
+    } else if (type === 'file') {
+      const file = fileInput.files[0];
+      if (!file) return alert("Aucun fichier sélectionné.");
+      const reader = new FileReader();
+      reader.onload = () => translateText(reader.result);
+      reader.readAsText(file);
+    } else if (type === 'image') {
+      const file = fileInput.files[0];
+      if (!file) return alert("Aucune image sélectionnée.");
+      Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+    } else if (type === 'url') {
+      fetch(urlInput.value)
+        .then(res => res.text())
+        .then(text => translateText(text))
+        .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
+    }
+  }
+</script>
+
 </body>
 </html>
