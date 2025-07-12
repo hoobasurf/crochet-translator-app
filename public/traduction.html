@@ -3,123 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <title>Traduction Crochet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 20px;
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
+      background: url('fond-traduction.jpg') center/cover no-repeat;
       color: #fff;
-      min-height: 100vh;
     }
 
     h1 {
       text-align: center;
       color: #ff69b4;
-      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    textarea, input[type="url"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .upload-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .result {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 12px;
+      white-space: pre-wrap;
     }
 
     .back-btn {
       display: inline-block;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       background: linear-gradient(135deg, violet, pink);
       color: white;
       padding: 10px 15px;
       border-radius: 12px;
       text-decoration: none;
     }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 15px;
-    }
-
-    textarea, select {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Pacifico', cursive;
-      font-size: 1em;
-    }
-
-    button {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 12px;
-      font-size: 1em;
-      cursor: pointer;
-      width: 100%;
-      font-family: 'Pacifico', cursive;
-    }
-
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <a href="index.html" class="back-btn">⬅ Retour</a>
+    <h1>🧵 Traduction Crochet</h1>
 
-<a href="index.html" class="back-btn">⬅ Retour</a>
-<h1>🌍 Traduction</h1>
+    <textarea id="inputText" rows="6" placeholder="Colle ici ton texte crochet en anglais (ou autre)..."></textarea>
+    <input type="url" id="urlInput" placeholder="Ou colle un lien vers une page crochet à traduire..."/>
 
-<div class="container">
-  <textarea id="textToTranslate" rows="5" placeholder="Écris ton texte ici (max 480 caractères)"></textarea>
+    <div class="upload-zone">
+      <label>Ou choisis une image contenant du texte crochet :</label>
+      <input type="file" id="imageInput" accept="image/*"/>
+    </div>
 
-  <select id="languageSelect">
-    <option value="uk">Français → Anglais (UK)</option>
-    <option value="us">Français → Américain (US)</option>
-    <option value="es">Français → Espagnol</option>
-    <option value="de">Français → Allemand</option>
-    <option value="it">Français → Italien</option>
-  </select>
+    <button onclick="handleTranslation()">Traduire</button>
 
-  <button onclick="translate()">Traduire</button>
+    <div id="result" class="result"></div>
+  </div>
 
-  <div class="result" id="resultBox" style="display: none;"></div>
-</div>
-
-<script>
-  function translate() {
-    const text = document.getElementById('textToTranslate').value.trim();
-    const lang = document.getElementById('languageSelect').value;
-    const resultBox = document.getElementById('resultBox');
-
-    if (text.length === 0) {
-      alert("Le champ est vide !");
-      return;
+  <script>
+    async function translateText(fullText) {
+      const chunks = fullText.match(/[\s\S]{1,400}/g); // diviser en morceaux de 400 caractères
+      let result = '';
+      for (const part of chunks) {
+        const response = await fetch("https://api.mymemory.translated.net/get?q=" + encodeURIComponent(part) + "&langpair=en|fr");
+        const data = await response.json();
+        result += data.responseData.translatedText + " ";
+      }
+      return result.trim();
     }
 
-    if (text.length > 480) {
-      alert("Le texte dépasse la limite de 480 caractères.");
-      return;
+    async function handleTranslation() {
+      const text = document.getElementById("inputText").value.trim();
+      const url = document.getElementById("urlInput").value.trim();
+      const image = document.getElementById("imageInput").files[0];
+      const resultDiv = document.getElementById("result");
+
+      resultDiv.innerHTML = "⏳ Traduction en cours...";
+
+      if (text) {
+        const translated = await translateText(text);
+        resultDiv.textContent = translated;
+        return;
+      }
+
+      if (url) {
+        try {
+          const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+          const data = await response.json();
+          const extractedText = data.contents.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 3000);
+          const translated = await translateText(extractedText);
+          resultDiv.textContent = translated;
+        } catch (e) {
+          resultDiv.textContent = "⚠️ Erreur lors de la récupération de l'URL.";
+        }
+        return;
+      }
+
+      if (image) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          const base64Image = e.target.result.split(',')[1];
+          const res = await fetch("https://api.ocr.space/parse/image", {
+            method: "POST",
+            headers: {
+              apikey: "helloworld",
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `base64Image=data:image/jpeg;base64,${base64Image}`
+          });
+          const data = await res.json();
+          const extracted = data.ParsedResults?.[0]?.ParsedText || "";
+          if (extracted) {
+            const translated = await translateText(extracted);
+            resultDiv.textContent = translated;
+          } else {
+            resultDiv.textContent = "❌ Aucun texte détecté dans l'image.";
+          }
+        };
+        reader.readAsDataURL(image);
+        return;
+      }
+
+      resultDiv.textContent = "❗️Veuillez entrer du texte, un lien ou une image.";
     }
-
-    const label = {
-      uk: "Anglais (UK)",
-      us: "Américain (US)",
-      es: "Espagnol",
-      de: "Allemand",
-      it: "Italien"
-    };
-
-    resultBox.innerHTML = `<strong>[Français → ${label[lang]}]</strong><br>${text}`;
-    resultBox.style.display = 'block';
-  }
-</script>
-
+  </script>
 </body>
 </html>
