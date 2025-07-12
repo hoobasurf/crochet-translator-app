@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -13,14 +13,54 @@
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      color: #fff;
-      min-height: 100vh;
+      color: white;
     }
+
     h1 {
       text-align: center;
       color: #ff69b4;
-      margin-bottom: 20px;
     }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Pacifico', cursive;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      resize: none;
+    }
+
+    button {
+      background: linear-gradient(135deg, violet, pink);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: 'Pacifico', cursive;
+      margin: 10px 5px;
+      cursor: pointer;
+    }
+
+    .output {
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+    }
+
     .back-btn {
       display: inline-block;
       margin-bottom: 20px;
@@ -29,102 +69,58 @@
       padding: 10px 15px;
       border-radius: 12px;
       text-decoration: none;
-    }
-    .form {
-      text-align: center;
-      max-width: 700px;
-      margin: auto;
-    }
-    textarea {
-      width: 90%;
-      min-height: 130px;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
       font-family: 'Pacifico', cursive;
-      font-size: 1em;
-      margin-bottom: 15px;
     }
-    .controls {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    select, button {
-      font-family: 'Pacifico', cursive;
-      padding: 10px 18px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    .result {
-      background: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 12px;
-      white-space: pre-wrap;
-      text-align: left;
-    }
+
   </style>
 </head>
 <body>
+  <a href="index.html" class="back-btn">⬅ Retour</a>
+  <h1>🧶 Traduction</h1>
 
-<a href="index.html" class="back-btn">⬅ Retour</a>
-<h1>🌍 Traduction</h1>
-
-<div class="form">
-  <textarea id="textInput" placeholder="Entrez votre texte à traduire..."></textarea>
-
-  <div class="controls">
-    <select id="langSelect">
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <option value="it">Italien</option>
-      <option value="ja">Japonais</option>
-      <option value="zh">Chinois</option>
-    </select>
-
-    <button onclick="translateText()">Traduire</button>
+  <div class="container">
+    <textarea id="input" rows="6" placeholder="Écris ici ton modèle crochet (ex: sc, ch, inc...)"></textarea>
+    <div style="text-align:center;">
+      <button onclick="translateText()">Traduire</button>
+      <button onclick="clearText()">Effacer</button>
+    </div>
+    <div class="output" id="output"></div>
   </div>
 
-  <div class="result" id="resultBox"></div>
-</div>
+  <script>
+    const dictionary = {
+      "sc": "maille serrée",
+      "ch": "maille en l'air",
+      "inc": "augmentation",
+      "dec": "diminution",
+      "hdc": "demi-bride",
+      "dc": "bride",
+      "tr": "double-bride",
+      "sl st": "maille coulée"
+      // Ajoute ici d'autres abréviations si tu veux
+    };
 
-<script>
-async function translateText() {
-  const text = document.getElementById('textInput').value.trim();
-  const lang = document.getElementById('langSelect').value;
+    function translateText() {
+      const input = document.getElementById('input').value;
+      if (!input.trim()) {
+        alert('Merci de saisir un texte.');
+        return;
+      }
 
-  if (!text) {
-    alert("Merci d’écrire du texte à traduire.");
-    return;
-  }
+      // Couper en mots, traduire mot par mot
+      const words = input.split(/\s+/);
+      const translated = words.map(word => {
+        const cleaned = word.toLowerCase().replace(/[.,;:!?]/g, '');
+        return dictionary[cleaned] || word;
+      });
 
-  try {
-    const res = await fetch("https://libretranslate.de/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: text,
-        source: "fr",
-        target: lang,
-        format: "text"
-      })
-    });
+      document.getElementById('output').innerText = translated.join(' ');
+    }
 
-    const data = await res.json();
-    document.getElementById('resultBox').textContent = data.translatedText || "❌ Erreur de traduction.";
-  } catch (error) {
-    document.getElementById('resultBox').textContent = "⚠️ Une erreur est survenue.";
-    console.error(error);
-  }
-}
-</script>
-
+    function clearText() {
+      document.getElementById('input').value = '';
+      document.getElementById('output').innerText = '';
+    }
+  </script>
 </body>
 </html>
