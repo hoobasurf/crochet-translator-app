@@ -1,66 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Traduction</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0; padding: 20px;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      color: #fff;
-      min-height: 100vh;
+      margin:0; padding:20px;
+      font-family:'Pacifico', cursive;
+      background-image:url('fond-accueil.jpg');
+      background-size:cover;
+      background-position:center;
+      color:#fff;
+      min-height:100vh;
     }
     h1 {
-      text-align: center;
-      color: #ff69b4;
-      margin-bottom: 20px;
+      text-align:center;
+      color:#ff69b4;
+      margin-bottom:20px;
     }
     .back-btn {
-      display: inline-block;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-family: 'Pacifico', cursive;
+      display:inline-block;
+      margin-bottom:20px;
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:10px 15px;
+      border-radius:12px;
+      text-decoration:none;
+      font-family:'Pacifico', cursive;
     }
     textarea {
-      width: 90%;
-      height: 120px;
-      margin: 10px auto;
-      display: block;
-      border-radius: 8px;
-      border: none;
-      padding: 10px;
-      font-family: 'Pacifico', cursive;
-      font-size: 16px;
+      width:90%;
+      display:block;
+      margin:20px auto;
+      padding:10px;
+      border-radius:12px;
+      border:none;
+      font-family:'Pacifico', cursive;
+      font-size:1em;
       resize: none;
     }
-    select, button {
-      font-family: 'Pacifico', cursive;
-      font-size: 16px;
-      margin: 5px auto;
-      display: block;
-      border-radius: 8px;
-      border: none;
-      padding: 10px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      cursor: pointer;
+    button {
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:12px 20px;
+      border:none;
+      border-radius:12px;
+      font-family:'Pacifico', cursive;
+      font-size:1em;
+      cursor:pointer;
+      display:block;
+      margin:10px auto;
     }
     .result {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 18px;
-      background: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 12px;
+      background: rgba(255,255,255,0.2);
+      padding:15px;
+      border-radius:12px;
+      width:90%;
+      margin:20px auto;
+      color:white;
+      font-family:'Pacifico', cursive;
     }
   </style>
 </head>
@@ -69,61 +69,23 @@
 <a href="index.html" class="back-btn">⬅ Retour</a>
 <h1>🌍 Traduction</h1>
 
-<textarea id="inputText" placeholder="Écris ton texte ici... (max 400 caractères)" maxlength="400"></textarea>
+<textarea id="textInput" rows="6" placeholder="Entre le texte à traduire..."></textarea>
+<button onclick="translate()">Traduire</button>
 
-<select id="langSelect">
-  <option value="en">Anglais</option>
-  <option value="es">Espagnol</option>
-  <option value="de">Allemand</option>
-  <option value="it">Italien</option>
-  <option value="ja">Japonais</option>
-</select>
-
-<button onclick="translateText()">Traduire</button>
-
-<div class="result" id="resultBox"></div>
+<div class="result" id="resultArea"></div>
 
 <script>
-async function translateText() {
-  const text = document.getElementById('inputText').value.trim();
-  const targetLang = document.getElementById('langSelect').value;
-  const resultBox = document.getElementById('resultBox');
-
-  if (text.length === 0) {
-    resultBox.innerText = "⛔ Entrez un texte.";
-    return;
-  }
-
-  if (text.length > 400) {
-    resultBox.innerText = "❗ Texte trop long (max 400 caractères).";
-    return;
-  }
-
-  try {
-    resultBox.innerText = "⏳ Traduction en cours...";
-
-    const res = await fetch("https://libretranslate.de/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: text,
-        source: "fr",
-        target: targetLang,
-        format: "text"
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.translatedText) {
-      resultBox.innerText = "✅ " + data.translatedText;
-    } else {
-      resultBox.innerText = "❌ Erreur de traduction.";
+  function translate() {
+    const text = document.getElementById('textInput').value;
+    if (text.length > 480) {
+      alert("❗ Le texte est trop long. Merci de rester sous 480 caractères.");
+      return;
     }
-  } catch (err) {
-    resultBox.innerText = "🚫 Service indisponible ou problème réseau.";
+
+    // Simulation de traduction (remplace cette partie avec une vraie API si besoin)
+    const translated = "[FR → EN] " + text.toUpperCase(); // exemple fictif
+    document.getElementById('resultArea').textContent = translated;
   }
-}
 </script>
 
 </body>
