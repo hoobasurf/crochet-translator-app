@@ -1,155 +1,130 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Traduction</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
-      margin: 0; padding: 20px;
-      font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') no-repeat center center/cover;
-      color: white;
+      margin:0; padding:20px;
+      font-family:'Pacifico', cursive;
+      background-image:url('fond-accueil.jpg');
+      background-size:cover;
+      background-position:center;
+      color:#fff;
+      min-height:100vh;
     }
     h1 {
-      text-align: center;
-      font-size: 2.2em;
+      text-align:center;
+      color:#ff69b4;
+      margin-bottom:20px;
     }
     .back-btn {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      margin-bottom: 20px;
+      display:inline-block;
+      margin-bottom:20px;
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      padding:10px 15px;
+      border-radius:12px;
+      text-decoration:none;
+      font-family:'Pacifico', cursive;
     }
-    textarea {
-      width: 100%;
-      height: 120px;
-      font-size: 1em;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      resize: vertical;
+    .container {
+      background:rgba(0,0,0,0.4);
+      border-radius:12px;
+      padding:20px;
+      max-width:600px;
+      margin:auto;
     }
-    .input-section {
-      margin-bottom: 20px;
+    select, input[type=file], textarea, button, input[type=text] {
+      width:100%;
+      padding:10px;
+      margin:8px 0;
+      border-radius:8px;
+      border:none;
+      font-family:'Pacifico', cursive;
+      font-size:1em;
     }
-    .result {
-      margin-top: 20px;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 10px;
-      border-radius: 10px;
-      white-space: pre-wrap;
+    button {
+      background:linear-gradient(135deg,violet,pink);
+      color:white;
+      cursor:pointer;
     }
-    input[type="file"], input[type="url"] {
-      margin-top: 10px;
-    }
-    button.translate {
-      margin-top: 10px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      border-radius: 10px;
-      cursor: pointer;
+    #result {
+      white-space:pre-wrap;
+      background:rgba(255,255,255,0.2);
+      padding:15px;
+      border-radius:12px;
+      margin-top:20px;
+      color:#333;
     }
   </style>
 </head>
 <body>
+  <a href="index.html" class="back-btn">⬅ Retour</a>
+  <h1>🌐 Traduction</h1>
 
-  <button class="back-btn" onclick="history.back()">← Retour</button>
-  <h1>📝 Traduire un texte</h1>
+  <div class="container">
+    <select id="mode">
+      <option value="text">✍️ Texte à coller</option>
+      <option value="file">📁 Fichier .txt</option>
+      <option value="image">🖼️ Image (OCR)</option>
+      <option value="url">🔗 URL</option>
+    </select>
 
-  <div class="input-section">
-    <label>✍️ Écris ou colle ton texte :</label>
-    <textarea id="inputText" placeholder="Tape ici..."></textarea>
-    <button class="translate" onclick="translateText()">Traduire</button>
-  </div>
+    <textarea id="txt" placeholder="Entrez votre texte ici..."></textarea>
+    <input type="file" id="fileInput" accept=".txt,image/*" style="display:none;"/>
+    <input type="text" id="urlInput" placeholder="Collez l’adresse URL ici" style="display:none;"/>
 
-  <div class="input-section">
-    <label>📁 Fichier texte (.txt) :</label><br/>
-    <input type="file" id="fileInput" accept=".txt" onchange="readTextFile()" />
-  </div>
-
-  <div class="input-section">
-    <label>🖼️ Image avec texte :</label><br/>
-    <input type="file" id="imageInput" accept="image/*" onchange="readImage()" />
-  </div>
-
-  <div class="input-section">
-    <label>🔗 Texte depuis une URL (page web) :</label><br/>
-    <input type="url" id="urlInput" placeholder="https://..." />
-    <button class="translate" onclick="readURL()">Importer</button>
-  </div>
-
-  <div class="result">
-    <strong>Texte traduit :</strong>
-    <div id="translatedResult"></div>
+    <button onclick="doTranslate()">Traduire</button>
+    <div id="result">Résultat ici</div>
   </div>
 
   <script>
-    function translateText(text = null) {
-      const input = text || document.getElementById('inputText').value;
-      if (!input.trim()) return alert('Aucun texte à traduire !');
+    const mode = document.getElementById('mode');
+    const txt = document.getElementById('txt');
+    const fileInput = document.getElementById('fileInput');
+    const urlInput = document.getElementById('urlInput');
+    const resultEl = document.getElementById('result');
 
-      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(input)}&langpair=fr|en`)
-        .then(res => res.json())
-        .then(data => {
-          const result = data.responseData.translatedText;
-          document.getElementById('translatedResult').textContent = result;
-          localStorage.setItem('lastTranslated', result);
-        });
-    }
+    mode.addEventListener('change', () => {
+      txt.style.display = mode.value==='text' ? 'block' : 'none';
+      fileInput.style.display = mode.value!=='text' ? 'block' : 'none';
+      urlInput.style.display = mode.value==='url' ? 'block' : 'none';
+    });
 
-    function readTextFile() {
-      const file = document.getElementById('fileInput').files[0];
-      if (file) {
+    async function doTranslate(){
+      resultEl.textContent = "⏳ En cours...";
+      if(mode.value==='text'){
+        translate(txt.value);
+      } else if(mode.value==='file'){
+        const f = fileInput.files[0];
+        if(!f) return alert("Veuillez sélectionner un fichier.");
         const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('inputText').value = e.target.result;
-          translateText(e.target.result);
-        };
-        reader.readAsText(file);
+        reader.onload = e => translate(e.target.result);
+        reader.readAsText(f);
+      } else if(mode.value==='image'){
+        const f = fileInput.files[0];
+        if(!f) return alert("Veuillez sélectionner une image.");
+        Tesseract.recognize(f, 'eng').then(res=>{
+          translate(res.data.text);
+        }).catch(()=>resultEl.textContent="OCR impossible");
+      } else if(mode.value==='url'){
+        fetch(urlInput.value).then(r=>r.text()).then(t=>translate(t)).catch(()=> resultEl.textContent="URL inaccessible");
       }
     }
 
-    function readImage() {
-      const imageFile = document.getElementById('imageInput').files[0];
-      if (imageFile) {
-        Tesseract.recognize(imageFile, 'fra').then(({ data: { text } }) => {
-          document.getElementById('inputText').value = text;
-          translateText(text);
-        });
+    async function translate(s){
+      try {
+        const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(s)}&langpair=en|fr`);
+        const d = await r.json();
+        resultEl.textContent = d.responseData.translatedText || "Erreur traduction";
+      } catch {
+        resultEl.textContent = "Erreur traduction";
       }
     }
-
-    function readURL() {
-      const url = document.getElementById('urlInput').value;
-      if (!url) return alert('Entre une URL valide');
-      fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
-        .then(response => response.json())
-        .then(data => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(data.contents, "text/html");
-          const text = doc.body.innerText.slice(0, 2000); // sécurité
-          document.getElementById('inputText').value = text;
-          translateText(text);
-        });
-    }
-
-    // Restaurer la dernière traduction
-    window.onload = () => {
-      const last = localStorage.getItem('lastTranslated');
-      if (last) document.getElementById('translatedResult').textContent = last;
-    };
   </script>
-
 </body>
 </html>
