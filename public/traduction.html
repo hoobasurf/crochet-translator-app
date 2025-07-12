@@ -30,7 +30,7 @@
       text-decoration:none;
       font-family:'Pacifico', cursive;
     }
-    textarea {
+    textarea, select {
       width:90%;
       display:block;
       margin:20px auto;
@@ -70,21 +70,38 @@
 <h1>🌍 Traduction</h1>
 
 <textarea id="textInput" rows="6" placeholder="Entre le texte à traduire..."></textarea>
+
+<select id="langSelect">
+  <option value="en">🇬🇧 Anglais</option>
+  <option value="es">🇪🇸 Espagnol</option>
+  <option value="de">🇩🇪 Allemand</option>
+  <option value="it">🇮🇹 Italien</option>
+  <option value="ja">🇯🇵 Japonais</option>
+  <option value="zh">🇨🇳 Chinois</option>
+</select>
+
 <button onclick="translate()">Traduire</button>
 
 <div class="result" id="resultArea"></div>
 
 <script>
   function translate() {
-    const text = document.getElementById('textInput').value;
-    if (text.length > 480) {
-      alert("❗ Le texte est trop long. Merci de rester sous 480 caractères.");
+    const text = document.getElementById('textInput').value.trim();
+    const lang = document.getElementById('langSelect').value;
+
+    if (text.length === 0) {
+      alert("⛔ Merci d'entrer un texte.");
       return;
     }
 
-    // Simulation de traduction (remplace cette partie avec une vraie API si besoin)
-    const translated = "[FR → EN] " + text.toUpperCase(); // exemple fictif
-    document.getElementById('resultArea').textContent = translated;
+    if (text.length > 480) {
+      alert("❗ Le texte est trop long. Max : 480 caractères.");
+      return;
+    }
+
+    // Simulation de traduction
+    const simulated = `[FR → ${lang.toUpperCase()}] ${text.toUpperCase()}`;
+    document.getElementById('resultArea').textContent = simulated;
   }
 </script>
 
