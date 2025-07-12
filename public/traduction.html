@@ -2,115 +2,110 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Traduction Crochet</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <style>
     body {
+      margin: 0;
+      padding: 20px;
       font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') center/cover no-repeat;
-      margin: 0; padding: 20px;
-      color: white;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      min-height: 100vh;
     }
+
     h1 {
       text-align: center;
       color: #ff69b4;
+      margin-bottom: 20px;
     }
+
     .container {
       max-width: 800px;
-      margin: auto;
+      margin: 0 auto;
     }
-    textarea, input[type="text"] {
+
+    textarea {
       width: 100%;
-      margin: 10px 0;
+      height: 150px;
       padding: 10px;
-      border: none;
       border-radius: 10px;
-      font-family: 'Pacifico', cursive;
-    }
-    button {
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 10px 20px;
       border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
       font-size: 1em;
+      font-family: 'Pacifico', cursive;
     }
-    .result {
+
+    .output {
       margin-top: 20px;
       background: rgba(255,255,255,0.1);
       padding: 15px;
       border-radius: 12px;
+      min-height: 100px;
       white-space: pre-wrap;
     }
-    .lang-label {
+
+    button {
       margin-top: 15px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Pacifico', cursive;
       font-size: 1em;
+      cursor: pointer;
+      display: block;
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🧶 Traduction Crochet</h1>
-    
-    <textarea id="textInput" rows="6" placeholder="Colle ton texte ici..."></textarea>
-    <input type="text" id="urlInput" placeholder="... ou colle une URL">
-    <input type="file" id="imageInput" accept="image/*">
-    
-    <button onclick="startTranslation()">Traduire automatiquement</button>
-    
-    <div class="result" id="resultBox"></div>
+    <textarea id="inputText" placeholder="Colle ici ton texte en anglais ou américain..."></textarea>
+    <button onclick="translateText()">Traduire automatiquement en français</button>
+    <div class="output" id="output"></div>
   </div>
 
   <script>
-    async function startTranslation() {
-      const text = document.getElementById('textInput').value.trim();
-      const url = document.getElementById('urlInput').value.trim();
-      const image = document.getElementById('imageInput').files[0];
-      const resultBox = document.getElementById('resultBox');
-      resultBox.textContent = "⏳ Traduction en cours...";
+    const crochetMap = {
+      // 🇺🇸 US -> 🇫🇷
+      "single crochet": "maille serrée",
+      "double crochet": "bride",
+      "half double crochet": "demi-bride",
+      "treble crochet": "double bride",
+      "slip stitch": "maille coulée",
+      "chain stitch": "maille en l'air",
+      "magic ring": "cercle magique",
 
-      if (text) {
-        await translateAll(text, resultBox);
-      } else if (url) {
-        try {
-          const res = await fetch(url);
-          const html = await res.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-          const content = doc.body.innerText.trim().slice(0, 2000);
-          await translateAll(content, resultBox);
-        } catch {
-          resultBox.textContent = "❌ Erreur : URL invalide ou inaccessible.";
-        }
-      } else if (image) {
-        resultBox.textContent = "🖼️ OCR non disponible (ajouter une API si souhaité).";
-      } else {
-        resultBox.textContent = "⚠️ Merci de fournir un texte, une URL ou une image.";
-      }
-    }
+      // 🇬🇧 UK -> 🇫🇷
+      "double crochet (UK)": "maille serrée",
+      "treble crochet (UK)": "bride",
+      "half treble (UK)": "demi-bride",
+      "double treble (UK)": "double bride",
+      "slip stitch (UK)": "maille coulée",
+      "chain stitch (UK)": "maille en l'air"
+    };
 
-    async function translateAll(text, box) {
-      const chunks = text.match(/[\s\S]{1,400}/g);
-      let fr = '';
-      let us = '';
-
-      for (const part of chunks) {
-        const frRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(part)}&langpair=auto|fr`);
-        const frData = await frRes.json();
-        fr += frData.responseData.translatedText + " ";
-
-        const usRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(part)}&langpair=auto|en-US`);
-        const usData = await usRes.json();
-        us += usData.responseData.translatedText + " ";
+    function translateText() {
+      const input = document.getElementById('inputText').value;
+      if (!input.trim()) {
+        document.getElementById('output').textContent = "Merci d’entrer un texte à traduire.";
+        return;
       }
 
-      box.innerHTML = `
-        <div><strong>🇫🇷 Traduction française :</strong><br>${fr.trim()}</div><br>
-        <div><strong>🇺🇸 Équivalent américain (crochet US) :</strong><br>${us.trim()}</div>
-      `;
+      let translated = input.toLowerCase();
+
+      for (const [key, val] of Object.entries(crochetMap)) {
+        const regex = new RegExp(key, "gi");
+        translated = translated.replace(regex, val);
+      }
+
+      // Affiche le texte avec la casse d'origine conservée
+      document.getElementById('output').textContent = translated;
     }
   </script>
 </body>
