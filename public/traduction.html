@@ -37,32 +37,37 @@
     }
     textarea {
       width: 90%;
-      min-height: 120px;
-      padding: 10px;
-      margin-bottom: 10px;
+      min-height: 130px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-family: 'Pacifico', cursive;
       font-size: 1em;
+      margin-bottom: 15px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     select, button {
       font-family: 'Pacifico', cursive;
-      padding: 10px 15px;
+      padding: 10px 18px;
       border: none;
       border-radius: 10px;
-      margin: 5px;
-    }
-    button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
+      font-size: 1em;
       cursor: pointer;
     }
     .result {
-      margin-top: 20px;
       background: rgba(255,255,255,0.1);
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       white-space: pre-wrap;
+      text-align: left;
     }
   </style>
 </head>
@@ -72,36 +77,38 @@
 <h1>🌍 Traduction</h1>
 
 <div class="form">
-  <textarea id="textInput" placeholder="Entrez votre texte à traduire..."></textarea><br>
-  <select id="langSelect">
-    <option value="en">Anglais</option>
-    <option value="es">Espagnol</option>
-    <option value="de">Allemand</option>
-    <option value="it">Italien</option>
-    <option value="ja">Japonais</option>
-    <option value="zh">Chinois</option>
-  </select>
-  <button onclick="translateText()">Traduire</button>
+  <textarea id="textInput" placeholder="Entrez votre texte à traduire..."></textarea>
+
+  <div class="controls">
+    <select id="langSelect">
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+      <option value="it">Italien</option>
+      <option value="ja">Japonais</option>
+      <option value="zh">Chinois</option>
+    </select>
+
+    <button onclick="translateText()">Traduire</button>
+  </div>
 
   <div class="result" id="resultBox"></div>
 </div>
 
 <script>
 async function translateText() {
-  const text = document.getElementById('textInput').value;
+  const text = document.getElementById('textInput').value.trim();
   const lang = document.getElementById('langSelect').value;
 
-  if (!text.trim()) {
-    alert("Merci d’écrire du texte à traduire !");
+  if (!text) {
+    alert("Merci d’écrire du texte à traduire.");
     return;
   }
 
   try {
     const res = await fetch("https://libretranslate.de/translate", {
       method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         q: text,
         source: "fr",
@@ -111,10 +118,10 @@ async function translateText() {
     });
 
     const data = await res.json();
-    document.getElementById('resultBox').textContent = data.translatedText || "Erreur de traduction.";
-  } catch (err) {
+    document.getElementById('resultBox').textContent = data.translatedText || "❌ Erreur de traduction.";
+  } catch (error) {
     document.getElementById('resultBox').textContent = "⚠️ Une erreur est survenue.";
-    console.error(err);
+    console.error(error);
   }
 }
 </script>
