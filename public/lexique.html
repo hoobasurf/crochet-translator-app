@@ -1,53 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Lexique Crochet</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lexique du Crochet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #fff0f5;
-      color: #333;
+      background: #f9f9f9;
+      margin: 0;
       padding: 20px;
     }
+
     h1 {
-      color: #e91e63;
       text-align: center;
+      color: #333;
     }
+
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background: #ff69b4;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 30px;
+      margin-top: 10px;
     }
+
     th, td {
-      border: 1px solid #f48fb1;
       padding: 10px;
-      text-align: center;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
+
     th {
-      background-color: #f8bbd0;
-      color: #fff;
-    }
-    tr:nth-child(even) {
-      background-color: #fdeef4;
-    }
-    .back-button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #f48fb1;
+      background-color: #ff69b4;
       color: white;
-      border-radius: 8px;
-      text-decoration: none;
     }
-    .back-button:hover {
-      background-color: #ec407a;
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    @media screen and (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+      }
+
+      td {
+        padding-left: 50%;
+        position: relative;
+      }
+
+      td::before {
+        position: absolute;
+        left: 10px;
+        white-space: nowrap;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Lexique du Crochet 🇬🇧 UK 🇺🇸 US</h1>
-
+  <a href="index.html" class="back-button">← Retour</a>
+  <h1>Lexique Crochet : Français / Anglais UK / Américain</h1>
   <table>
     <thead>
       <tr>
@@ -57,17 +83,40 @@
       </tr>
     </thead>
     <tbody>
+      <tr><td>Anneau magique</td><td>Magic Ring</td><td>Magic Circle</td></tr>
+      <tr><td>Augmentation</td><td>Increase (inc)</td><td>Increase (inc)</td></tr>
+      <tr><td>Bobine</td><td>Spool</td><td>Spool</td></tr>
+      <tr><td>Bobble</td><td>Bobble Stitch</td><td>Bobble Stitch</td></tr>
+      <tr><td>Bride</td><td>Treble (tr)</td><td>Double Crochet (dc)</td></tr>
+      <tr><td>Chaînette</td><td>Foundation Chain</td><td>Foundation Chain</td></tr>
+      <tr><td>Crab Stitch</td><td>Reverse Double Crochet</td><td>Crab Stitch</td></tr>
+      <tr><td>Crochet</td><td>Hook</td><td>Hook</td></tr>
+      <tr><td>Crochet avant</td><td>Front Post (FP)</td><td>Front Post (FP)</td></tr>
+      <tr><td>Crochet arrière</td><td>Back Post (BP)</td><td>Back Post (BP)</td></tr>
+      <tr><td>Diminuation</td><td>Decrease (dec)</td><td>Decrease (dec)</td></tr>
+      <tr><td>Double bride</td><td>Double Treble (dtr)</td><td>Treble Crochet (tr)</td></tr>
+      <tr><td>Demi-bride</td><td>Half Treble (htr)</td><td>Half Double Crochet (hdc)</td></tr>
+      <tr><td>Échantillon</td><td>Tension/Gauge</td><td>Gauge</td></tr>
+      <tr><td>Fasten off</td><td>Fasten off</td><td>Fasten off</td></tr>
+      <tr><td>Fil</td><td>Yarn</td><td>Yarn</td></tr>
+      <tr><td>Maille coulée</td><td>Slip Stitch (sl st)</td><td>Slip Stitch (sl st)</td></tr>
       <tr><td>Maille en l'air</td><td>Chain (ch)</td><td>Chain (ch)</td></tr>
       <tr><td>Maille serrée</td><td>Double Crochet (dc)</td><td>Single Crochet (sc)</td></tr>
-      <tr><td>Bride</td><td>Treble Crochet (tr)</td><td>Double Crochet (dc)</td></tr>
-      <tr><td>Demi-bride</td><td>Half Treble (htr)</td><td>Half Double (hdc)</td></tr>
-      <tr><td>Double bride</td><td>Double Treble (dtr)</td><td>Treble Crochet (tr)</td></tr>
-      <tr><td>Triple bride</td><td>Triple Treble (trtr)</td><td>Double Treble (dtr)</td></tr>
-      <tr><td>Maille coulée</td><td>Slip Stitch (sl st)</td><td>Slip Stitch (sl st)</td></tr>
-      <!-- Ajoute autant de lignes que tu veux -->
+      <tr><td>Maille rabattue</td><td>Fasten off</td><td>Fasten off</td></tr>
+      <tr><td>Motif</td><td>Pattern</td><td>Pattern</td></tr>
+      <tr><td>Point d'écrevisse</td><td>Reverse dc</td><td>Crab Stitch</td></tr>
+      <tr><td>Point étoile</td><td>Star Stitch</td><td>Star Stitch</td></tr>
+      <tr><td>Point noisette</td><td>Bobble Stitch</td><td>Bobble Stitch</td></tr>
+      <tr><td>Point pop-corn</td><td>Popcorn Stitch</td><td>Popcorn Stitch</td></tr>
+      <tr><td>Point soufflé</td><td>Puff Stitch</td><td>Puff Stitch</td></tr>
+      <tr><td>Point V</td><td>V-Stitch</td><td>V-Stitch</td></tr>
+      <tr><td>Rang</td><td>Row</td><td>Row</td></tr>
+      <tr><td>Reprendre le fil</td><td>Yarn Over (yo)</td><td>Yarn Over (yo)</td></tr>
+      <tr><td>Shell Stitch</td><td>Shell Stitch</td><td>Shell Stitch</td></tr>
+      <tr><td>Tour</td><td>Round (rnd)</td><td>Round (rnd)</td></tr>
+      <tr><td>Tourner</td><td>Turn</td><td>Turn</td></tr>
+      <tr><td>Vêtement</td><td>Garment</td><td>Garment</td></tr>
     </tbody>
   </table>
-
-  <a href="index.html" class="back-button">← Retour à l’accueil</a>
 </body>
 </html>
