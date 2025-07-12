@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Création</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
@@ -10,14 +10,16 @@
       margin: 0;
       padding: 20px;
       font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      background-image: url('fond-accueil.jpg');
       background-size: cover;
+      background-position: center;
       color: #fff;
       min-height: 100vh;
     }
     h1 {
       text-align: center;
       color: #ff69b4;
+      margin-bottom: 20px;
     }
     .back-btn {
       display: inline-block;
@@ -33,34 +35,37 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    input[type="file"], input[type="text"] {
+    input[type="file"],
+    input[type="text"] {
+      font-family: 'Pacifico', cursive;
       display: block;
+      width: 80%;
       margin: 10px auto;
       padding: 10px;
-      width: 80%;
-      border-radius: 10px;
       border: none;
-      font-family: 'Pacifico', cursive;
+      border-radius: 8px;
     }
     button {
-      padding: 10px 20px;
       background: linear-gradient(135deg, violet, pink);
       color: white;
+      padding: 12px 20px;
       border: none;
       border-radius: 12px;
-      cursor: pointer;
       font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      cursor: pointer;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
       gap: 15px;
     }
     .card {
       position: relative;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
     }
     .card img {
       width: 100%;
@@ -68,22 +73,35 @@
       cursor: pointer;
     }
     .card p {
-      text-align: center;
-      font-size: 0.9em;
-      margin: 5px 0 0;
+      margin-top: 8px;
+      font-weight: bold;
     }
     .del-btn {
       position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(0,0,0,0.4);
-      color: white;
+      top: 8px;
+      right: 8px;
+      background: none;
       border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
+      font-size: 18px;
+      color: white;
       cursor: pointer;
+    }
+    .fullscreen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .fullscreen img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
     }
   </style>
 </head>
@@ -100,89 +118,76 @@
 
 <div class="grid" id="creationGrid"></div>
 
+<div id="fullscreen" class="fullscreen" onclick="this.style.display='none'">
+  <img src="" alt="">
+</div>
+
 <script>
-let db;
-const request = indexedDB.open("CreationsDB", 1);
+  let creations = [];
 
-request.onupgradeneeded = (e) => {
-  db = e.target.result;
-  if (!db.objectStoreNames.contains("creations")) {
-    db.createObjectStore("creations", { keyPath: "id", autoIncrement: true });
-  }
-};
-
-request.onsuccess = (e) => {
-  db = e.target.result;
-  renderCreations();
-};
-
-function addCreations() {
-  const files = document.getElementById('fileInput').files;
-  const title = document.getElementById('titleInput').value;
-
-  if (files.length === 0) {
-    alert("Choisissez au moins une image.");
-    return;
+  // Charger depuis localStorage
+  try {
+    const stored = JSON.parse(localStorage.getItem('creations'));
+    if (Array.isArray(stored)) {
+      creations = stored;
+    }
+  } catch (e) {
+    creations = [];
   }
 
-  const tx = db.transaction("creations", "readwrite");
-  const store = tx.objectStore("creations");
+  const grid = document.getElementById('creationGrid');
 
-  let completed = 0;
-
-  Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      store.add({ src: event.target.result, title: title });
-      completed++;
-      if (completed === files.length) {
-        tx.oncomplete = () => {
-          document.getElementById('fileInput').value = "";
-          document.getElementById('titleInput').value = "";
-          renderCreations();
-        };
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderCreations() {
-  const grid = document.getElementById("creationGrid");
-  grid.innerHTML = "";
-
-  const tx = db.transaction("creations", "readonly");
-  const store = tx.objectStore("creations");
-  const request = store.getAll();
-
-  request.onsuccess = () => {
-    request.result.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const img = document.createElement("img");
-      img.src = item.src;
-
-      const p = document.createElement("p");
-      p.textContent = item.title || "";
-
-      const del = document.createElement("button");
-      del.className = "del-btn";
-      del.textContent = "✖";
-      del.onclick = () => {
-        const delTx = db.transaction("creations", "readwrite");
-        const delStore = delTx.objectStore("creations");
-        delStore.delete(item.id);
-        delTx.oncomplete = renderCreations;
+  function render() {
+    grid.innerHTML = '';
+    creations.forEach((c, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.src = c.src;
+      img.onclick = () => {
+        document.querySelector('#fullscreen img').src = c.src;
+        document.getElementById('fullscreen').style.display = 'flex';
       };
-
-      card.appendChild(del);
-      card.appendChild(img);
-      card.appendChild(p);
-      grid.appendChild(card);
+      const p = document.createElement('p');
+      p.textContent = c.title || '';
+      const del = document.createElement('button');
+      del.className = 'del-btn';
+      del.textContent = '✖';
+      del.onclick = () => {
+        creations.splice(i, 1);
+        localStorage.setItem('creations', JSON.stringify(creations));
+        render();
+      };
+      card.append(del, img, p);
+      grid.append(card);
     });
-  };
-}
+  }
+
+  function addCreations() {
+    const files = document.getElementById('fileInput').files;
+    const title = document.getElementById('titleInput').value.trim();
+    if (files.length === 0) {
+      alert('Veuillez choisir au moins une image.');
+      return;
+    }
+    let count = 0;
+    Array.from(files).forEach(f => {
+      const r = new FileReader();
+      r.onload = e => {
+        creations.push({ src: e.target.result, title: title });
+        count++;
+        if (count === files.length) {
+          localStorage.setItem('creations', JSON.stringify(creations));
+          render();
+        }
+      };
+      r.readAsDataURL(f);
+    });
+    document.getElementById('fileInput').value = '';
+    document.getElementById('titleInput').value = '';
+  }
+
+  render();
 </script>
 
 </body>
