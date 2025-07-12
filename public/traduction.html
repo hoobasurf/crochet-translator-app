@@ -1,66 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <style>
     body {
-      margin:0; padding:20px;
-      font-family:'Pacifico', cursive;
-      background-image:url('fond-accueil.jpg');
-      background-size:cover;
-      background-position:center;
-      color:#fff;
-      min-height:100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      min-height: 100vh;
     }
+
     h1 {
-      text-align:center;
-      color:#ff69b4;
-      margin-bottom:20px;
+      text-align: center;
+      color: #ff69b4;
+      margin-bottom: 30px;
     }
+
     .back-btn {
-      display:inline-block;
-      margin-bottom:20px;
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:10px 15px;
-      border-radius:12px;
-      text-decoration:none;
-      font-family:'Pacifico', cursive;
+      display: inline-block;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 12px;
+      text-decoration: none;
     }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
     textarea, select {
-      width:90%;
-      display:block;
-      margin:20px auto;
-      padding:10px;
-      border-radius:12px;
-      border:none;
-      font-family:'Pacifico', cursive;
-      font-size:1em;
-      resize: none;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
     }
+
     button {
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:12px 20px;
-      border:none;
-      border-radius:12px;
-      font-family:'Pacifico', cursive;
-      font-size:1em;
-      cursor:pointer;
-      display:block;
-      margin:10px auto;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+      cursor: pointer;
+      width: 100%;
+      font-family: 'Pacifico', cursive;
     }
+
     .result {
-      background: rgba(255,255,255,0.2);
-      padding:15px;
-      border-radius:12px;
-      width:90%;
-      margin:20px auto;
-      color:white;
-      font-family:'Pacifico', cursive;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
     }
   </style>
 </head>
@@ -69,39 +76,48 @@
 <a href="index.html" class="back-btn">⬅ Retour</a>
 <h1>🌍 Traduction</h1>
 
-<textarea id="textInput" rows="6" placeholder="Entre le texte à traduire..."></textarea>
+<div class="container">
+  <textarea id="textToTranslate" rows="5" placeholder="Écris ton texte ici (max 480 caractères)"></textarea>
 
-<select id="langSelect">
-  <option value="en">🇬🇧 Anglais</option>
-  <option value="es">🇪🇸 Espagnol</option>
-  <option value="de">🇩🇪 Allemand</option>
-  <option value="it">🇮🇹 Italien</option>
-  <option value="ja">🇯🇵 Japonais</option>
-  <option value="zh">🇨🇳 Chinois</option>
-</select>
+  <select id="languageSelect">
+    <option value="uk">Français → Anglais (UK)</option>
+    <option value="us">Français → Américain (US)</option>
+    <option value="es">Français → Espagnol</option>
+    <option value="de">Français → Allemand</option>
+    <option value="it">Français → Italien</option>
+  </select>
 
-<button onclick="translate()">Traduire</button>
+  <button onclick="translate()">Traduire</button>
 
-<div class="result" id="resultArea"></div>
+  <div class="result" id="resultBox" style="display: none;"></div>
+</div>
 
 <script>
   function translate() {
-    const text = document.getElementById('textInput').value.trim();
-    const lang = document.getElementById('langSelect').value;
+    const text = document.getElementById('textToTranslate').value.trim();
+    const lang = document.getElementById('languageSelect').value;
+    const resultBox = document.getElementById('resultBox');
 
     if (text.length === 0) {
-      alert("⛔ Merci d'entrer un texte.");
+      alert("Le champ est vide !");
       return;
     }
 
     if (text.length > 480) {
-      alert("❗ Le texte est trop long. Max : 480 caractères.");
+      alert("Le texte dépasse la limite de 480 caractères.");
       return;
     }
 
-    // Simulation de traduction
-    const simulated = `[FR → ${lang.toUpperCase()}] ${text.toUpperCase()}`;
-    document.getElementById('resultArea').textContent = simulated;
+    const label = {
+      uk: "Anglais (UK)",
+      us: "Américain (US)",
+      es: "Espagnol",
+      de: "Allemand",
+      it: "Italien"
+    };
+
+    resultBox.innerHTML = `<strong>[Français → ${label[lang]}]</strong><br>${text}`;
+    resultBox.style.display = 'block';
   }
 </script>
 
