@@ -23,6 +23,12 @@
       background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      /* Ajout d'un léger contour noir au titre */
+      text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
     }
 
     #searchInput {
@@ -52,13 +58,19 @@
       padding: 14px;
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.2);
-      color: #B19CD9; /* violet doux */
+      /* Couleur violet doux */
+      color: #b19cd9; /* lilas/violet doux */
+      /* contour d’écriture noir */
+      text-shadow:
+        -1px -1px 1px #000,
+        1px -1px 1px #000,
+        -1px 1px 1px #000,
+        1px 1px 1px #000;
     }
 
     th {
       background: rgba(255, 255, 255, 0.25);
       font-weight: bold;
-      color: #D8CFF0; /* violet très clair pour l’en-tête */
     }
 
     tr:hover {
@@ -77,6 +89,12 @@
       border-radius: 12px;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
       transition: transform 0.2s;
+      /* contour texte bouton retour */
+      text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
     }
 
     .btn-back:hover {
