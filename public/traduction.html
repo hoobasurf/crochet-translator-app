@@ -1,137 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Traduction</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
+      padding: 20px;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
-      color: white;
-      padding: 20px;
+      color: #fff;
+      min-height: 100vh;
     }
-
     h1 {
       text-align: center;
-      font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 30px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 120px;
-      font-size: 1.2em;
-      border-radius: 10px;
-      border: none;
-      padding: 12px;
-      font-family: 'Pacifico', cursive;
-      color: #333;
+      color: #ff69b4;
       margin-bottom: 20px;
     }
-
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 12px;
+      text-decoration: none;
+    }
+    .form {
+      text-align: center;
+      max-width: 700px;
+      margin: auto;
+    }
+    textarea {
+      width: 90%;
+      min-height: 120px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+    }
     select, button {
       font-family: 'Pacifico', cursive;
-      font-size: 1.2em;
-      margin: 10px 10px 20px 0;
       padding: 10px 15px;
-      border-radius: 10px;
       border: none;
+      border-radius: 10px;
+      margin: 5px;
     }
-
     button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
-      font-weight: bold;
       cursor: pointer;
     }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    #translated {
+    .result {
       margin-top: 20px;
-      background-color: rgba(255, 255, 255, 0.85);
-      color: #333;
+      background: rgba(255,255,255,0.1);
       padding: 15px;
       border-radius: 10px;
-      min-height: 80px;
-    }
-
-    .back-btn {
-      display: inline-block;
-      margin-top: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.2em;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-    }
-
-    .back-btn:hover {
-      transform: scale(1.05);
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-  <h1>Traduction ✨</h1>
+<a href="index.html" class="back-btn">⬅ Retour</a>
+<h1>🌍 Traduction</h1>
 
-  <label for="inputText">Texte à traduire :</label>
-  <textarea id="inputText" placeholder="Copie ici ton texte..."></textarea>
-
-  <div>
-    <label for="sourceLang">De :</label>
-    <select id="sourceLang">
-      <option value="auto">Auto</option>
-      <option value="fr">Français</option>
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <!-- Ajoute d'autres langues ici -->
-    </select>
-
-    <label for="targetLang">Vers :</label>
-    <select id="targetLang">
-      <option value="en">Anglais</option>
-      <option value="fr">Français</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-    </select>
-  </div>
-
+<div class="form">
+  <textarea id="textInput" placeholder="Entrez votre texte à traduire..."></textarea><br>
+  <select id="langSelect">
+    <option value="en">Anglais</option>
+    <option value="es">Espagnol</option>
+    <option value="de">Allemand</option>
+    <option value="it">Italien</option>
+    <option value="ja">Japonais</option>
+    <option value="zh">Chinois</option>
+  </select>
   <button onclick="translateText()">Traduire</button>
 
-  <div id="translated"></div>
+  <div class="result" id="resultBox"></div>
+</div>
 
-  <a href="index.html" class="back-btn">⬅ Retour à l’accueil</a>
+<script>
+async function translateText() {
+  const text = document.getElementById('textInput').value;
+  const lang = document.getElementById('langSelect').value;
 
-  <script>
-    async function translateText() {
-      const text = document.getElementById("inputText").value.trim();
-      const source = document.getElementById("sourceLang").value;
-      const target = document.getElementById("targetLang").value;
-      if (!text) return;
+  if (!text.trim()) {
+    alert("Merci d’écrire du texte à traduire !");
+    return;
+  }
 
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+  try {
+    const res = await fetch("https://libretranslate.de/translate", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        q: text,
+        source: "fr",
+        target: lang,
+        format: "text"
+      })
+    });
 
-      const res = await fetch(url);
-      const data = await res.json();
-      const translated = data.responseData.translatedText;
+    const data = await res.json();
+    document.getElementById('resultBox').textContent = data.translatedText || "Erreur de traduction.";
+  } catch (err) {
+    document.getElementById('resultBox').textContent = "⚠️ Une erreur est survenue.";
+    console.error(err);
+  }
+}
+</script>
 
-      document.getElementById("translated").innerText = translated || "Erreur de traduction.";
-    }
-  </script>
 </body>
 </html>
