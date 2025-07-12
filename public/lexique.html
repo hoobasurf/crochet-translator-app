@@ -1,44 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Accueil - Tutoriels Crochet</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Lexique Crochet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #fff0f5;
+      background-color: #fff0f5;
       color: #333;
+      padding: 20px;
     }
     h1 {
-      color: #d94b69;
+      color: #e91e63;
+      text-align: center;
     }
-    /* Style bouton lexique */
-    .btn-lexique {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      border: 1px solid #f48fb1;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f8bbd0;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background-color: #fdeef4;
+    }
+    .back-button {
       display: inline-block;
       margin-top: 20px;
-      padding: 12px 20px;
-      background-color: #d94b69;
+      padding: 10px 20px;
+      background-color: #f48fb1;
       color: white;
+      border-radius: 8px;
       text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
     }
-    .btn-lexique:hover {
-      background-color: #b43b56;
+    .back-button:hover {
+      background-color: #ec407a;
     }
   </style>
 </head>
 <body>
-  <h1>Bienvenue sur le site des Tutoriels Crochet</h1>
-  <p>Retrouvez des tutoriels, astuces et ressources pour apprendre le crochet.</p>
+  <h1>Lexique du Crochet 🇬🇧 UK 🇺🇸 US</h1>
 
-  <!-- Bouton vers site lexique américain-français externe -->
-  <a href="http://helpcrochet.free.fr/lexique_crochet_americain_francais.html#tableau_crochet" target="_blank" rel="noopener noreferrer" class="btn-lexique" aria-label="Ouvrir le lexique américain vers français">
-    📘 Voir le Lexique US ➜ FR
-  </a>
+  <table>
+    <thead>
+      <tr>
+        <th>Français</th>
+        <th>Anglais (UK)</th>
+        <th>Américain (US)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Maille en l'air</td><td>Chain (ch)</td><td>Chain (ch)</td></tr>
+      <tr><td>Maille serrée</td><td>Double Crochet (dc)</td><td>Single Crochet (sc)</td></tr>
+      <tr><td>Bride</td><td>Treble Crochet (tr)</td><td>Double Crochet (dc)</td></tr>
+      <tr><td>Demi-bride</td><td>Half Treble (htr)</td><td>Half Double (hdc)</td></tr>
+      <tr><td>Double bride</td><td>Double Treble (dtr)</td><td>Treble Crochet (tr)</td></tr>
+      <tr><td>Triple bride</td><td>Triple Treble (trtr)</td><td>Double Treble (dtr)</td></tr>
+      <tr><td>Maille coulée</td><td>Slip Stitch (sl st)</td><td>Slip Stitch (sl st)</td></tr>
+      <!-- Ajoute autant de lignes que tu veux -->
+    </tbody>
+  </table>
+
+  <a href="index.html" class="back-button">← Retour à l’accueil</a>
 </body>
 </html>
