@@ -20,10 +20,22 @@
       text-align: center;
       font-size: 2.5em;
       margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .titre-degrade {
       background: linear-gradient(135deg, violet, pink);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* contour noir + lisibilité */
+      text-shadow: 1px 1px 2px black; /* contour noir léger */
+    }
+
+    .emoji {
+      font-size: 1.3em;
+      text-shadow: 1px 1px 2px black; /* pour lisibilité sur fond clair */
     }
 
     #searchInput {
@@ -54,7 +66,7 @@
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.2);
       color: #fff;
-      text-shadow: 1px 1px 2px #000; /* contour noir texte */
+      text-shadow: 1px 1px 2px black; /* contour noir léger pour le texte */
     }
 
     th {
@@ -87,7 +99,7 @@
 </head>
 <body>
 
-  <h1>🪡 Lexique Crochet</h1>
+  <h1><span class="emoji">🧶</span> <span class="titre-degrade">Lexique Crochet</span></h1>
 
   <input type="text" id="searchInput" placeholder="🔍 Rechercher un mot...">
 
