@@ -1,145 +1,124 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin:0;
-      padding:20px;
-      font-family:'Pacifico', cursive;
-      background-image:url('fond-traduction.jpg');
-      background-size:cover;
-      background-position:center;
-      color:#fff;
-      min-height:100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: white;
+      text-shadow: 1px 1px 2px black;
     }
-    h1 {
-      text-align:center;
-      color:#ff69b4;
-      margin-bottom:20px;
-      text-shadow:1px 1px 2px black;
+
+    header {
+      text-align: center;
+      padding: 40px 10px 20px;
+      font-size: 2.5em;
+      background: linear-gradient(135deg, violet, pink);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .back-btn {
-      display:inline-block;
-      margin-bottom:20px;
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:10px 15px;
-      border-radius:12px;
-      text-decoration:none;
+
+    .chat, .pelote {
+      position: fixed;
+      width: 80px;
+      z-index: 10;
     }
+
+    .chat {
+      top: 10px;
+      left: 20px;
+      animation: jump 2s ease-in-out infinite;
+    }
+
+    .pelote {
+      top: 10px;
+      left: 120px;
+      animation: movePelote 4s linear infinite;
+    }
+
+    @keyframes jump {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes movePelote {
+      0% { transform: translateX(0) rotate(0deg); }
+      50% { transform: translateX(40px) rotate(180deg); }
+      100% { transform: translateX(0) rotate(360deg); }
+    }
+
     .container {
-      background:rgba(0,0,0,0.5);
-      border-radius:12px;
-      padding:20px;
-      max-width:800px;
-      margin:auto;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    select, input[type=file], textarea, input[type=text], button {
-      width:100%;
-      padding:10px;
-      margin:10px 0;
-      border-radius:8px;
-      border:none;
-      font-family:'Pacifico', cursive;
-      font-size:1em;
+
+    textarea, pre {
+      width: 100%;
+      font-family: monospace;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      resize: vertical;
     }
+
     button {
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      cursor:pointer;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      cursor: pointer;
     }
-    #result {
-      white-space:pre-wrap;
-      background:rgba(255,255,255,0.1);
-      padding:15px;
-      border-radius:12px;
-      margin-top:20px;
+
+    button:hover {
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-<a href="index.html" class="back-btn">⬅ Retour</a>
-<h1>🌐 Traduction</h1>
 
-<div class="container">
-  <select id="inputType">
-    <option value="text">✍️ Entrer du texte</option>
-    <option value="file">📁 Fichier .txt</option>
-    <option value="image">🖼️ Image (OCR)</option>
-    <option value="url">🔗 URL</option>
-  </select>
+  <img src="chat.png" alt="Chat" class="chat" />
+  <img src="pelote.png" alt="Pelote" class="pelote" />
 
-  <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
-  <input type="file" id="fileInput" style="display:none;">
-  <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display:none;">
+  <header>📝 Traduction</header>
 
-  <button onclick="handleTranslate()">Traduire</button>
+  <div class="container">
+    <textarea id="input" rows="8" placeholder="Entre ici les instructions de crochet..."></textarea>
+    <button onclick="traduire()">Traduire</button>
+    <pre id="output"></pre>
+  </div>
 
-  <div id="result"></div>
-</div>
+  <script>
+    function traduire() {
+      const texte = document.getElementById('input').value;
+      const dico = {
+        'sc': 'maille serrée',
+        'inc': 'augmentation',
+        'dec': 'diminution',
+        'ch': 'maille en l’air',
+        'sl st': 'maille coulée',
+        'hdc': 'demi-bride',
+        'dc': 'bride'
+      };
 
-<script>
-  const inputTypeSelect = document.getElementById('inputType');
-  const manualText = document.getElementById('manualText');
-  const fileInput = document.getElementById('fileInput');
-  const urlInput = document.getElementById('urlInput');
-  const resultDiv = document.getElementById('result');
-
-  inputTypeSelect.addEventListener('change', () => {
-    const type = inputTypeSelect.value;
-    manualText.style.display = type === 'text' ? 'block' : 'none';
-    fileInput.style.display = (type === 'file' || type === 'image') ? 'block' : 'none';
-    urlInput.style.display = type === 'url' ? 'block' : 'none';
-  });
-
-  function convertUnits(text) {
-    return text
-      .replace(/(\\d+(?:\\.\\d+)?)\\s?inches?/gi, (_, val) => `${(parseFloat(val)*2.54).toFixed(1)} cm`)
-      .replace(/(\\d+(?:\\.\\d+)?)\\s?miles?/gi, (_, val) => `${(parseFloat(val)*1.60934).toFixed(1)} km`)
-      .replace(/(\\d+(?:\\.\\d+)?)\\s?lbs?/gi, (_, val) => `${(parseFloat(val)*0.453592).toFixed(1)} kg`)
-      .replace(/(\\d+(?:\\.\\d+)?)\\s?feet?/gi, (_, val) => `${(parseFloat(val)*30.48).toFixed(1)} cm`)
-      .replace(/(\\d+(?:\\.\\d+)?)\\s?yards?/gi, (_, val) => `${(parseFloat(val)*0.9144).toFixed(1)} m`);
-  }
-
-  async function translateText(text) {
-    const converted = convertUnits(text);
-    try {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(converted)}&langpair=en|fr`);
-      const data = await res.json();
-      resultDiv.textContent = data.responseData.translatedText || "Erreur de traduction.";
-    } catch (e) {
-      resultDiv.textContent = "Erreur de traduction.";
+      let resultat = texte.replace(/\b(sc|inc|dec|ch|sl st|hdc|dc)\b/g, m => dico[m] || m);
+      document.getElementById('output').textContent = resultat;
     }
-  }
-
-  function handleTranslate() {
-    const type = inputTypeSelect.value;
-
-    if (type === 'text') {
-      translateText(manualText.value);
-    } else if (type === 'file') {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucun fichier sélectionné.");
-      const reader = new FileReader();
-      reader.onload = () => translateText(reader.result);
-      reader.readAsText(file);
-    } else if (type === 'image') {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucune image sélectionnée.");
-      Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
-    } else if (type === 'url') {
-      fetch(urlInput.value)
-        .then(res => res.text())
-        .then(text => translateText(text))
-        .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
