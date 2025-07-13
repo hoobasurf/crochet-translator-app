@@ -7,7 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       font-family: 'Pacifico', cursive;
       background-image: url('fond-accueil.jpg');
       background-size: cover;
@@ -16,40 +17,67 @@
       min-height: 100vh;
     }
 
-    /* Animation d’ouverture */
-    #intro-animation {
+    /* ✨ Animation d'intro */
+    .intro-overlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-image: url('fond-animation.jpg'); /* Remplace par une image de galaxie/champ de pelotes */
-      background-size: cover;
-      background-position: center;
+      width: 100%;
+      height: 100%;
+      background: url('fond-animation.jpg') no-repeat center center/cover;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      animation: fadeOut 1s ease-out 3s forwards;
+      z-index: 9999;
+      animation: fadeOut 1s ease 5s forwards;
     }
 
-    #intro-animation h1 {
-      color: white;
+    .intro-text {
       font-size: 3em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: moveUp 2s ease-out;
+      color: white;
+      text-shadow: 2px 2px 4px black;
+      animation: slideUp 3s ease forwards;
+      opacity: 0;
+      padding: 0 20px;
     }
 
-    @keyframes moveUp {
-      from { transform: translateY(80px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    .scintillements {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .scintillements::before, .scintillements::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.3), transparent 70%);
+      transform: translate(-50%, -50%);
+      animation: sparkle 2s linear infinite;
+    }
+
+    .scintillements::after {
+      animation-delay: 1s;
+      opacity: 0.5;
+    }
+
+    @keyframes slideUp {
+      0% { transform: translateY(50px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(-10px); opacity: 1; }
     }
 
     @keyframes fadeOut {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    @keyframes sparkle {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
     }
 
     header {
@@ -82,18 +110,20 @@
       transition: transform 0.2s;
     }
 
-    .btn-link:hover { transform: scale(1.05); }
+    .btn-link:hover {
+      transform: scale(1.05);
+    }
 
     .chat, .pelote {
       position: fixed;
-      top: 10px;
+      bottom: 0;
       width: 80px;
-      z-index: 999;
+      z-index: 10;
     }
 
     .chat {
       left: 20px;
-      animation: jump 2s ease-in-out infinite;
+      animation: lick 2s infinite;
     }
 
     .pelote {
@@ -101,9 +131,9 @@
       animation: movePelote 4s linear infinite;
     }
 
-    @keyframes jump {
-      0%,100%{transform: translateY(0);}
-      50%{transform: translateY(-20px);}
+    @keyframes lick {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     @keyframes movePelote {
@@ -114,15 +144,17 @@
   </style>
 </head>
 <body>
-
-  <!-- Animation d’ouverture -->
-  <div id="intro-animation">
-    <h1>L’appli Crochet Steph</h1>
+  <!-- 🌌 Animation d'ouverture -->
+  <div class="intro-overlay">
+    <div class="scintillements"></div>
+    <div class="intro-text">Crochet Steph</div>
   </div>
 
+  <!-- 🐱 Images -->
   <img src="chat.png" alt="Chat" class="chat" />
   <img src="pelote.png" alt="Pelote" class="pelote" />
 
+  <!-- 🧶 Contenu principal -->
   <header>Crochet Steph 🧶</header>
   <div class="btn-container">
     <a class="btn-link" href="translator.html">📝 Traduire</a>
@@ -130,6 +162,5 @@
     <a class="btn-link" href="note.html">🗒️ Mes notes</a>
     <a class="btn-link" href="lexique.html">📚 Lexique</a>
   </div>
-
 </body>
 </html>
