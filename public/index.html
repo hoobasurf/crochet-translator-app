@@ -28,14 +28,14 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      animation: fadeOut 1s ease 5s forwards;
+      animation: fadeOut 1s ease 4s forwards; /* ⏱️ 4s */
     }
 
     .intro-text {
       font-size: 3em;
       color: white;
       text-shadow: 2px 2px 4px black;
-      animation: slideUp 3s ease forwards;
+      animation: slideUp 2.5s ease forwards;
       opacity: 0;
       padding: 0 20px;
     }
@@ -116,24 +116,25 @@
 
     .chat, .pelote {
       position: fixed;
-      bottom: 0;
       width: 80px;
       z-index: 10;
     }
 
     .chat {
+      top: 10px;
       left: 20px;
-      animation: lick 2s infinite;
+      animation: jump 2s ease-in-out infinite;
     }
 
     .pelote {
+      top: 10px;
       left: 120px;
       animation: movePelote 4s linear infinite;
     }
 
-    @keyframes lick {
+    @keyframes jump {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-20px); }
     }
 
     @keyframes movePelote {
@@ -144,6 +145,7 @@
   </style>
 </head>
 <body>
+
   <!-- 🌌 Animation d'ouverture -->
   <div class="intro-overlay">
     <div class="scintillements"></div>
