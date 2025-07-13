@@ -145,36 +145,20 @@
 </head>
 <body>
 
-  <!-- 🌌 Animation d'ouverture (jouée une seule fois par session) -->
-  <div class="intro-overlay" id="intro">
+  <div class="intro-overlay">
     <div class="scintillements"></div>
     <div class="intro-text">Crochet Steph</div>
   </div>
 
-  <!-- 🐱 Images -->
   <img src="chat.png" alt="Chat" class="chat" />
   <img src="pelote.png" alt="Pelote" class="pelote" />
 
-  <!-- 🧶 Contenu principal -->
   <header>Crochet Steph 🧶</header>
   <div class="btn-container">
-    <a class="btn-link" href="translator.html">📝 Traduire</a>
+    <a class="btn-link" href="traduction.html">📝 Traduire</a>
     <a class="btn-link" href="creation.html">🎨 Mes créations</a>
     <a class="btn-link" href="note.html">🗒️ Mes notes</a>
     <a class="btn-link" href="lexique.html">📚 Lexique</a>
   </div>
-
-  <script>
-    // Si l'animation a déjà été vue dans cette session, on la masque immédiatement
-    if (sessionStorage.getItem("introPlayed")) {
-      const intro = document.getElementById("intro");
-      if (intro) {
-        intro.style.display = "none";
-      }
-    } else {
-      // Sinon, on joue l'animation et on marque comme déjà vue
-      sessionStorage.setItem("introPlayed", "true");
-    }
-  </script>
 </body>
 </html>
