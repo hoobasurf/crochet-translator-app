@@ -21,6 +21,7 @@
       text-align:center;
       color:#ff69b4;
       margin-bottom:20px;
+      text-shadow:1px 1px 2px black;
     }
     .back-btn {
       display:inline-block;
@@ -38,7 +39,7 @@
       max-width:800px;
       margin:auto;
     }
-    select, input[type=file], textarea, button {
+    select, input[type=file], textarea, input[type=text], button {
       width:100%;
       padding:10px;
       margin:10px 0;
@@ -96,9 +97,19 @@
     urlInput.style.display = type === 'url' ? 'block' : 'none';
   });
 
+  function convertUnits(text) {
+    return text
+      .replace(/(\\d+(?:\\.\\d+)?)\\s?inches?/gi, (_, val) => `${(parseFloat(val)*2.54).toFixed(1)} cm`)
+      .replace(/(\\d+(?:\\.\\d+)?)\\s?miles?/gi, (_, val) => `${(parseFloat(val)*1.60934).toFixed(1)} km`)
+      .replace(/(\\d+(?:\\.\\d+)?)\\s?lbs?/gi, (_, val) => `${(parseFloat(val)*0.453592).toFixed(1)} kg`)
+      .replace(/(\\d+(?:\\.\\d+)?)\\s?feet?/gi, (_, val) => `${(parseFloat(val)*30.48).toFixed(1)} cm`)
+      .replace(/(\\d+(?:\\.\\d+)?)\\s?yards?/gi, (_, val) => `${(parseFloat(val)*0.9144).toFixed(1)} m`);
+  }
+
   async function translateText(text) {
+    const converted = convertUnits(text);
     try {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|fr`);
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(converted)}&langpair=en|fr`);
       const data = await res.json();
       resultDiv.textContent = data.responseData.translatedText || "Erreur de traduction.";
     } catch (e) {
