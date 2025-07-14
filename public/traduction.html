@@ -1,65 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traduction Crochet + OCR</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traduction Crochet</title>
   <style>
     body {
-      background-color: #222;
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
+
     header {
       font-size: 2.2em;
+      text-align: center;
+      padding: 30px 20px 10px;
       color: white;
       text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
-      margin: 30px 0 10px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px;
     }
-    header img.pelote {
-      height: 40px;
+
+    .pelote {
+      width: 50px;
+      height: auto;
+      margin-left: 10px;
     }
-    .container {
-      width: 90%;
-      max-width: 700px;
-      margin-bottom: 100px;
-    }
-    textarea {
-      width: 100%;
-      min-height: 180px;
-      background: #333;
-      color: white;
-      border: none;
-      padding: 15px;
-      font-size: 1em;
-      border-radius: 10px;
-      box-shadow: inset 0 0 5px #f0f;
-      resize: vertical;
-      margin-top: 10px;
-      font-family: monospace, monospace;
-      line-height: 1.4em;
-    }
-    #output {
-      white-space: pre-wrap;
-      margin-top: 15px;
-      background: #111;
-      padding: 15px;
-      border-radius: 10px;
-      min-height: 150px;
-      box-shadow: 0 0 10px #f0f;
-      font-family: monospace, monospace;
-      line-height: 1.4em;
-    }
+
     .btn-retour {
       position: fixed;
       bottom: 15px;
@@ -74,80 +47,79 @@
       text-decoration: none;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       z-index: 1000;
+    }
+
+    .container {
+      margin: 50px 20px 100px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      resize: vertical;
+      box-shadow: 0 0 5px #fff3;
+      background-color: rgba(0,0,0,0.4);
+      color: white;
+    }
+
+    input[type="file"], input[type="text"] {
+      display: block;
+      margin: 15px 0;
+    }
+
+    button {
+      background-color: #f0f;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px 10px 30px 0;
+      font-size: 1em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
       cursor: pointer;
     }
-    .buttons {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    input[type="file"], input[type="url"] {
-      background: #333;
-      border-radius: 10px;
-      border: none;
-      padding: 8px 12px;
-      color: white;
-      font-size: 1em;
-      width: 100%;
-      max-width: 350px;
-      box-shadow: inset 0 0 5px #f0f;
-      margin-top: 10px;
-    }
-    label {
-      display: block;
+
+    #output {
       margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
+      white-space: pre-wrap;
+      font-size: 1.1em;
     }
-    #status {
-      margin-top: 15px;
-      font-style: italic;
+
+    .footer {
       text-align: center;
-      min-height: 24px;
+      margin-bottom: 40px;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
-
   <a href="index.html" class="btn-retour">← Retour</a>
 
   <header>
-    Traduction Crochet 
-    <img src="pelote.png" alt="Pelote" class="pelote" />
+    Traduction Crochet
+    <img src="pelote.png" alt="Pelote" class="pelote">
   </header>
 
-  <main class="container">
-
-    <label for="textInput">Texte à traduire :</label>
-    <textarea id="textInput" placeholder="Colle ici ton texte crochet..."></textarea>
-
-    <div class="buttons">
-      <button id="btnTraduire" type="button">Traduire le texte</button>
-    </div>
-
-    <label for="imageInput">Ou sélectionner une image pour OCR :</label>
-    <input type="file" id="imageInput" accept="image/*" />
-
-    <label for="urlInput">Ou saisir l'URL d'une image :</label>
-    <input type="url" id="urlInput" placeholder="https://exemple.com/image.jpg" />
-
-    <div class="buttons">
-      <button id="btnOCR" type="button">Extraire et traduire OCR</button>
-    </div>
-
-    <div id="status"></div>
-
-    <label for="output">Résultat traduit :</label>
+  <div class="container">
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="urlInput" placeholder="ou colle une URL d’image ici...">
+    <textarea id="textInput" placeholder="Colle ici ton texte ou utilise une image ci-dessus..."></textarea>
+    <button id="btnTraduire">Traduire</button>
+    <button id="btnOCR">OCR depuis image</button>
     <div id="output"></div>
+    <p id="status"></p>
+  </div>
 
-  </main>
+  <div class="footer">
+    <a href="index.html" class="btn-retour">← Retour</a>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <script>
     const mapping = {
-      // Abréviations et termes crochet
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
       "from hook": "à partir du crochet",
@@ -178,8 +150,6 @@
       "ch": "chaînette",
       "inc": "augmentation",
       "dec": "diminution",
-
-      // Corrections OCR fréquentes
       "audouble bridee": "à double bride",
       "chaînettee": "chaînette",
       "mailleserrée": "maille serrée",
@@ -193,74 +163,59 @@
     function traduireTexte() {
       let texte = document.getElementById('textInput').value.toLowerCase();
 
-      // Correction OCR d'abord
+      // Correction OCR
       for (const erreur in mapping) {
         const regexOCR = new RegExp(erreur, 'gi');
         texte = texte.replace(regexOCR, mapping[erreur]);
       }
 
-      // Gestion abréviations collées à des chiffres (ex: 3scin)
+      // Abréviations collées à des chiffres
       for (const key in mapping) {
         const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
         texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
       }
 
-      // Remplacement simple des mots isolés
+      // Remplacement simple
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
       for (const key of sortedKeys) {
         const regexMot = new RegExp('\\b' + key + '\\b', 'gi');
         texte = texte.replace(regexMot, mapping[key]);
       }
 
-      // Nettoyage final
       texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n');
       document.getElementById('output').innerText = texte.trim();
     }
 
-    document.getElementById('btnTraduire').addEventListener('click', () => {
-      traduireTexte();
-      document.getElementById('status').textContent = '';
-    });
+    document.getElementById('btnTraduire').addEventListener('click', traduireTexte);
 
     document.getElementById('btnOCR').addEventListener('click', () => {
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('urlInput');
       const output = document.getElementById('output');
-      const status = document.getElementById('status');
 
-      output.textContent = '';
-      status.textContent = '⏳ Extraction en cours, patience...';
+      output.textContent = '⏳ Extraction en cours, patience...';
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        Tesseract.recognize(
-          file,
-          'eng',
-          { logger: m => console.log(m) }
-        ).then(({ data: { text } }) => {
-          document.getElementById('textInput').value = text;
-          traduireTexte();
-          status.textContent = '✅ Extraction terminée.';
-        }).catch(err => {
-          status.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
-        });
+        Tesseract.recognize(file, 'eng', { logger: m => console.log(m) })
+          .then(({ data: { text } }) => {
+            document.getElementById('textInput').value = text;
+            traduireTexte();
+          }).catch(err => {
+            output.textContent = '❌ Erreur OCR : ' + err.message;
+          });
       } else if (urlInput.value.trim() !== '') {
-        Tesseract.recognize(
-          urlInput.value.trim(),
-          'eng',
-          { logger: m => console.log(m) }
-        ).then(({ data: { text } }) => {
-          document.getElementById('textInput').value = text;
-          traduireTexte();
-          status.textContent = '✅ Extraction terminée.';
-        }).catch(err => {
-          status.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
-        });
+        Tesseract.recognize(urlInput.value.trim(), 'eng', { logger: m => console.log(m) })
+          .then(({ data: { text } }) => {
+            document.getElementById('textInput').value = text;
+            traduireTexte();
+          }).catch(err => {
+            output.textContent = '❌ Erreur OCR : ' + err.message;
+          });
       } else {
-        status.textContent = '⚠️ Veuillez choisir un fichier image ou saisir une URL.';
+        output.textContent = '⚠️ Veuillez choisir une image ou entrer une URL.';
       }
     });
   </script>
-
 </body>
 </html>
