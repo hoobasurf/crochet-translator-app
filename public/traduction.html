@@ -141,9 +141,11 @@
   <script>
     const mapping = {
       "sc": "maille serrée",
+      "chb": "maille en l’air",
+      "in": "dans",
+      "scin": "maille serrée",
       "inc": "augmentation",
       "dec": "diminution",
-      "ch": "maille en l’air",
       "sl st": "maille coulée",
       "hdc": "demi-bride",
       "dc": "bride",
@@ -166,13 +168,22 @@
       "stitch": "maille"
     };
 
+    function preProcessTexte(texte) {
+      // Ajoute un espace entre abréviations collées pour que la traduction fonctionne
+      texte = texte.replace(/(chb)(in)/gi, "$1 $2");
+      texte = texte.replace(/(in)(scin)/gi, "$1 $2");
+      return texte;
+    }
+
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
 
-      // Remplacer les phrases complètes d’abord (plus longues en premier)
+      // Prétraitement pour séparer les abréviations collées
+      texte = preProcessTexte(texte);
+
+      // Trie les clés par longueur décroissante pour éviter les remplacements partiels
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
       for (const mot of sortedKeys) {
-        // Remplacer en ignorant la casse et en ne remplaçant que mots isolés (avec \b)
         const regex = new RegExp(`\\b${mot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, "gi");
         texte = texte.replace(regex, mapping[mot]);
       }
