@@ -145,11 +145,6 @@
 </head>
 <body>
 
-  <div class="intro-overlay">
-    <div class="scintillements"></div>
-    <div class="intro-text">Crochet Steph</div>
-  </div>
-
   <img src="chat.png" alt="Chat" class="chat" />
   <img src="pelote.png" alt="Pelote" class="pelote" />
 
@@ -160,5 +155,35 @@
     <a class="btn-link" href="note.html">🗒️ Mes notes</a>
     <a class="btn-link" href="lexique.html">📚 Lexique</a>
   </div>
+
+  <script>
+    // Vérifie si l’animation a déjà été vue
+    const dejaVue = localStorage.getItem("animationDejaVue");
+
+    if (!dejaVue) {
+      const overlay = document.createElement("div");
+      overlay.className = "intro-overlay";
+
+      const scintillements = document.createElement("div");
+      scintillements.className = "scintillements";
+
+      const texte = document.createElement("div");
+      texte.className = "intro-text";
+      texte.innerText = "Crochet Steph";
+
+      overlay.appendChild(scintillements);
+      overlay.appendChild(texte);
+      document.body.appendChild(overlay);
+
+      // Marque l'animation comme vue
+      localStorage.setItem("animationDejaVue", "oui");
+
+      // Supprimer après disparition
+      setTimeout(() => {
+        overlay.remove();
+      }, 5000);
+    }
+  </script>
+
 </body>
 </html>
