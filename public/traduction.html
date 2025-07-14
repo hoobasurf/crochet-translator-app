@@ -140,10 +140,23 @@
 
   <script>
     const mapping = {
+      "with white yarn": "avec du fil blanc",
+      "with yarn": "avec du fil",
+      "from hook": "à partir du crochet",
+      "continue on the other side": "continuer de l’autre côté",
+      "start": "début",
+      "continue": "continuer",
+      "times": "fois",
+      "last": "dernière",
+      "next": "suivante",
+      "join": "joindre",
+      "chain": "chaînette",
+      "round": "tour",
+      "stitch": "maille",
+      "scin": "maille serrée",
       "sc": "maille serrée",
       "chb": "maille en l’air",
       "in": "dans",
-      "scin": "maille serrée",
       "inc": "augmentation",
       "dec": "diminution",
       "sl st": "maille coulée",
@@ -151,44 +164,20 @@
       "dc": "bride",
       "tr": "double bride",
       "blo": "brin arrière",
-      "flo": "brin avant",
-      "with white yarn": "avec du fil blanc",
-      "with yarn": "avec du fil",
-      "from hook": "à partir du crochet",
-      "continue on the other side": "continuer de l’autre côté",
-      "continue": "continuer",
-      "times": "fois",
-      "start": "début",
-      "repeat": "répéter",
-      "last": "dernière",
-      "next": "suivante",
-      "join": "joindre",
-      "chain": "chaînette",
-      "round": "tour",
-      "stitch": "maille"
+      "flo": "brin avant"
     };
-
-    function preProcessTexte(texte) {
-      // Ajoute un espace entre abréviations collées pour que la traduction fonctionne
-      texte = texte.replace(/(chb)(in)/gi, "$1 $2");
-      texte = texte.replace(/(in)(scin)/gi, "$1 $2");
-      return texte;
-    }
 
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
-
-      texte = preProcessTexte(texte);
+      texte = texte.toLowerCase();
 
       // Trie les clés par longueur décroissante pour éviter les remplacements partiels
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
 
-      for (const mot of sortedKeys) {
-        // Autoriser un nombre collé devant : (\d*) pour capturer un nombre s’il y en a
-        const regex = new RegExp(`(\\d*)${mot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "gi");
-        texte = texte.replace(regex, (match, p1) => {
-          return (p1 || "") + mapping[mot];
-        });
+      for (const key of sortedKeys) {
+        // On capte un nombre éventuel collé devant (ex: 5scin)
+        const regex = new RegExp(`(\\d*)${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "gi");
+        texte = texte.replace(regex, (match, p1) => (p1 || "") + mapping[key]);
       }
 
       document.getElementById('output').innerText = texte;
