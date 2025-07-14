@@ -2,165 +2,149 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>✨ Traduction Crochet Automatique ✨</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Traduction Crochet + OCR</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
-
     body {
+      background-color: #222;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: 'Quicksand', sans-serif;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      color: #fff;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      font-size: 2.2em;
+      color: white;
+      text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
+      margin: 30px 0 10px 0;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: flex-start;
-      padding: 40px 15px;
+      gap: 15px;
     }
-
+    header img.pelote {
+      height: 40px;
+    }
     .container {
-      background: rgba(0, 0, 0, 0.75);
-      max-width: 900px;
-      width: 100%;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 0, 150, 0.5);
-      box-sizing: border-box;
+      width: 90%;
+      max-width: 700px;
+      margin-bottom: 100px;
     }
-
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 30px;
-      color: #ff8ce0;
-      text-shadow: 0 0 10px #ff8ce0;
-    }
-
     textarea {
       width: 100%;
-      height: 160px;
-      padding: 15px;
-      border-radius: 12px;
-      border: none;
-      font-size: 16px;
-      resize: vertical;
-      background-color: #222;
-      color: #fff;
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
-      margin-bottom: 20px;
-      box-sizing: border-box;
-    }
-
-    button {
-      display: inline-block;
-      padding: 12px 20px;
-      font-size: 18px;
-      background: linear-gradient(90deg, #ff6ec4, #7873f5);
+      min-height: 180px;
+      background: #333;
       color: white;
       border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      margin-right: 15px;
-      margin-bottom: 20px;
+      padding: 15px;
+      font-size: 1em;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px #f0f;
+      resize: vertical;
+      margin-top: 10px;
+      font-family: monospace, monospace;
+      line-height: 1.4em;
     }
-
-    button:hover {
-      background: linear-gradient(90deg, #ff8ce0, #6a67d5);
-    }
-
-    h3 {
-      margin-top: 30px;
-      color: #ffd5fa;
-      font-weight: 700;
-      text-shadow: 0 0 5px #ff8ce0;
-    }
-
-    pre {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 12px;
+    #output {
       white-space: pre-wrap;
-      color: #fff;
-      font-size: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      min-height: 160px;
-      box-sizing: border-box;
+      margin-top: 15px;
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+      min-height: 150px;
+      box-shadow: 0 0 10px #f0f;
+      font-family: monospace, monospace;
+      line-height: 1.4em;
     }
-
-    .input-group {
-      margin-bottom: 15px;
+    .btn-retour {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      text-decoration: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+      cursor: pointer;
     }
-
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    input[type="file"], input[type="url"] {
+      background: #333;
+      border-radius: 10px;
+      border: none;
+      padding: 8px 12px;
+      color: white;
+      font-size: 1em;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: inset 0 0 5px #f0f;
+      margin-top: 10px;
+    }
     label {
       display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #ff8ce0;
-      text-shadow: 0 0 5px #ff8ce0;
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
     }
-
-    input[type="file"],
-    input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    input[type="file"] {
-      background-color: #222;
-      color: #fff;
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
-    }
-
-    input[type="text"] {
-      background-color: #222;
-      color: #fff;
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 600px) {
-      button {
-        width: 100%;
-        margin-right: 0;
-      }
+    #status {
+      margin-top: 15px;
+      font-style: italic;
+      text-align: center;
+      min-height: 24px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
 
-  <div class="container">
-    <h1>✨ Traduction Crochet Automatique ✨</h1>
+  <a href="index.html" class="btn-retour">← Retour</a>
 
-    <textarea id="textInput" placeholder="Colle ici ton texte en anglais (ex: With white yarn: Chain 5, sc in 2nd ch...)"></textarea>
+  <header>
+    Traduction Crochet 
+    <img src="pelote.png" alt="Pelote" class="pelote" />
+  </header>
 
-    <div style="margin-bottom:20px;">
-      <button id="btnTraduire">Traduire</button>
-      <button id="btnOCR">Extraire et Traduire (OCR)</button>
+  <main class="container">
+
+    <label for="textInput">Texte à traduire :</label>
+    <textarea id="textInput" placeholder="Colle ici ton texte crochet..."></textarea>
+
+    <div class="buttons">
+      <button id="btnTraduire" type="button">Traduire le texte</button>
     </div>
 
-    <div class="input-group">
-      <label for="imageInput">Choisir une image locale :</label>
-      <input type="file" id="imageInput" accept="image/*" />
+    <label for="imageInput">Ou sélectionner une image pour OCR :</label>
+    <input type="file" id="imageInput" accept="image/*" />
+
+    <label for="urlInput">Ou saisir l'URL d'une image :</label>
+    <input type="url" id="urlInput" placeholder="https://exemple.com/image.jpg" />
+
+    <div class="buttons">
+      <button id="btnOCR" type="button">Extraire et traduire OCR</button>
     </div>
 
-    <div class="input-group">
-      <label for="urlInput">Ou saisir URL d'image :</label>
-      <input type="text" id="urlInput" placeholder="https://exemple.com/image.jpg" />
-    </div>
+    <div id="status"></div>
 
-    <h3>🧶 Résultat :</h3>
-    <pre id="output"></pre>
-  </div>
+    <label for="output">Résultat traduit :</label>
+    <div id="output"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  </main>
+
   <script>
     const mapping = {
       // Abréviations et termes crochet
@@ -233,17 +217,19 @@
       document.getElementById('output').innerText = texte.trim();
     }
 
-    // Événements boutons
     document.getElementById('btnTraduire').addEventListener('click', () => {
       traduireTexte();
+      document.getElementById('status').textContent = '';
     });
 
     document.getElementById('btnOCR').addEventListener('click', () => {
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('urlInput');
       const output = document.getElementById('output');
+      const status = document.getElementById('status');
 
-      output.textContent = '⏳ Extraction en cours, patience...';
+      output.textContent = '';
+      status.textContent = '⏳ Extraction en cours, patience...';
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
@@ -254,8 +240,9 @@
         ).then(({ data: { text } }) => {
           document.getElementById('textInput').value = text;
           traduireTexte();
+          status.textContent = '✅ Extraction terminée.';
         }).catch(err => {
-          output.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
+          status.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
         });
       } else if (urlInput.value.trim() !== '') {
         Tesseract.recognize(
@@ -265,11 +252,12 @@
         ).then(({ data: { text } }) => {
           document.getElementById('textInput').value = text;
           traduireTexte();
+          status.textContent = '✅ Extraction terminée.';
         }).catch(err => {
-          output.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
+          status.textContent = '❌ Erreur lors de l\'extraction OCR : ' + err.message;
         });
       } else {
-        output.textContent = '⚠️ Veuillez choisir un fichier image ou saisir une URL.';
+        status.textContent = '⚠️ Veuillez choisir un fichier image ou saisir une URL.';
       }
     });
   </script>
