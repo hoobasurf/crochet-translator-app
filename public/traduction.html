@@ -178,14 +178,17 @@
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
 
-      // Prétraitement pour séparer les abréviations collées
       texte = preProcessTexte(texte);
 
       // Trie les clés par longueur décroissante pour éviter les remplacements partiels
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
+
       for (const mot of sortedKeys) {
-        const regex = new RegExp(`\\b${mot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, "gi");
-        texte = texte.replace(regex, mapping[mot]);
+        // Autoriser un nombre collé devant : (\d*) pour capturer un nombre s’il y en a
+        const regex = new RegExp(`(\\d*)${mot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "gi");
+        texte = texte.replace(regex, (match, p1) => {
+          return (p1 || "") + mapping[mot];
+        });
       }
 
       document.getElementById('output').innerText = texte;
