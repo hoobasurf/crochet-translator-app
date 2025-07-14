@@ -41,6 +41,7 @@
       background: #fffafa;
       resize: vertical;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+      font-family: monospace;
     }
 
     button {
@@ -54,97 +55,4 @@
       border-radius: 12px;
       cursor: pointer;
       font-family: 'Pacifico', cursive;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #ff1493;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.15);
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2em;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="container">
-    <h1>🧶 Traduction Crochet</h1>
-
-    <label for="input">✏️ Instructions en abrégé (EN) :</label>
-    <textarea id="input" rows="10" placeholder="Ex: 05. inc, sc 10, inc, sc 2, inc, sc, inc, sc..."></textarea>
-
-    <button id="translateBtn">🔄 Traduire</button>
-
-    <label for="output">📘 Traduction (FR) :</label>
-    <textarea id="output" rows="10" readonly placeholder="Résultat..."></textarea>
-  </div>
-
-  <script>
-    const traductions = {
-      'sc': 'maille serrée',
-      'inc': 'augmentation',
-      'dec': 'diminution',
-      'ch': 'maille en l’air',
-      'sl st': 'maille coulée',
-      'hdc': 'demi-bride',
-      'dc': 'bride',
-      'tr': 'double bride'
-    };
-
-    function nettoyerTexte(text) {
-      // Séparer les abréviations collées (ex: 3scin → 3 sc in)
-      text = text.replace(/(\d)([a-zA-Z]+)/g, '$1 $2');
-      text = text.replace(/([a-z])(\d)/g, '$1 $2');
-
-      // Corriger les structures anglaises
-      text = text.replace(/\bin the\b/gi, 'dans la');
-      text = text.replace(/\bin\b(?=\s+[a-z])/gi, 'dans la');
-      text = text.replace(/\bof the\b/gi, 'de la');
-      return text;
-    }
-
-    function traduireTexte(input) {
-      input = nettoyerTexte(input);
-
-      // Traduire les abréviations simples
-      let output = input.replace(/\b(sl st|hdc|dc|tr|sc|inc|dec|ch)\b/gi, (abbr) => {
-        const mot = abbr.toLowerCase();
-        return traductions[mot] || abbr;
-      });
-
-      // Traduire les répétitions *...* 3 times
-      output = output.replace(/\*([^*]+)\*\s*(\d+)\s*times?/gi, (match, sequence, count) => {
-        return `répéter ${sequence.trim()} ${count} fois`;
-      });
-
-      return output;
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const input = document.getElementById('input');
-      const output = document.getElementById('output');
-      const btn = document.getElementById('translateBtn');
-
-      btn.addEventListener('click', () => {
-        const lignes = input.value.split('\n');
-        const traduites = lignes.map(traduireTexte);
-        output.value = traduites.join('\n');
-      });
-    });
-  </script>
-
-</body>
-</html>
+      box-shadow: 0 4px 8px rgba(0,0
