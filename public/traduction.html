@@ -2,218 +2,123 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction Crochet</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
+  <title>Traduction Crochet Automatique</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      color: white;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+    h1 {
       text-align: center;
+      color: #444;
     }
-
-    header {
-      margin-top: 20px;
-      font-size: 2.2em;
-      color: white;
-      text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pelote {
-      width: 50px;
-      margin-left: 10px;
-    }
-
-    .btn-retour {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-size: 1em;
-      text-decoration: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      z-index: 1000;
-    }
-
-    .container {
-      margin: 50px 20px 100px;
-    }
-
     textarea {
-      width: 90%;
-      max-width: 500px;
+      width: 100%;
       height: 180px;
       padding: 10px;
-      border-radius: 12px;
-      font-size: 1em;
-      border: none;
-      resize: none;
-      font-family: sans-serif;
+      font-size: 15px;
+      margin-bottom: 15px;
     }
-
-    .btn {
-      margin-top: 20px;
-      background: linear-gradient(135deg, violet, pink);
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
       color: white;
-      padding: 12px 25px;
+      font-size: 16px;
       border: none;
-      font-size: 1em;
-      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      margin-bottom: 15px;
     }
-
-    input[type="file"],
-    input[type="url"] {
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      background-color: rgba(255, 255, 255, 0.7);
-      font-family: sans-serif;
-      font-size: 0.9em;
-    }
-
-    #output {
-      margin-top: 20px;
-      font-size: 1.2em;
+    pre {
+      background: #eee;
+      padding: 15px;
       white-space: pre-wrap;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      color: white;
-      text-shadow: 1px 1px 3px black;
-    }
-
-    #status {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #ffb6c1;
-      text-shadow: 0 0 3px #f0f;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
 
-  <a href="index.html" class="btn-retour">← Retour</a>
+<h1>🧶 Traduction Crochet (EN → FR)</h1>
 
-  <header>
-    Traduction Crochet
-    <img src="pelote.png" alt="Pelote" class="pelote">
-  </header>
+<textarea id="textInput" placeholder="Collez ici le texte en anglais…"></textarea>
+<button onclick="traduireTexte()">Traduire</button>
 
-  <div class="container">
+<h3>Traduction :</h3>
+<pre id="output"></pre>
 
-    <input type="file" id="imageInput" accept="image/*">
-    <br/>
-    <input type="url" id="imageURL" placeholder="Ou collez une URL d'image" style="width:90%; max-width:400px;">
-    <br/>
+<script>
+  const mapping = {
+    // Abréviations et termes crochet
+    "with white yarn": "avec du fil blanc",
+    "with yarn": "avec du fil",
+    "from hook": "à partir du crochet",
+    "continue on the other side": "continuer de l’autre côté",
+    "start": "début",
+    "continue": "continuer",
+    "times": "fois",
+    "last": "dernière",
+    "next": "suivante",
+    "join": "joindre",
+    "chain": "chaînette",
+    "stitch": "maille",
+    "base": "base",
+    "side": "côté",
+    "the": "",
+    "of": "de",
+    "in": "dans",
+    "on": "sur",
+    "chb": "maille en l’air",
+    "sl st": "maille coulée",
+    "hdc": "demi-bride",
+    "dc": "bride",
+    "tr": "double bride",
+    "blo": "brin arrière",
+    "flo": "brin avant",
+    "scin": "maille serrée dans",
+    "sc": "maille serrée",
+    "ch": "chaînette",
+    "inc": "augmentation",
+    "dec": "diminution",
 
-    <button class="btn" onclick="processImage()">📸 Extraire et Traduire</button>
+    // Corrections OCR fréquentes
+    "audouble bridee": "à double bride",
+    "chaînettee": "chaînette",
+    "mailleserrée": "maille serrée",
+    "mailleen l’air": "maille en l’air",
+    "maillecoulée": "maille coulée",
+    "doublebride": "double bride",
+    "maille serré": "maille serrée",
+    "the dernière ch": "la dernière chaînette"
+  };
 
-    <textarea id="textInput" placeholder="Colle ici ton texte ou utilise une image ci-dessus..."></textarea>
+  function traduireTexte() {
+    let texte = document.getElementById('textInput').value.toLowerCase();
 
-    <div id="output"></div>
-    <p id="status"></p>
-
-  </div>
-
-  <script>
-    const mapping = {
-      "with white yarn": "avec du fil blanc",
-      "with yarn": "avec du fil",
-      "from hook": "à partir du crochet",
-      "continue on the other side": "continuer de l’autre côté",
-      "start": "début",
-      "continue": "continuer",
-      "times": "fois",
-      "last": "dernière",
-      "next": "suivante",
-      "join": "joindre",
-      "chain": "chaînette",
-      "round": "tour",
-      "stitch": "maille",
-      "scin": "maille serrée",
-      "sc": "maille serrée",
-      "chb": "maille en l’air",
-      "in": "dans",
-      "inc": "augmentation",
-      "dec": "diminution",
-      "sl st": "maille coulée",
-      "hdc": "demi-bride",
-      "dc": "bride",
-      "tr": "double bride",
-      "blo": "brin arrière",
-      "flo": "brin avant"
-    };
-
-    function traduireTexte() {
-      let texte = document.getElementById('textInput').value;
-      texte = texte.toLowerCase();
-
-      // Trie les clés par longueur décroissante pour éviter les remplacements partiels
-      const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
-
-      for (const key of sortedKeys) {
-        // On capte un nombre éventuel collé devant (ex: 5scin)
-        const regex = new RegExp(`(\\d*)${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "gi");
-        texte = texte.replace(regex, (match, p1) => (p1 || "") + mapping[key]);
-      }
-
-      document.getElementById('output').innerText = texte;
+    // Corriger les fautes OCR d'abord
+    for (const erreur in mapping) {
+      const regexOCR = new RegExp(erreur, 'gi');
+      texte = texte.replace(regexOCR, mapping[erreur]);
     }
 
-    function processImage() {
-      const fileInput = document.getElementById('imageInput');
-      const urlInput = document.getElementById('imageURL').value;
-      const status = document.getElementById('status');
-      status.textContent = "⏳ Lecture en cours...";
-
-      let image;
-
-      if (fileInput.files.length > 0) {
-        image = URL.createObjectURL(fileInput.files[0]);
-      } else if (urlInput) {
-        image = urlInput;
-      } else {
-        status.textContent = "Veuillez sélectionner une image ou coller une URL.";
-        return;
-      }
-
-      Tesseract.recognize(
-        image,
-        'eng',
-        { logger: m => console.log(m) }
-      ).then(({ data: { text } }) => {
-        document.getElementById('textInput').value = text;
-        status.textContent = "✅ Image lue avec succès !";
-        traduireTexte();
-      }).catch(err => {
-        console.error(err);
-        status.textContent = "❌ Erreur lors de la lecture de l’image.";
-      });
+    // Gérer les abréviations collées à un chiffre, ex: 3sc ou 5scin
+    for (const key in mapping) {
+      const regexAbbr = new RegExp("(\\d+)\\s*" + key + "\\b", "gi");
+      texte = texte.replace(regexAbbr, (_, num) => num + " " + mapping[key]);
     }
-  </script>
+
+    // Remplacer les mots simples
+    const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
+    for (const key of sortedKeys) {
+      const regexMot = new RegExp("\\b" + key + "\\b", "gi");
+      texte = texte.replace(regexMot, mapping[key]);
+    }
+
+    // Nettoyage final
+    texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n');
+    document.getElementById('output').innerText = texte.trim();
+  }
+</script>
 
 </body>
 </html>
