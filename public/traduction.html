@@ -1,51 +1,99 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Traduction Crochet Automatique</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background-image: url('fond-tokyo.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      min-height: 100vh;
     }
+
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      margin: 50px auto;
+      max-width: 900px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 0, 150, 0.5);
+    }
+
     h1 {
       text-align: center;
-      color: #444;
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #ff8ce0;
+      text-shadow: 0 0 10px #ff8ce0;
     }
+
     textarea {
       width: 100%;
-      height: 180px;
-      padding: 10px;
-      font-size: 15px;
-      margin-bottom: 15px;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      margin-bottom: 15px;
-    }
-    pre {
-      background: #eee;
+      height: 160px;
       padding: 15px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      resize: vertical;
+      background-color: #222;
+      color: #fff;
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      background: linear-gradient(90deg, #ff6ec4, #7873f5);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ff8ce0, #6a67d5);
+    }
+
+    h3 {
+      margin-top: 30px;
+      color: #ffd5fa;
+      font-weight: 700;
+      text-shadow: 0 0 5px #ff8ce0;
+    }
+
+    pre {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
       white-space: pre-wrap;
-      font-size: 15px;
+      color: #fff;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
   </style>
 </head>
 <body>
 
-<h1>🧶 Traduction Crochet (EN → FR)</h1>
+<div class="container">
+  <h1>✨ Traduction Crochet Automatique ✨</h1>
 
-<textarea id="textInput" placeholder="Collez ici le texte en anglais…"></textarea>
-<button onclick="traduireTexte()">Traduire</button>
+  <textarea id="textInput" placeholder="Colle ici ton texte en anglais (ex: With white yarn: Chain 5, sc in 2nd ch...)"></textarea>
+  <button onclick="traduireTexte()">Traduire</button>
 
-<h3>Traduction :</h3>
-<pre id="output"></pre>
+  <h3>🧶 Résultat :</h3>
+  <pre id="output"></pre>
+</div>
 
 <script>
   const mapping = {
@@ -95,22 +143,22 @@
   function traduireTexte() {
     let texte = document.getElementById('textInput').value.toLowerCase();
 
-    // Corriger les fautes OCR d'abord
+    // Correction OCR d'abord
     for (const erreur in mapping) {
       const regexOCR = new RegExp(erreur, 'gi');
       texte = texte.replace(regexOCR, mapping[erreur]);
     }
 
-    // Gérer les abréviations collées à un chiffre, ex: 3sc ou 5scin
+    // Gestion abréviations collées à des chiffres (ex: 3scin)
     for (const key in mapping) {
-      const regexAbbr = new RegExp("(\\d+)\\s*" + key + "\\b", "gi");
-      texte = texte.replace(regexAbbr, (_, num) => num + " " + mapping[key]);
+      const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
+      texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
     }
 
-    // Remplacer les mots simples
+    // Remplacement simple des mots isolés
     const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
     for (const key of sortedKeys) {
-      const regexMot = new RegExp("\\b" + key + "\\b", "gi");
+      const regexMot = new RegExp('\\b' + key + '\\b', 'gi');
       texte = texte.replace(regexMot, mapping[key]);
     }
 
