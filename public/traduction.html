@@ -149,7 +149,7 @@
       texte = texte.replace(regexOCR, mapping[erreur]);
     }
 
-    // Gestion abréviations collées à des chiffres (ex: 3scin)
+    // Gestion des abréviations collées à des chiffres (ex: 3scin)
     for (const key in mapping) {
       const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
       texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
