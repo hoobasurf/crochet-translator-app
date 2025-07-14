@@ -10,16 +10,37 @@
       margin: 0;
       padding: 0;
       font-family: 'Quicksand', sans-serif;
-      background-image: url('fond-tokyo.jpg');
+      background-image: url('fond-accueil.jpg');
       background-size: cover;
       background-position: center;
       color: #fff;
       min-height: 100vh;
     }
 
+    .menu {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .menu a {
+      padding: 10px 20px;
+      background: linear-gradient(90deg, #ff6ec4, #7873f5);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .menu a:hover {
+      background: linear-gradient(90deg, #ff8ce0, #6a67d5);
+    }
+
     .container {
       background: rgba(0, 0, 0, 0.75);
-      margin: 50px auto;
+      margin: 40px auto;
       max-width: 900px;
       padding: 30px;
       border-radius: 20px;
@@ -85,6 +106,11 @@
 </head>
 <body>
 
+<div class="menu">
+  <a href="index.html">🏠 Accueil</a>
+  <a href="traduction.html">🔤 Traduction</a>
+</div>
+
 <div class="container">
   <h1>✨ Traduction Crochet Automatique ✨</h1>
 
@@ -149,7 +175,7 @@
       texte = texte.replace(regexOCR, mapping[erreur]);
     }
 
-    // Gestion des abréviations collées à des chiffres (ex: 3scin)
+    // Gestion abréviations collées à des chiffres (ex: 3scin)
     for (const key in mapping) {
       const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
       texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
