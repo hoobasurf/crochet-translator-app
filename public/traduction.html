@@ -4,57 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      color: white;
-      text-shadow: 1px 1px 2px black;
+      font-family: 'Arial', sans-serif;
+      background-color: #ffe6f0;
+      color: #333;
     }
 
     header {
       text-align: center;
-      padding: 40px 10px 20px;
+      padding: 30px 10px 20px;
       font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .chat, .pelote {
-      position: fixed;
-      width: 80px;
-      z-index: 10;
-    }
-
-    .chat {
-      top: 10px;
-      left: 20px;
-      animation: jump 2s ease-in-out infinite;
-    }
-
-    .pelote {
-      top: 10px;
-      left: 120px;
-      animation: movePelote 4s linear infinite;
-    }
-
-    @keyframes jump {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-
-    @keyframes movePelote {
-      0% { transform: translateX(0) rotate(0deg); }
-      50% { transform: translateX(40px) rotate(180deg); }
-      100% { transform: translateX(0) rotate(360deg); }
+      color: #e91e63;
     }
 
     .container {
@@ -69,9 +32,7 @@
       padding: 10px;
       margin: 10px 0;
       border-radius: 10px;
-      border: none;
-      background: rgba(255,255,255,0.1);
-      color: white;
+      border: 1px solid #ccc;
       resize: vertical;
     }
 
@@ -80,20 +41,23 @@
       font-size: 1em;
       border: none;
       border-radius: 10px;
-      background: linear-gradient(135deg, violet, pink);
+      background-color: #e91e63;
       color: white;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      opacity: 0.8;
+      background-color: #d81b60;
+    }
+
+    pre {
+      background-color: #fff;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-
-  <img src="chat.png" alt="Chat" class="chat" />
-  <img src="pelote.png" alt="Pelote" class="pelote" />
 
   <header>📝 Traduction</header>
 
