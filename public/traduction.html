@@ -3,47 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Correcteur & Traducteur Crochet (OCR)</title>
+  <title>OCR Crochet - Correction & Traduction</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
   <style>
-    /* Ton style existant ici (ne rien changer) */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input[type="file"], input[type="url"], textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 5px;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    textarea {
+      min-height: 150px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 20px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      background-color: #3b82f6;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    pre {
+      background: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+      min-height: 120px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: "Courier New", Courier, monospace;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>OCR Crochet - Correction & Traduction</h1>
 
-  <h1>🔄 Correcteur & Traducteur Crochet (OCR)</h1>
+    <label for="imageInput">Choisir une image locale :</label>
+    <input type="file" id="imageInput" accept="image/*" />
 
-  <label for="ocrInput">📝 Collez ici votre texte OCR brut :</label>
-  <textarea id="ocrInput" placeholder="Exemple : danmaille serréee, chaînetteaînette 5..."></textarea>
+    <label for="imageURL">Ou saisir une URL d'image :</label>
+    <input type="url" id="imageURL" placeholder="https://exemple.com/image.jpg" />
 
-  <button onclick="corrigerEtTraduire()">Corriger & Traduire</button>
+    <button id="btnOCR">Lancer OCR & Traduction</button>
 
-  <h2>✅ Résultat :</h2>
-  <div id="resultat"></div>
+    <label for="textInput">Texte OCR (modifiable pour retraduire) :</label>
+    <textarea id="textInput" placeholder="Texte reconnu par OCR..."></textarea>
 
-  <hr />
+    <button id="btnTraduire">Corriger & Traduire Texte</button>
 
-  <label for="textInput">📥 Ou collez ici votre texte à traduire :</label>
-  <textarea id="textInput" placeholder="Collez votre texte ici..."></textarea>
+    <h2>Résultat corrigé + traduit :</h2>
+    <pre id="output" aria-live="polite" aria-atomic="true"></pre>
 
-  <button id="btnTraduire">Traduire</button>
-
-  <h2>📤 Traduction :</h2>
-  <pre id="output" style="white-space: pre-wrap;"></pre>
-
-  <hr />
-
-  <label for="imageInput">📷 Ou choisissez une image pour OCR :</label>
-  <input type="file" id="imageInput" accept="image/*" />
-
-  <label for="imageURL">Ou entrez une URL d'image :</label>
-  <input type="url" id="imageURL" placeholder="https://exemple.com/image.jpg" />
-
-  <button id="btnOCR">Extraire texte OCR</button>
-
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <h2>Résultat final nettoyé + fusionné :</h2>
+    <pre id="resultat" aria-live="polite" aria-atomic="true"></pre>
+  </div>
 
   <script>
-    // Mappage des erreurs OCR vers français correct
+    // Mapping des erreurs OCR vers traduction française correcte
     const mapping = {
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
@@ -85,19 +138,19 @@
       "the dernière ch": "la dernière chaînette"
     };
 
-    // Fonction nettoyage OCR : réduit lettres répétées, enlève caractères spéciaux, espaces multiples
+    // Nettoyage du texte OCR
     function nettoyerTexteOCR(texte) {
       texte = texte.toLowerCase();
-      // Réduction lettres répétées (ex: serréee -> serrée)
-      texte = texte.replace(/(\w)\1{2,}/g, '$1');
-      // Nettoyage caractères spéciaux non alphabétiques autorisés
-      texte = texte.replace(/[^\w\s.,:*\[\]\(\)-éèêëàâäîïçùûüôœ’']/gi, '');
-      // Espaces multiples en un seul
+      // Réduire répétitions excessives de lettres (ex: serréee -> serrée)
+      texte = texte.replace(/(\w)\1{2,}/g, '$1$1');
+      // Supprimer caractères spéciaux non autorisés (garder accents, apostrophes, ponctuation de base)
+      texte = texte.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
+      // Remplacer multiples espaces par un seul
       texte = texte.replace(/\s{2,}/g, ' ');
-      return texte;
+      return texte.trim();
     }
 
-    // Corrige mots fusionnés typiques OCR
+    // Corriger mots fusionnés typiques OCR
     function corrigerMotsFusionnes(texte) {
       const corrections = {
         "danmaille": "dans maille",
@@ -127,52 +180,33 @@
       return texte;
     }
 
-    // Fonction globale de correction + traduction du texte OCR
+    // Correction + traduction globale du texte OCR
     function corrigerEtTraduire() {
-      let texte = document.getElementById('ocrInput').value;
+      let texte = document.getElementById('textInput').value;
 
       texte = nettoyerTexteOCR(texte);
       texte = corrigerMotsFusionnes(texte);
 
-      // Appliquer le mapping pour traduire les termes anglais mal reconnus
+      // Appliquer le mapping de traduction
       for (const erreur in mapping) {
         const regexOCR = new RegExp(erreur, 'gi');
         texte = texte.replace(regexOCR, mapping[erreur]);
       }
 
-      // Nettoyer espaces et lignes multiples
+      // Nettoyer espaces multiples et sauts de ligne multiples
       texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n').trim();
 
+      // Afficher dans les 2 zones : résultat simple et final fusionné
+      document.getElementById('output').innerText = texte;
       document.getElementById('resultat').innerText = texte;
     }
 
-    // Fonction traduction basique avec mapping, pour la zone 'textInput'
+    // Traduction directe à partir de la zone textInput (bouton corriger & traduire)
     function traduireTexte() {
-      let texte = document.getElementById('textInput').value.toLowerCase();
-
-      for (const erreur in mapping) {
-        const regexOCR = new RegExp(erreur, 'gi');
-        texte = texte.replace(regexOCR, mapping[erreur]);
-      }
-
-      // Traduction des expressions "nombre + mot"
-      for (const key in mapping) {
-        const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
-        texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
-      }
-
-      // Traduction mots seuls, triés par longueur décroissante pour éviter conflits
-      const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
-      for (const key of sortedKeys) {
-        const regexMot = new RegExp('\\b' + key + '\\b', 'gi');
-        texte = texte.replace(regexMot, mapping[key]);
-      }
-
-      texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n');
-      document.getElementById('output').innerText = texte.trim();
+      corrigerEtTraduire();
     }
 
-    // Événements boutons et input
+    // Gestion des événements
     document.getElementById('btnTraduire').addEventListener('click', traduireTexte);
     document.getElementById('textInput').addEventListener('input', traduireTexte);
 
@@ -181,31 +215,46 @@
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('imageURL');
       const output = document.getElementById('output');
+      const resultat = document.getElementById('resultat');
 
       output.textContent = '⏳ Extraction en cours, patience...';
+      resultat.textContent = '';
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        Tesseract.recognize(file, 'eng', { logger: m => console.log(m) })
+        Tesseract.recognize(file, 'eng', {
+          logger: m => {
+            // Optionnel: afficher progression dans console
+            // console.log(m);
+          }
+        })
           .then(({ data: { text } }) => {
             document.getElementById('textInput').value = text;
             traduireTexte();
-          }).catch(err => {
+          })
+          .catch(err => {
             output.textContent = '❌ Erreur OCR : ' + err.message;
+            resultat.textContent = '';
           });
       } else if (urlInput.value.trim() !== '') {
-        Tesseract.recognize(urlInput.value.trim(), 'eng', { logger: m => console.log(m) })
+        Tesseract.recognize(urlInput.value.trim(), 'eng', {
+          logger: m => {
+            // console.log(m);
+          }
+        })
           .then(({ data: { text } }) => {
             document.getElementById('textInput').value = text;
             traduireTexte();
-          }).catch(err => {
+          })
+          .catch(err => {
             output.textContent = '❌ Erreur OCR : ' + err.message;
+            resultat.textContent = '';
           });
       } else {
-        output.textContent = '⚠️ Veuillez choisir une image ou entrer une URL.';
+        output.textContent = '⚠️ Veuillez sélectionner une image locale ou saisir une URL.';
+        resultat.textContent = '';
       }
     });
   </script>
-
 </body>
 </html>
