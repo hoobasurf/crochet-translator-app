@@ -44,7 +44,7 @@
     }
 
     button {
-      margin-top: 15px;
+      margin-top: 20px;
       width: 100%;
       padding: 14px;
       font-size: 1.1em;
@@ -65,7 +65,7 @@
     .container {
       max-width: 900px;
       margin: auto;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.85);
       border-radius: 20px;
       padding: 30px;
       box-shadow: 0 0 20px rgba(0,0,0,0.15);
@@ -83,14 +83,13 @@
   <div class="container">
     <h1>🧶 Traduction Crochet</h1>
 
-    <label for="input">✏️ Instructions en abrégé (EN/FR mix) :</label>
-    <textarea id="input" rows="12" placeholder="Ex: 05. inc, sc 10, inc, sc 2, inc, sc, inc, sc..."></textarea>
+    <label for="input">✏️ Instructions en abrégé (EN) :</label>
+    <textarea id="input" rows="10" placeholder="Ex: 05. inc, sc 10, inc, sc 2, inc, sc, inc, sc..."></textarea>
 
-    <button id="cleanBtn">🧼 Nettoyer le texte</button>
     <button id="translateBtn">🔄 Traduire</button>
 
     <label for="output">📘 Traduction (FR) :</label>
-    <textarea id="output" rows="12" readonly placeholder="Résultat..."></textarea>
+    <textarea id="output" rows="10" readonly placeholder="Résultat..."></textarea>
   </div>
 
   <script>
@@ -105,36 +104,30 @@
       'tr': 'double bride'
     };
 
-    function nettoyerTexte(input) {
-      let output = input;
+    function nettoyerTexte(text) {
+      // Séparer les abréviations collées (ex: 3scin → 3 sc in)
+      text = text.replace(/(\d)([a-zA-Z]+)/g, '$1 $2');
+      text = text.replace(/([a-z])(\d)/g, '$1 $2');
 
-      // Corriger franglais courant
-      output = output.replace(/in the dernière maille en l[’']air/gi, 'dans la dernière maille en l’air');
-      output = output.replace(/of the cha[iî]nette/gi, 'de la chaînette');
-      output = output.replace(/cha[iî]nette base/gi, 'chaînette de base');
-
-      // Corriger erreurs typographiques (ex : 3scin → 3 sc dans)
-      output = output.replace(/(\d+)scin/gi, '$1 sc dans');
-      output = output.replace(/(\d+)sc/gi, '$1 sc');
-      output = output.replace(/(\d+)inc/gi, '$1 inc');
-      output = output.replace(/(\d+)dec/gi, '$1 dec');
-      output = output.replace(/(\d+)ch/gi, '$1 ch');
-
-      return output;
+      // Corriger les structures anglaises
+      text = text.replace(/\bin the\b/gi, 'dans la');
+      text = text.replace(/\bin\b(?=\s+[a-z])/gi, 'dans la');
+      text = text.replace(/\bof the\b/gi, 'de la');
+      return text;
     }
 
     function traduireTexte(input) {
-      let output = nettoyerTexte(input);
+      input = nettoyerTexte(input);
 
-      // Traduire les répétitions : *sc 6, dec* 3 times
-      output = output.replace(/\*([^*]+)\*\s*(\d+)\s*(times?|fois?)/gi, (match, motif, count) => {
-        return `répéter ${motif.trim()} ${count} fois`;
-      });
-
-      // Traduire les abréviations
-      output = output.replace(/\b(sl st|hdc|dc|tr|sc|inc|dec|ch)\b/gi, (abbr) => {
+      // Traduire les abréviations simples
+      let output = input.replace(/\b(sl st|hdc|dc|tr|sc|inc|dec|ch)\b/gi, (abbr) => {
         const mot = abbr.toLowerCase();
         return traductions[mot] || abbr;
+      });
+
+      // Traduire les répétitions *...* 3 times
+      output = output.replace(/\*([^*]+)\*\s*(\d+)\s*times?/gi, (match, sequence, count) => {
+        return `répéter ${sequence.trim()} ${count} fois`;
       });
 
       return output;
@@ -143,17 +136,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       const input = document.getElementById('input');
       const output = document.getElementById('output');
-      const translateBtn = document.getElementById('translateBtn');
-      const cleanBtn = document.getElementById('cleanBtn');
+      const btn = document.getElementById('translateBtn');
 
-      translateBtn.addEventListener('click', () => {
+      btn.addEventListener('click', () => {
         const lignes = input.value.split('\n');
         const traduites = lignes.map(traduireTexte);
         output.value = traduites.join('\n');
-      });
-
-      cleanBtn.addEventListener('click', () => {
-        input.value = nettoyerTexte(input.value);
       });
     });
   </script>
