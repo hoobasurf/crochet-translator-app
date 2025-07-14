@@ -81,6 +81,12 @@
     input[type="file"],
     input[type="url"] {
       margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.7);
+      font-family: sans-serif;
+      font-size: 0.9em;
     }
 
     #output {
@@ -94,6 +100,8 @@
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
   </style>
 </head>
@@ -108,22 +116,24 @@
 
   <div class="container">
 
-    <!-- Choix d’image -->
+    <!-- Choix image ou URL -->
     <input type="file" id="imageInput" accept="image/*">
     <br/>
-    <input type="url" id="imageURL" placeholder="Ou collez une URL d'image" style="width:90%; max-width:400px; padding:10px; border-radius:10px; border:none;">
+    <input type="url" id="imageURL" placeholder="Ou collez une URL d'image" style="width:90%; max-width:400px;">
     <br/>
+
+    <!-- Bouton unique -->
     <button class="btn" onclick="processImage()">📸 Extraire et Traduire</button>
 
-    <p id="status"></p>
-
-    <!-- Zone de texte -->
+    <!-- Zone de texte manuelle -->
     <textarea id="textInput" placeholder="Colle ici ton texte ou utilise une image ci-dessus..."></textarea>
-    <br/>
-    <button class="btn" onclick="traduireTexte()">🔄 Traduire</button>
 
     <!-- Résultat -->
     <div id="output"></div>
+
+    <!-- Statut OCR -->
+    <p id="status"></p>
+
   </div>
 
   <script>
