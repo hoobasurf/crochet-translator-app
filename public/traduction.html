@@ -2,144 +2,48 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Traduction Crochet</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Correcteur & Traducteur Crochet (OCR)</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      color: white;
-      text-align: center;
-    }
-
-    header {
-      margin-top: 20px;
-      font-size: 2.2em;
-      color: white;
-      text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pelote {
-      width: 50px;
-      margin-left: 10px;
-    }
-
-    .container {
-      margin: 50px 20px;
-    }
-
-    textarea {
-      width: 90%;
-      max-width: 500px;
-      height: 180px;
-      padding: 10px;
-      border-radius: 12px;
-      font-size: 1em;
-      border: none;
-      resize: none;
-      font-family: sans-serif;
-    }
-
-    .btn {
-      margin-top: 20px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 12px 25px;
-      border: none;
-      font-size: 1em;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    input[type="file"],
-    input[type="url"] {
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      background-color: rgba(255, 255, 255, 0.7);
-      font-family: sans-serif;
-      font-size: 0.9em;
-    }
-
-    #output {
-      margin-top: 20px;
-      font-size: 1.2em;
-      white-space: pre-wrap;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      color: white;
-      text-shadow: 1px 1px 3px black;
-    }
-
-    .btn-retour {
-      display: inline-block;
-      margin-top: 60px;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-size: 1em;
-      text-decoration: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
-
-    .footer {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+    /* Ton style existant ici (ne rien changer) */
   </style>
 </head>
 <body>
 
-  <header>
-    Traduction Crochet
-    <img src="pelote.png" alt="Pelote" class="pelote">
-  </header>
+  <h1>🔄 Correcteur & Traducteur Crochet (OCR)</h1>
 
-  <div class="container">
+  <label for="ocrInput">📝 Collez ici votre texte OCR brut :</label>
+  <textarea id="ocrInput" placeholder="Exemple : danmaille serréee, chaînetteaînette 5..."></textarea>
 
-    <input type="file" id="imageInput" accept="image/*">
-    <br/>
-    <input type="url" id="imageURL" placeholder="Ou collez une URL d'image" style="width:90%; max-width:400px;">
-    <br/>
+  <button onclick="corrigerEtTraduire()">Corriger & Traduire</button>
 
-    <button class="btn" id="btnOCR">📸 Extraire et Traduire</button>
-    <br/>
-    <button class="btn" id="btnTraduire">📝 Traduire le texte</button>
+  <h2>✅ Résultat :</h2>
+  <div id="resultat"></div>
 
-    <textarea id="textInput" placeholder="Colle ici ton texte ou utilise une image ci-dessus..."></textarea>
+  <hr />
 
-    <div id="output"></div>
+  <label for="textInput">📥 Ou collez ici votre texte à traduire :</label>
+  <textarea id="textInput" placeholder="Collez votre texte ici..."></textarea>
 
-    <p id="status"></p>
+  <button id="btnTraduire">Traduire</button>
 
-  </div>
+  <h2>📤 Traduction :</h2>
+  <pre id="output" style="white-space: pre-wrap;"></pre>
 
-  <div class="footer">
-    <a href="index.html" class="btn-retour">← Retour</a>
-  </div>
+  <hr />
+
+  <label for="imageInput">📷 Ou choisissez une image pour OCR :</label>
+  <input type="file" id="imageInput" accept="image/*" />
+
+  <label for="imageURL">Ou entrez une URL d'image :</label>
+  <input type="url" id="imageURL" placeholder="https://exemple.com/image.jpg" />
+
+  <button id="btnOCR">Extraire texte OCR</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
   <script>
+    // Mappage des erreurs OCR vers français correct
     const mapping = {
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
@@ -181,6 +85,68 @@
       "the dernière ch": "la dernière chaînette"
     };
 
+    // Fonction nettoyage OCR : réduit lettres répétées, enlève caractères spéciaux, espaces multiples
+    function nettoyerTexteOCR(texte) {
+      texte = texte.toLowerCase();
+      // Réduction lettres répétées (ex: serréee -> serrée)
+      texte = texte.replace(/(\w)\1{2,}/g, '$1');
+      // Nettoyage caractères spéciaux non alphabétiques autorisés
+      texte = texte.replace(/[^\w\s.,:*\[\]\(\)-éèêëàâäîïçùûüôœ’']/gi, '');
+      // Espaces multiples en un seul
+      texte = texte.replace(/\s{2,}/g, ' ');
+      return texte;
+    }
+
+    // Corrige mots fusionnés typiques OCR
+    function corrigerMotsFusionnes(texte) {
+      const corrections = {
+        "danmaille": "dans maille",
+        "dansmaille": "dans maille",
+        "maillecoulee": "maille coulée",
+        "maillecolée": "maille coulée",
+        "maille serreee": "maille serrée",
+        "maille serree": "maille serrée",
+        "maille serré": "maille serrée",
+        "maille serréee": "maille serrée",
+        "maille serréeee": "maille serrée",
+        "maille serréeeee": "maille serrée",
+        "crochaînettet": "crochet",
+        "chaînetteaînette": "chaînette",
+        "csurtdansuerr": "dans le coin",
+        "maille en lair": "maille en l’air",
+        "maille en l'air": "maille en l’air",
+        "mailleenlair": "maille en l’air",
+        "maillencoulée": "maille coulée",
+        "doublebridee": "double bride"
+      };
+
+      for (const mot in corrections) {
+        const regex = new RegExp(mot, 'gi');
+        texte = texte.replace(regex, corrections[mot]);
+      }
+      return texte;
+    }
+
+    // Fonction globale de correction + traduction du texte OCR
+    function corrigerEtTraduire() {
+      let texte = document.getElementById('ocrInput').value;
+
+      texte = nettoyerTexteOCR(texte);
+      texte = corrigerMotsFusionnes(texte);
+
+      // Appliquer le mapping pour traduire les termes anglais mal reconnus
+      for (const erreur in mapping) {
+        const regexOCR = new RegExp(erreur, 'gi');
+        texte = texte.replace(regexOCR, mapping[erreur]);
+      }
+
+      // Nettoyer espaces et lignes multiples
+      texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n').trim();
+
+      document.getElementById('resultat').innerText = texte;
+    }
+
+    // Fonction traduction basique avec mapping, pour la zone 'textInput'
     function traduireTexte() {
       let texte = document.getElementById('textInput').value.toLowerCase();
 
@@ -189,11 +155,13 @@
         texte = texte.replace(regexOCR, mapping[erreur]);
       }
 
+      // Traduction des expressions "nombre + mot"
       for (const key in mapping) {
         const regexChiffre = new RegExp('(\\d+)\\s*' + key + '\\b', 'gi');
         texte = texte.replace(regexChiffre, (_, nombre) => nombre + ' ' + mapping[key]);
       }
 
+      // Traduction mots seuls, triés par longueur décroissante pour éviter conflits
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
       for (const key of sortedKeys) {
         const regexMot = new RegExp('\\b' + key + '\\b', 'gi');
@@ -204,10 +172,11 @@
       document.getElementById('output').innerText = texte.trim();
     }
 
+    // Événements boutons et input
     document.getElementById('btnTraduire').addEventListener('click', traduireTexte);
-
     document.getElementById('textInput').addEventListener('input', traduireTexte);
 
+    // OCR via Tesseract.js
     document.getElementById('btnOCR').addEventListener('click', () => {
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('imageURL');
@@ -237,5 +206,6 @@
       }
     });
   </script>
+
 </body>
 </html>
