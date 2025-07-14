@@ -162,11 +162,20 @@
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
 
-      // Remplacer les phrases complètes d’abord (plus longues en premier)
+      // Trier les clés par longueur décroissante pour remplacer d'abord les plus longues
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
+
       for (const mot of sortedKeys) {
-        const regex = new RegExp(`\\b${mot}\\b`, "gi");
-        texte = texte.replace(regex, mapping[mot]);
+        // \b ne marche pas sur les espaces, on remplace pour des expressions contenant des espaces avec une autre méthode
+        if (mot.includes(" ")) {
+          // Recherche insensible à la casse
+          const regex = new RegExp(mot, "gi");
+          texte = texte.replace(regex, mapping[mot]);
+        } else {
+          // Mot simple : utiliser \b pour mot entier
+          const regex = new RegExp(`\\b${mot}\\b`, "gi");
+          texte = texte.replace(regex, mapping[mot]);
+        }
       }
 
       document.getElementById('output').innerText = texte;
