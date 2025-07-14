@@ -104,6 +104,13 @@
       color: white;
       text-shadow: 1px 1px 3px black;
     }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #ffb6c1;
+      text-shadow: 0 0 3px #f0f;
+    }
   </style>
 </head>
 <body>
@@ -162,20 +169,12 @@
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
 
-      // Trier les clés par longueur décroissante pour remplacer d'abord les plus longues
+      // Remplacer les phrases complètes d’abord (plus longues en premier)
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
-
       for (const mot of sortedKeys) {
-        // \b ne marche pas sur les espaces, on remplace pour des expressions contenant des espaces avec une autre méthode
-        if (mot.includes(" ")) {
-          // Recherche insensible à la casse
-          const regex = new RegExp(mot, "gi");
-          texte = texte.replace(regex, mapping[mot]);
-        } else {
-          // Mot simple : utiliser \b pour mot entier
-          const regex = new RegExp(`\\b${mot}\\b`, "gi");
-          texte = texte.replace(regex, mapping[mot]);
-        }
+        // Remplacer en ignorant la casse et en ne remplaçant que mots isolés (avec \b)
+        const regex = new RegExp(`\\b${mot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, "gi");
+        texte = texte.replace(regex, mapping[mot]);
       }
 
       document.getElementById('output').innerText = texte;
