@@ -36,21 +36,6 @@
       margin-left: 10px;
     }
 
-  .btn-retour {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: linear-gradient(135deg, violet, pink);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 10px;
-  font-size: 1em;
-  text-decoration: none;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  z-index: 1000;
-}
-
     .container {
       margin: 50px 20px;
     }
@@ -104,11 +89,27 @@
       color: white;
       text-shadow: 1px 1px 3px black;
     }
+
+    .btn-retour {
+      display: inline-block;
+      margin-top: 60px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 1em;
+      text-decoration: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .footer {
+      text-align: center;
+      margin-bottom: 40px;
+    }
   </style>
 </head>
 <body>
-
-  <a href="index.html" class="btn-retour">← Retour</a>
 
   <header>
     Traduction Crochet
@@ -117,24 +118,24 @@
 
   <div class="container">
 
-    <!-- Choix image ou URL -->
     <input type="file" id="imageInput" accept="image/*">
     <br/>
     <input type="url" id="imageURL" placeholder="Ou collez une URL d'image" style="width:90%; max-width:400px;">
     <br/>
 
-    <!-- Bouton unique -->
     <button class="btn" onclick="processImage()">📸 Extraire et Traduire</button>
 
-    <!-- Zone de texte manuelle -->
     <textarea id="textInput" placeholder="Colle ici ton texte ou utilise une image ci-dessus..."></textarea>
 
-    <!-- Résultat -->
     <div id="output"></div>
 
-    <!-- Statut OCR -->
     <p id="status"></p>
 
+  </div>
+
+  <!-- Bouton retour en bas -->
+  <div class="footer">
+    <a href="index.html" class="btn-retour">← Retour</a>
   </div>
 
   <script>
