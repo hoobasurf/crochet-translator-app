@@ -2,76 +2,131 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OCR Crochet - Correction & Traduction</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traduction Crochet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
       margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #222;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 15px;
-      display: block;
-    }
-    input[type="file"], input[type="url"], textarea {
-      width: 100%;
-      box-sizing: border-box;
-      margin-top: 5px;
-      padding: 8px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      resize: vertical;
-    }
-    textarea {
-      min-height: 150px;
-    }
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 12px 20px;
-      font-size: 1.1em;
-      border: none;
-      border-radius: 5px;
-      background-color: #3b82f6;
+      padding: 0;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      overflow-x: hidden;
       color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+      text-shadow: 1px 1px 3px black;
+      text-align: center;
     }
-    button:hover {
-      background-color: #2563eb;
+    header {
+      margin-top: 20px;
+      font-size: 2.2em;
+      text-align: center;
+      padding: 30px 20px 10px;
+      color: white;
+      text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    pre {
-      background: #fff;
-      padding: 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      white-space: pre-wrap;
-      min-height: 120px;
-      max-height: 400px;
-      overflow-y: auto;
-      font-family: "Courier New", Courier, monospace;
+    .pelote {
+      width: 50px;
+      height: auto;
+      margin-left: 10px;
+    }
+    .btn-retour {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      text-decoration: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
     }
     .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      margin: 50px 20px 100px;
+    }
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      height: 180px;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 1em;
+      border: none;
+      box-shadow: 0 0 5px #fff3;
+      background-color: rgba(0,0,0,0.4);
+      color: white;
+      resize: none;
+      font-family: sans-serif;
+    }
+    input[type="file"],
+    input[type="url"] {
+      margin: 10px 0;
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.7);
+      font-family: sans-serif;
+      font-size: 0.9em;
+    }
+    .btn {
+      margin-top: 20px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      font-size: 1em;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 1.2em;
+      white-space: pre-wrap;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      color: white;
+      text-shadow: 1px 1px 3px black;
+    }
+    #resultat {
+      margin-top: 20px;
+      font-size: 1.2em;
+      white-space: pre-wrap;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
   </style>
 </head>
 <body>
+  <header>
+    OCR Crochet
+    <img src="pelote.png" alt="pelote de laine" class="pelote" />
+  </header>
+
   <div class="container">
     <h1>OCR Crochet - Correction & Traduction</h1>
 
@@ -81,12 +136,13 @@
     <label for="imageURL">Ou saisir une URL d'image :</label>
     <input type="url" id="imageURL" placeholder="https://exemple.com/image.jpg" />
 
-    <button id="btnOCR">Lancer OCR & Traduction</button>
+    <button id="btnOCR" class="btn">Lancer OCR & Traduction</button>
+    <button id="btnClear" class="btn">Effacer tout</button>
 
     <label for="textInput">Texte OCR (modifiable pour retraduire) :</label>
-    <textarea id="textInput" placeholder="Texte reconnu par OCR..."></textarea>
+    <textarea id="textInput" rows="6" placeholder="Texte reconnu par OCR..."></textarea>
 
-    <button id="btnTraduire">Corriger & Traduire Texte</button>
+    <button id="btnTraduire" class="btn">Corriger & Traduire Texte</button>
 
     <h2>Résultat corrigé + traduit :</h2>
     <pre id="output" aria-live="polite" aria-atomic="true"></pre>
@@ -95,8 +151,9 @@
     <pre id="resultat" aria-live="polite" aria-atomic="true"></pre>
   </div>
 
+  <a href="index.html" class="btn-retour">Retour</a>
+
   <script>
-    // Mapping des erreurs OCR vers traduction française correcte
     const mapping = {
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
@@ -138,19 +195,14 @@
       "the dernière ch": "la dernière chaînette"
     };
 
-    // Nettoyage du texte OCR
     function nettoyerTexteOCR(texte) {
       texte = texte.toLowerCase();
-      // Réduire répétitions excessives de lettres (ex: serréee -> serrée)
       texte = texte.replace(/(\w)\1{2,}/g, '$1$1');
-      // Supprimer caractères spéciaux non autorisés (garder accents, apostrophes, ponctuation de base)
       texte = texte.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
-      // Remplacer multiples espaces par un seul
       texte = texte.replace(/\s{2,}/g, ' ');
       return texte.trim();
     }
 
-    // Corriger mots fusionnés typiques OCR
     function corrigerMotsFusionnes(texte) {
       const corrections = {
         "danmaille": "dans maille",
@@ -180,37 +232,30 @@
       return texte;
     }
 
-    // Correction + traduction globale du texte OCR
     function corrigerEtTraduire() {
       let texte = document.getElementById('textInput').value;
 
       texte = nettoyerTexteOCR(texte);
       texte = corrigerMotsFusionnes(texte);
 
-      // Appliquer le mapping de traduction
       for (const erreur in mapping) {
         const regexOCR = new RegExp(erreur, 'gi');
         texte = texte.replace(regexOCR, mapping[erreur]);
       }
 
-      // Nettoyer espaces multiples et sauts de ligne multiples
       texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n').trim();
 
-      // Afficher dans les 2 zones : résultat simple et final fusionné
       document.getElementById('output').innerText = texte;
       document.getElementById('resultat').innerText = texte;
     }
 
-    // Traduction directe à partir de la zone textInput (bouton corriger & traduire)
     function traduireTexte() {
       corrigerEtTraduire();
     }
 
-    // Gestion des événements
     document.getElementById('btnTraduire').addEventListener('click', traduireTexte);
     document.getElementById('textInput').addEventListener('input', traduireTexte);
 
-    // OCR via Tesseract.js
     document.getElementById('btnOCR').addEventListener('click', () => {
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('imageURL');
@@ -223,37 +268,40 @@
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         Tesseract.recognize(file, 'eng', {
-          logger: m => {
-            // Optionnel: afficher progression dans console
-            // console.log(m);
-          }
+          logger: m => {}
         })
-          .then(({ data: { text } }) => {
-            document.getElementById('textInput').value = text;
-            traduireTexte();
-          })
-          .catch(err => {
-            output.textContent = '❌ Erreur OCR : ' + err.message;
-            resultat.textContent = '';
-          });
+        .then(({ data: { text } }) => {
+          document.getElementById('textInput').value = text;
+          traduireTexte();
+        })
+        .catch(err => {
+          output.textContent = '❌ Erreur OCR : ' + err.message;
+          resultat.textContent = '';
+        });
       } else if (urlInput.value.trim() !== '') {
         Tesseract.recognize(urlInput.value.trim(), 'eng', {
-          logger: m => {
-            // console.log(m);
-          }
+          logger: m => {}
         })
-          .then(({ data: { text } }) => {
-            document.getElementById('textInput').value = text;
-            traduireTexte();
-          })
-          .catch(err => {
-            output.textContent = '❌ Erreur OCR : ' + err.message;
-            resultat.textContent = '';
-          });
+        .then(({ data: { text } }) => {
+          document.getElementById('textInput').value = text;
+          traduireTexte();
+        })
+        .catch(err => {
+          output.textContent = '❌ Erreur OCR : ' + err.message;
+          resultat.textContent = '';
+        });
       } else {
         output.textContent = '⚠️ Veuillez sélectionner une image locale ou saisir une URL.';
         resultat.textContent = '';
       }
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      document.getElementById('imageInput').value = '';
+      document.getElementById('imageURL').value = '';
+      document.getElementById('textInput').value = '';
+      document.getElementById('output').innerText = '';
+      document.getElementById('resultat').innerText = '';
     });
   </script>
 </body>
