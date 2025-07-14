@@ -22,9 +22,21 @@
       text-align: center;
       padding: 30px 10px 10px;
       font-size: 2.5em;
-      background: linear-gradient(135deg, violet, pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+
+    header .titre {
+      display: inline-block;
+      padding: 10px 25px;
+      color: white;
+      text-shadow: 0 0 10px fuchsia, 0 0 20px fuchsia;
+      border-radius: 20px;
+    }
+
+    header img {
+      height: 50px;
+      vertical-align: middle;
+      margin-left: 10px;
     }
 
     .container {
@@ -88,17 +100,50 @@
     .retour a:hover {
       background: linear-gradient(135deg, deeppink, purple);
     }
+
+    .input-wrapper {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .input-wrapper input {
+      display: none;
+    }
+
+    .input-wrapper label {
+      display: inline-block;
+      background: linear-gradient(135deg, pink, violet);
+      color: white;
+      padding: 12px 25px;
+      font-size: 1.1em;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .input-wrapper label:hover {
+      background: linear-gradient(135deg, deeppink, purple);
+    }
   </style>
 </head>
 <body>
 
-  <header>📝 Traduction Crochet</header>
+  <header>
+    <span class="titre">🧶 Traduction Crochet</span>
+    <img src="pelote.png" alt="Pelote">
+  </header>
 
   <div class="container">
     <textarea id="input" rows="8" placeholder="Colle ici ton modèle crochet (ex: inc, sc 3, dec...)"></textarea>
     <br>
     <button onclick="traduire()">Traduire</button>
     <div id="output"></div>
+
+    <div class="input-wrapper">
+      <label for="imgInput">📷 Choisir une image ou coller une URL</label>
+      <input type="file" id="imgInput" accept="image/*" onchange="handleImage(event)">
+    </div>
 
     <div class="retour">
       <a href="index.html">← Retour à l'accueil</a>
@@ -129,6 +174,11 @@
       }
 
       document.getElementById("output").innerText = texteTraduit;
+    }
+
+    function handleImage(event) {
+      alert("Image sélectionnée ! (Traitement non encore implémenté)");
+      // Tu peux ajouter ici ton code OCR plus tard si tu veux extraire du texte de l’image
     }
   </script>
 
