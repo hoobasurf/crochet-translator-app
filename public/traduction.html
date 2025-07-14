@@ -162,7 +162,7 @@
     function traduireTexte() {
       let texte = document.getElementById('textInput').value;
 
-      // Remplacer les phrases complètes d’abord (longs mots d’abord)
+      // Remplacer les phrases complètes d’abord (plus longues en premier)
       const sortedKeys = Object.keys(mapping).sort((a, b) => b.length - a.length);
       for (const mot of sortedKeys) {
         const regex = new RegExp(`\\b${mot}\\b`, "gi");
