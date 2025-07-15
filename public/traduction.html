@@ -1,94 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Traducteur Crochet OCR</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCR Crochet</title>
   <style>
     body {
-      background-color: #121212;
-      color: #f0f0f0;
-      font-family: 'Arial', sans-serif;
-      padding: 20px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
     }
 
-    textarea, input {
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+    }
+
+    textarea, input, button {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      background-color: #1e1e1e;
-      color: #fff;
-      border: 1px solid #444;
+      margin-top: 10px;
+      font-size: 1em;
       border-radius: 5px;
     }
 
     button {
-      padding: 10px 15px;
-      margin: 5px;
-      background-color: #ff4081;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
+      margin-bottom: 10px;
     }
 
     button:hover {
-      background-color: #f50057;
-    }
-
-    h1 {
-      color: #ff4081;
-    }
-
-    .zone {
-      margin-bottom: 30px;
+      background-color: #45a049;
     }
 
     #output, #resultat {
       white-space: pre-wrap;
-      background-color: #1e1e1e;
+      background-color: #222;
       padding: 10px;
       border-radius: 5px;
-      border: 1px solid #444;
+      margin-top: 10px;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
+  <div class="container">
+    <h1>Traduction OCR Patron Crochet</h1>
 
-  <h1>🔠 OCR & Traduction Crochet</h1>
+    <input type="file" id="imageInput" accept="image/*" />
+    <input type="text" id="imageURL" placeholder="Ou collez une URL d’image ici" />
 
-  <div class="zone">
-    <label for="imageInput">📷 Sélectionner une image (locale) :</label>
-    <input type="file" id="imageInput" accept="image/*">
-  </div>
+    <textarea id="textInput" placeholder="Texte OCR ou manuel ici..."></textarea>
 
-  <div class="zone">
-    <label for="imageURL">🌐 Ou entrer une URL d’image :</label>
-    <input type="text" id="imageURL" placeholder="https://...">
-  </div>
+    <button id="btnOCR">Extraire depuis l’image</button>
+    <button id="btnTraduire">Corriger + Traduire</button>
+    <button id="btnClear">Tout Effacer</button>
 
-  <div class="zone">
-    <button id="btnOCR">📤 Lancer l’OCR</button>
-    <button id="btnTraduire">🔁 Traduire le texte</button>
-    <button id="btnClear">🧹 Effacer tout</button>
-  </div>
-
-  <div class="zone">
-    <label for="textInput">📝 Texte extrait :</label>
-    <textarea id="textInput" rows="10" placeholder="Le texte OCR s’affichera ici..."></textarea>
-  </div>
-
-  <div class="zone">
-    <h2>🧵 Texte corrigé et traduit :</h2>
     <div id="output"></div>
-  </div>
-
-  <div class="zone">
-    <h2>✨ Résultat final :</h2>
     <div id="resultat"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
   <script>
     const mapping = {
       "with white yarn": "avec du fil blanc",
@@ -203,25 +182,29 @@
 
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        Tesseract.recognize(file, 'eng', { logger: m => {} })
-          .then(({ data: { text } }) => {
-            document.getElementById('textInput').value = text;
-            traduireTexte();
-          })
-          .catch(err => {
-            output.textContent = '❌ Erreur OCR : ' + err.message;
-            resultat.textContent = '';
-          });
+        Tesseract.recognize(file, 'eng', {
+          logger: m => {}
+        })
+        .then(({ data: { text } }) => {
+          document.getElementById('textInput').value = text;
+          traduireTexte();
+        })
+        .catch(err => {
+          output.textContent = '❌ Erreur OCR : ' + err.message;
+          resultat.textContent = '';
+        });
       } else if (urlInput.value.trim() !== '') {
-        Tesseract.recognize(urlInput.value.trim(), 'eng', { logger: m => {} })
-          .then(({ data: { text } }) => {
-            document.getElementById('textInput').value = text;
-            traduireTexte();
-          })
-          .catch(err => {
-            output.textContent = '❌ Erreur OCR : ' + err.message;
-            resultat.textContent = '';
-          });
+        Tesseract.recognize(urlInput.value.trim(), 'eng', {
+          logger: m => {}
+        })
+        .then(({ data: { text } }) => {
+          document.getElementById('textInput').value = text;
+          traduireTexte();
+        })
+        .catch(err => {
+          output.textContent = '❌ Erreur OCR : ' + err.message;
+          resultat.textContent = '';
+        });
       } else {
         output.textContent = '⚠️ Veuillez sélectionner une image locale ou saisir une URL.';
         resultat.textContent = '';
