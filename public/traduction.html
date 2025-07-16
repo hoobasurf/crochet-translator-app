@@ -2,111 +2,173 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OCR Crochet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OCR Crochet - Correction & Traduction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
-      background-size: cover;
+      font-family: 'Pacifico', cursive;
+      background: #f0f0f0 url('fond-accueil.jpg') center/cover no-repeat;
+      min-height: 100vh;
+      overflow-x: hidden;
       color: white;
+      text-shadow: 1px 1px 3px black;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      margin-top: 20px;
+      font-size: 2.2em;
+      color: white;
+      text-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 30px 20px 10px;
+    }
+
+    .pelote {
+      width: 50px;
+      height: auto;
     }
 
     .container {
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 10px;
+      margin: 50px auto 100px;
+      max-width: 900px;
+      background: rgba(255,255,255,0.15);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
     }
 
-    textarea, input, button {
-      width: 100%;
-      padding: 10px;
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input[type="file"],
+    input[type="url"],
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      box-sizing: border-box;
       margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.7);
+      font-family: sans-serif;
       font-size: 1em;
-      border-radius: 5px;
     }
 
-    button {
-      background-color: #4CAF50;
+    textarea {
+      min-height: 150px;
+      background-color: rgba(0,0,0,0.4);
       color: white;
+      box-shadow: 0 0 5px #fff3;
+      resize: none;
+    }
+
+    button, .btn {
+      margin: 20px 10px 0;
+      padding: 12px 25px;
+      font-size: 1em;
       border: none;
+      border-radius: 12px;
       cursor: pointer;
-      margin-bottom: 10px;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #45a049;
+      background-color: #2563eb;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .btn-retour {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      text-decoration: none;
+    }
+
+    pre, #output, #resultat {
+      margin: 20px auto;
+      white-space: pre-wrap;
+      padding: 10px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      font-family: "Courier New", Courier, monospace;
     }
 
     #output, #resultat {
-      white-space: pre-wrap;
-      background-color: #222;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-shadow: 1px 1px 3px black;
     }
   </style>
 </head>
 <body>
+  <header>
+    OCR Crochet
+    <img src="pelote.png" alt="pelote de laine" class="pelote" />
+  </header>
+
   <div class="container">
-    <h1>Traduction OCR Patron Crochet</h1>
+    <h1>OCR Crochet - Correction & Traduction</h1>
 
+    <label for="imageInput">Choisir une image locale :</label>
     <input type="file" id="imageInput" accept="image/*" />
-    <input type="text" id="imageURL" placeholder="Ou collez une URL d’image ici" />
 
-    <textarea id="textInput" placeholder="Texte OCR ou manuel ici..."></textarea>
+    <label for="imageURL">Ou saisir une URL d'image :</label>
+    <input type="url" id="imageURL" placeholder="https://exemple.com/image.jpg" />
 
-    <button id="btnOCR">Extraire depuis l’image</button>
-    <button id="btnTraduire">Corriger + Traduire</button>
-    <button id="btnClear">Tout Effacer</button>
+    <button id="btnOCR" class="btn">Lancer OCR & Traduction</button>
+    <button id="btnClear" class="btn">Effacer tout</button>
 
-    <div id="output"></div>
-    <div id="resultat"></div>
+    <label for="textInput">Texte OCR (modifiable pour retraduire) :</label>
+    <textarea id="textInput" rows="6" placeholder="Texte reconnu par OCR..."></textarea>
+
+    <button id="btnTraduire" class="btn">Corriger & Traduire Texte</button>
+
+    <h2>Résultat corrigé + traduit :</h2>
+    <pre id="output" aria-live="polite" aria-atomic="true"></pre>
+
+    <h2>Résultat final nettoyé + fusionné :</h2>
+    <pre id="resultat" aria-live="polite" aria-atomic="true"></pre>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <a href="index.html" class="btn-retour">⬅ Retour</a>
+
   <script>
     const mapping = {
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
-      "from hook": "à partir du crochet",
-      "continue on the other side": "continuer de l’autre côté",
-      "start": "début",
-      "continue": "continuer",
-      "times": "fois",
-      "last": "dernière",
-      "next": "suivante",
+      "in next stitch": "dans la maille suivante",
+      "repeat": "répéter",
       "join": "joindre",
-      "chain": "chaînette",
-      "stitch": "maille",
-      "base": "base",
-      "side": "côté",
-      "the": "",
-      "of": "de",
-      "in": "dans",
-      "on": "sur",
-      "chb": "maille en l’air",
+      "fasten off": "arrêter",
+      "chain": "faire une chaînette",
       "sl st": "maille coulée",
+      "sc": "maille serrée",
       "hdc": "demi-bride",
       "dc": "bride",
-      "tr": "double bride",
-      "blo": "brin arrière",
-      "flo": "brin avant",
-      "scin": "maille serrée dans",
-      "sc": "maille serrée",
-      "ch": "chaînette",
-      "inc": "augmentation",
-      "dec": "diminution",
-      "audouble bridee": "à double bride",
-      "chaînettee": "chaînette",
-      "mailleserrée": "maille serrée",
-      "mailleen l’air": "maille en l’air",
-      "maillecoulée": "maille coulée",
-      "doublebride": "double bride",
-      "maille serré": "maille serrée",
+      "tr": "double-bride",
+      "next st": "maille suivante",
+      "into same st": "dans la même maille",
+      "round": "tour",
+      "row": "rang",
+      "skip": "sauter",
+      "repeat from *": "répéter à partir de *",
       "the dernière ch": "la dernière chaînette"
     };
 
@@ -121,25 +183,11 @@
     function corrigerMotsFusionnes(texte) {
       const corrections = {
         "danmaille": "dans maille",
-        "dansmaille": "dans maille",
-        "maillecoulee": "maille coulée",
-        "maillecolée": "maille coulée",
-        "maille serreee": "maille serrée",
-        "maille serree": "maille serrée",
-        "maille serré": "maille serrée",
-        "maille serréee": "maille serrée",
-        "maille serréeee": "maille serrée",
-        "maille serréeeee": "maille serrée",
-        "crochaînettet": "crochet",
-        "chaînetteaînette": "chaînette",
-        "csurtdansuerr": "dans le coin",
-        "maille en lair": "maille en l’air",
-        "maille en l'air": "maille en l’air",
-        "mailleenlair": "maille en l’air",
-        "maillencoulée": "maille coulée",
-        "doublebridee": "double bride"
+        "maillecoulée": "maille coulée",
+        "mailleserrée": "maille serrée",
+        "faireune": "faire une",
+        "surlamaille": "sur la maille"
       };
-
       for (const mot in corrections) {
         const regex = new RegExp(mot, 'gi');
         texte = texte.replace(regex, corrections[mot]);
@@ -149,17 +197,13 @@
 
     function corrigerEtTraduire() {
       let texte = document.getElementById('textInput').value;
-
       texte = nettoyerTexteOCR(texte);
       texte = corrigerMotsFusionnes(texte);
-
       for (const erreur in mapping) {
         const regexOCR = new RegExp(erreur, 'gi');
         texte = texte.replace(regexOCR, mapping[erreur]);
       }
-
       texte = texte.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n').trim();
-
       document.getElementById('output').innerText = texte;
       document.getElementById('resultat').innerText = texte;
     }
@@ -174,49 +218,38 @@
     document.getElementById('btnOCR').addEventListener('click', () => {
       const fileInput = document.getElementById('imageInput');
       const urlInput = document.getElementById('imageURL');
-      const output = document.getElementById('output');
-      const resultat = document.getElementById('resultat');
-
-      output.textContent = '⏳ Extraction en cours, patience...';
-      resultat.textContent = '';
-
       if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        Tesseract.recognize(file, 'eng', {
-          logger: m => {}
-        })
-        .then(({ data: { text } }) => {
-          document.getElementById('textInput').value = text;
-          traduireTexte();
-        })
-        .catch(err => {
-          output.textContent = '❌ Erreur OCR : ' + err.message;
-          resultat.textContent = '';
-        });
+        Tesseract.recognize(file, 'eng', { logger: m => {} })
+          .then(({ data: { text } }) => {
+            document.getElementById('textInput').value = text;
+            traduireTexte();
+          })
+          .catch(err => {
+            output.textContent = '❌ Erreur OCR : ' + err.message;
+            resultat.textContent = '';
+          });
       } else if (urlInput.value.trim() !== '') {
-        Tesseract.recognize(urlInput.value.trim(), 'eng', {
-          logger: m => {}
-        })
-        .then(({ data: { text } }) => {
-          document.getElementById('textInput').value = text;
-          traduireTexte();
-        })
-        .catch(err => {
-          output.textContent = '❌ Erreur OCR : ' + err.message;
-          resultat.textContent = '';
-        });
+        Tesseract.recognize(urlInput.value.trim(), 'eng', { logger: m => {} })
+          .then(({ data: { text } }) => {
+            document.getElementById('textInput').value = text;
+            traduireTexte();
+          })
+          .catch(err => {
+            output.textContent = '❌ Erreur OCR : ' + err.message;
+            resultat.textContent = '';
+          });
       } else {
-        output.textContent = '⚠️ Veuillez sélectionner une image locale ou saisir une URL.';
-        resultat.textContent = '';
+        alert("Veuillez choisir une image ou entrer une URL.");
       }
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
-      document.getElementById('imageInput').value = '';
-      document.getElementById('imageURL').value = '';
-      document.getElementById('textInput').value = '';
-      document.getElementById('output').innerText = '';
-      document.getElementById('resultat').innerText = '';
+      document.getElementById('imageInput').value = "";
+      document.getElementById('imageURL').value = "";
+      document.getElementById('textInput').value = "";
+      document.getElementById('output').innerText = "";
+      document.getElementById('resultat').innerText = "";
     });
   </script>
 </body>
