@@ -8,127 +8,189 @@
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
-      margin:0;
-      padding:20px;
-      font-family:'Pacifico', cursive;
-      background-image:url('fond-traduction.jpg');
-      background-size:cover;
-      background-position:center;
-      color:#fff;
-      min-height:100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background-image: url('fond-accueil.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      min-height: 100vh;
     }
+
     h1 {
-      text-align:center;
-      color:#ff69b4;
-      margin-bottom:20px;
+      text-align: center;
+      color: #ff69b4;
+      margin-bottom: 20px;
     }
+
     .back-btn {
-      display:inline-block;
-      margin-bottom:20px;
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      padding:10px 15px;
-      border-radius:12px;
-      text-decoration:none;
+      display: block;
+      width: fit-content;
+      margin: 40px auto 0;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1.1em;
     }
+
     .container {
-      background:rgba(0,0,0,0.5);
-      border-radius:12px;
-      padding:20px;
-      max-width:800px;
-      margin:auto;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
-    select, input[type=file], textarea, button {
-      width:100%;
-      padding:10px;
-      margin:10px 0;
-      border-radius:8px;
-      border:none;
-      font-family:'Pacifico', cursive;
-      font-size:1em;
+
+    select, input[type=file], textarea, button, input[type=text] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
     }
+
     button {
-      background:linear-gradient(135deg,violet,pink);
-      color:white;
-      cursor:pointer;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      cursor: pointer;
     }
+
     #result {
-      white-space:pre-wrap;
-      background:rgba(255,255,255,0.1);
-      padding:15px;
-      border-radius:12px;
-      margin-top:20px;
+      white-space: pre-wrap;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-<a href="index.html" class="back-btn">⬅ Retour</a>
-<h1>🌐 Traduction</h1>
 
-<div class="container">
-  <select id="inputType">
-    <option value="text">✍️ Entrer du texte</option>
-    <option value="file">📁 Fichier .txt</option>
-    <option value="image">🖼️ Image (OCR)</option>
-    <option value="url">🔗 URL</option>
-  </select>
+  <h1>🌐 Traduction</h1>
 
-  <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
-  <input type="file" id="fileInput" style="display:none;">
-  <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display:none;">
+  <div class="container">
+    <select id="inputType">
+      <option value="text">✍️ Entrer du texte</option>
+      <option value="file">📁 Fichier .txt</option>
+      <option value="image">🖼️ Image (OCR)</option>
+      <option value="url">🔗 URL</option>
+    </select>
 
-  <button onclick="handleTranslate()">Traduire</button>
+    <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
+    <input type="file" id="fileInput" style="display: none;">
+    <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display: none;">
 
-  <div id="result"></div>
-</div>
+    <button onclick="handleTranslate()">Traduire</button>
 
-<script>
-  const inputTypeSelect = document.getElementById('inputType');
-  const manualText = document.getElementById('manualText');
-  const fileInput = document.getElementById('fileInput');
-  const urlInput = document.getElementById('urlInput');
-  const resultDiv = document.getElementById('result');
+    <div id="result"></div>
+  </div>
 
-  inputTypeSelect.addEventListener('change', () => {
-    const type = inputTypeSelect.value;
-    manualText.style.display = type === 'text' ? 'block' : 'none';
-    fileInput.style.display = (type === 'file' || type === 'image') ? 'block' : 'none';
-    urlInput.style.display = type === 'url' ? 'block' : 'none';
-  });
+  <!-- Bouton retour centré visible uniquement en scrollant -->
+  <a href="index.html" class="back-btn">⬅ Retour</a>
 
-  async function translateText(text) {
-    try {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|fr`);
-      const data = await res.json();
-      resultDiv.textContent = data.responseData.translatedText || "Erreur de traduction.";
-    } catch (e) {
-      resultDiv.textContent = "Erreur de traduction.";
+  <script>
+    const inputTypeSelect = document.getElementById('inputType');
+    const manualText = document.getElementById('manualText');
+    const fileInput = document.getElementById('fileInput');
+    const urlInput = document.getElementById('urlInput');
+    const resultDiv = document.getElementById('result');
+
+    const mapping = {
+      "with white yarn": "avec du fil blanc",
+      "with yarn": "avec du fil",
+      "in next stitch": "dans la maille suivante",
+      "repeat": "répéter",
+      "join": "joindre",
+      "fasten off": "arrêter",
+      "chain": "faire une chaînette",
+      "sl st": "maille coulée",
+      "sc": "maille serrée",
+      "hdc": "demi-bride",
+      "dc": "bride",
+      "tr": "double-bride",
+      "next st": "maille suivante",
+      "into same st": "dans la même maille",
+      "round": "tour",
+      "row": "rang",
+      "skip": "sauter",
+      "repeat from *": "répéter à partir de *",
+      "the dernière ch": "la dernière chaînette"
+    };
+
+    function nettoyerTexteOCR(texte) {
+      texte = texte.toLowerCase();
+      texte = texte.replace(/(\w)\1{2,}/g, '$1$1');
+      texte = texte.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
+      texte = texte.replace(/\s{2,}/g, ' ');
+      return texte.trim();
     }
-  }
 
-  function handleTranslate() {
-    const type = inputTypeSelect.value;
-
-    if (type === 'text') {
-      translateText(manualText.value);
-    } else if (type === 'file') {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucun fichier sélectionné.");
-      const reader = new FileReader();
-      reader.onload = () => translateText(reader.result);
-      reader.readAsText(file);
-    } else if (type === 'image') {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucune image sélectionnée.");
-      Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
-    } else if (type === 'url') {
-      fetch(urlInput.value)
-        .then(res => res.text())
-        .then(text => translateText(text))
-        .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
+    function corrigerMotsFusionnes(texte) {
+      const corrections = {
+        "danmaille": "dans maille",
+        "maillecoulée": "maille coulée",
+        "mailleserrée": "maille serrée",
+        "faireune": "faire une",
+        "surlamaille": "sur la maille"
+      };
+      for (const mot in corrections) {
+        const regex = new RegExp(mot, 'gi');
+        texte = texte.replace(regex, corrections[mot]);
+      }
+      return texte;
     }
-  }
-</script>
+
+    function appliquerCorrections(text) {
+      text = nettoyerTexteOCR(text);
+      text = corrigerMotsFusionnes(text);
+      for (const erreur in mapping) {
+        const regexOCR = new RegExp(erreur, 'gi');
+        text = text.replace(regexOCR, mapping[erreur]);
+      }
+      return text.replace(/\s{2,}/g, ' ').replace(/\n{2,}/g, '\n').trim();
+    }
+
+    async function translateText(text) {
+      const corrigé = appliquerCorrections(text);
+      try {
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(corrigé)}&langpair=en|fr`);
+        const data = await res.json();
+        resultDiv.textContent = data.responseData.translatedText || "Erreur de traduction.";
+      } catch (e) {
+        resultDiv.textContent = "Erreur de traduction.";
+      }
+    }
+
+    function handleTranslate() {
+      const type = inputTypeSelect.value;
+
+      if (type === 'text') {
+        translateText(manualText.value);
+      } else if (type === 'file') {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucun fichier sélectionné.");
+        const reader = new FileReader();
+        reader.onload = () => translateText(reader.result);
+        reader.readAsText(file);
+      } else if (type === 'image') {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucune image sélectionnée.");
+        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+      } else if (type === 'url') {
+        fetch(urlInput.value)
+          .then(res => res.text())
+          .then(text => translateText(text))
+          .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
+      }
+    }
+
+    inputTypeSelect.dispatchEvent(new Event('change'));
+  </script>
 
 </body>
 </html>
