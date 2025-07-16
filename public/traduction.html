@@ -90,7 +90,16 @@
     <div id="result"></div>
   </div>
 
-  <!-- Bouton retour centré visible uniquement en scrollant -->
+  <!-- 🔁 Nouveau bloc vidéo YouTube -->
+  <div class="container" style="margin-top: 50px;">
+    <h2 style="text-align:center;">🎥 Traduire une vidéo YouTube</h2>
+    <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube">
+    <button onclick="loadYouTubeVideo()">Lancer</button>
+    <div id="videoContainer" style="margin-top:20px; text-align:center;"></div>
+    <div id="ytTranslation" style="margin-top:20px; font-size:1.1em;"></div>
+  </div>
+
+  <!-- Bouton retour -->
   <a href="index.html" class="back-btn">⬅ Retour</a>
 
   <script>
@@ -169,6 +178,10 @@
     function handleTranslate() {
       const type = inputTypeSelect.value;
 
+      manualText.style.display = (type === "text") ? "block" : "none";
+      fileInput.style.display = (type === "file" || type === "image") ? "block" : "none";
+      urlInput.style.display = (type === "url") ? "block" : "none";
+
       if (type === 'text') {
         translateText(manualText.value);
       } else if (type === 'file') {
@@ -187,6 +200,42 @@
           .then(text => translateText(text))
           .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
       }
+    }
+
+    // 🔁 Nouvelle fonction pour charger la vidéo + simuler la traduction
+    function loadYouTubeVideo() {
+      const url = document.getElementById('youtubeUrl').value;
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      if (!videoId) return alert("Lien YouTube invalide");
+
+      document.getElementById('videoContainer').innerHTML = `
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
+        frameborder="0" allowfullscreen></iframe>`;
+
+      const phrases = [
+        "Prenez votre crochet 3.5 mm.",
+        "Faites une chaînette de 5 mailles.",
+        "Rejoignez en rond avec une maille coulée.",
+        "Faites 12 mailles serrées dans l’anneau."
+      ];
+
+      const translationBox = document.getElementById('ytTranslation');
+      translationBox.innerHTML = '';
+      let i = 0;
+
+      function displayNext() {
+        if (i >= phrases.length) return;
+        translationBox.innerHTML = `<span style="color:#ff69b4; font-weight:bold;">${phrases[i]}</span>`;
+        
+        const utter = new SpeechSynthesisUtterance(phrases[i]);
+        utter.lang = "fr-FR";
+        speechSynthesis.speak(utter);
+
+        i++;
+        setTimeout(displayNext, 5000);
+      }
+
+      displayNext();
     }
 
     inputTypeSelect.dispatchEvent(new Event('change'));
