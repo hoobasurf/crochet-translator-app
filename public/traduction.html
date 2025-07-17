@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Traduction</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
@@ -67,10 +67,17 @@
       border-radius: 12px;
       margin-top: 20px;
     }
+
+    .yt-line {
+      cursor: pointer;
+      margin: 10px 0;
+      font-size: 1.1em;
+      color: #ff69b4;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-
   <h1>🌐 Traduction</h1>
 
   <div class="container">
@@ -90,16 +97,15 @@
     <div id="result"></div>
   </div>
 
-  <!-- 🔁 Nouveau bloc vidéo YouTube -->
+  <!-- 🔁 Bloc vidéo YouTube -->
   <div class="container" style="margin-top: 50px;">
     <h2 style="text-align:center;">🎥 Traduire une vidéo YouTube</h2>
-    <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube">
+    <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube" />
     <button onclick="loadYouTubeVideo()">Lancer</button>
     <div id="videoContainer" style="margin-top:20px; text-align:center;"></div>
-    <div id="ytTranslation" style="margin-top:20px; font-size:1.1em;"></div>
+    <div id="ytTranslation" style="margin-top:20px;"></div>
   </div>
 
-  <!-- Bouton retour -->
   <a href="index.html" class="back-btn">⬅ Retour</a>
 
   <script>
@@ -202,7 +208,6 @@
       }
     }
 
-    // 🔁 Nouvelle fonction pour charger la vidéo + simuler la traduction
     function loadYouTubeVideo() {
       const url = document.getElementById('youtubeUrl').value;
       const videoId = url.split('v=')[1]?.split('&')[0];
@@ -219,18 +224,18 @@
         "Faites 12 mailles serrées dans l’anneau."
       ];
 
-      const translationBox = document.getElementById('ytTranslation');
-      translationBox.innerHTML = '';
+      const container = document.getElementById('ytTranslation');
+      container.innerHTML = '';
       let i = 0;
 
       function displayNext() {
         if (i >= phrases.length) return;
-        translationBox.innerHTML = `<span style="color:#ff69b4; font-weight:bold;">${phrases[i]}</span>`;
-        
-        const utter = new SpeechSynthesisUtterance(phrases[i]);
-        utter.lang = "fr-FR";
-        speechSynthesis.speak(utter);
-
+        const line = document.createElement("div");
+        line.className = "yt-line";
+        line.textContent = phrases[i];
+        line.onclick = () => readText(phrases[i]);
+        container.appendChild(line);
+        readText(phrases[i]);
         i++;
         setTimeout(displayNext, 5000);
       }
@@ -238,8 +243,29 @@
       displayNext();
     }
 
+    function readText(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "fr-FR";
+      utter.pitch = 1.2;
+      utter.rate = 0.9;
+      utter.volume = 1.0;
+
+      const voices = speechSynthesis.getVoices();
+      const female = voices.find(v =>
+        v.lang === "fr-FR" && (v.name.toLowerCase().includes("feminine") || v.name.toLowerCase().includes("google") || v.name.toLowerCase().includes("amelie"))
+      );
+      if (female) utter.voice = female;
+
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    // Chargement initial des voix
+    window.speechSynthesis.onvoiceschanged = () => {
+      speechSynthesis.getVoices();
+    };
+
     inputTypeSelect.dispatchEvent(new Event('change'));
   </script>
-
 </body>
 </html>
