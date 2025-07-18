@@ -17,13 +17,11 @@
       color: #fff;
       min-height: 100vh;
     }
-
     h1 {
       text-align: center;
       color: #ff69b4;
       margin-bottom: 20px;
     }
-
     .back-btn {
       display: block;
       width: fit-content;
@@ -35,7 +33,6 @@
       text-decoration: none;
       font-size: 1.1em;
     }
-
     .container {
       background: rgba(0, 0, 0, 0.5);
       border-radius: 12px;
@@ -43,7 +40,6 @@
       max-width: 800px;
       margin: auto;
     }
-
     select, input[type=file], textarea, button, input[type=text] {
       width: 100%;
       padding: 10px;
@@ -53,13 +49,11 @@
       font-family: 'Pacifico', cursive;
       font-size: 1em;
     }
-
     button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
       cursor: pointer;
     }
-
     #result {
       white-space: pre-wrap;
       background: rgba(255, 255, 255, 0.1);
@@ -67,7 +61,6 @@
       border-radius: 12px;
       margin-top: 20px;
     }
-
     .yt-line {
       cursor: pointer;
       margin: 10px 0;
@@ -138,11 +131,6 @@
       "st": "maille",
       "ch": "maille en l’air",
       "slst": "maille coulée",
-      "sc": "maille serrée",
-      "hdc": "demi-bride",
-      "dc": "bride",
-      "tr": "double bride",
-      "dtr": "triple bride",
       "inc": "augmentation",
       "dec": "diminution",
       "inv-dec": "diminution invisible",
@@ -156,7 +144,6 @@
       "front post": "autour de la maille en passant devant",
       "back post": "autour de la maille en passant derrière",
       "loop": "boucle",
-      "join": "joindre",
       "cut": "couper le fil",
       "weave in ends": "rentrer les fils",
       "edge": "bordure",
@@ -182,14 +169,38 @@
       urlInput.style.display = (type === "url") ? "block" : "none";
     }
 
-    async function translateText(text) {
-      const cleaned = text.toLowerCase().replace(/[^\w\s]/gi, '');
-      let translated = cleaned;
+    function applyCorrections(text) {
+      text = text.toLowerCase().replace(/(\w)\1{2,}/g, '$1$1');
+      text = text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
+      text = text.replace(/\s{2,}/g, ' ');
+      const corrections = {
+        "danmaille": "dans maille",
+        "maillecoulée": "maille coulée",
+        "mailleserrée": "maille serrée",
+        "faireune": "faire une",
+        "surlamaille": "sur la maille"
+      };
+      for (let wrong in corrections) {
+        const regex = new RegExp(wrong, 'gi');
+        text = text.replace(regex, corrections[wrong]);
+      }
       for (let key in mapping) {
         const regex = new RegExp(`\\b${key}\\b`, "gi");
-        translated = translated.replace(regex, mapping[key]);
+        text = text.replace(regex, mapping[key]);
       }
-      resultDiv.textContent = translated;
+      return text;
+    }
+
+    async function translateText(text) {
+      const cleaned = applyCorrections(text);
+      resultDiv.textContent = cleaned;
+    }
+
+    async function translateCrochetImage(file) {
+      resultDiv.textContent = "📸 Analyse de l'image en cours...";
+      const { data: { text } } = await Tesseract.recognize(file, 'eng');
+      const cleaned = applyCorrections(text);
+      resultDiv.textContent = cleaned;
     }
 
     function handleTranslate() {
@@ -206,7 +217,7 @@
       } else if (type === 'image') {
         const file = fileInput.files[0];
         if (!file) return alert("Aucune image sélectionnée.");
-        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+        translateCrochetImage(file);
       } else if (type === 'url') {
         fetch(urlInput.value)
           .then(res => res.text())
@@ -219,36 +230,10 @@
       const url = document.getElementById('youtubeUrl').value;
       const videoId = url.split('v=')[1]?.split('&')[0];
       if (!videoId) return alert("Lien YouTube invalide");
-
       document.getElementById('videoContainer').innerHTML = `
         <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
         frameborder="0" allowfullscreen></iframe>`;
-
-      // Placeholder en attendant sous-titres réels
-      const phrases = [
-        "Prenez votre crochet 3.5 mm.",
-        "Faites une chaînette de 5 mailles.",
-        "Rejoignez en rond avec une maille coulée.",
-        "Faites 12 mailles serrées dans l’anneau."
-      ];
-
-      const container = document.getElementById('ytTranslation');
-      container.innerHTML = '';
-      let i = 0;
-
-      function displayNext() {
-        if (i >= phrases.length) return;
-        const line = document.createElement("div");
-        line.className = "yt-line";
-        line.textContent = phrases[i];
-        line.onclick = () => readText(phrases[i]);
-        container.appendChild(line);
-        readText(phrases[i]);
-        i++;
-        setTimeout(displayNext, 5000);
-      }
-
-      displayNext();
+      document.getElementById('ytTranslation').innerHTML = "⏳ Traduction automatique des sous-titres YouTube à venir.";
     }
 
     function readText(text) {
@@ -257,6 +242,9 @@
       utter.pitch = 1.2;
       utter.rate = 0.9;
       utter.volume = 1.0;
+      const voices = speechSynthesis.getVoices();
+      const female = voices.find(v => v.lang === "fr-FR" && v.name.toLowerCase().includes("google"));
+      if (female) utter.voice = female;
       speechSynthesis.cancel();
       speechSynthesis.speak(utter);
     }
