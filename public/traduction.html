@@ -68,6 +68,12 @@
       color: #ff69b4;
       font-weight: bold;
     }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -86,7 +92,13 @@
     <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display: none;">
 
     <button onclick="handleTranslate()">Traduire</button>
+
     <div id="result"></div>
+
+    <div class="actions">
+      <button onclick="copyText()">📋 Copier</button>
+      <button onclick="downloadText()">💾 Télécharger</button>
+    </div>
   </div>
 
   <div class="container" style="margin-top: 50px;">
@@ -106,60 +118,6 @@
     const urlInput = document.getElementById('urlInput');
     const resultDiv = document.getElementById('result');
 
-    const mapping = {
-      "chain": "faire une chaînette",
-      "with white yarn": "avec du fil blanc",
-      "with yarn": "avec du fil",
-      "in next stitch": "dans la maille suivante",
-      "repeat": "répéter",
-      "join": "joindre",
-      "fasten off": "arrêter",
-      "sl st": "maille coulée",
-      "sc": "maille serrée",
-      "hdc": "demi-bride",
-      "dc": "bride",
-      "tr": "double bride",
-      "dtr": "triple bride",
-      "next st": "maille suivante",
-      "into same st": "dans la même maille",
-      "round": "tour",
-      "row": "rang",
-      "skip": "sauter",
-      "repeat from *": "répéter à partir de *",
-      "st": "maille",
-      "ch": "maille en l’air",
-      "slst": "maille coulée",
-      "inc": "augmentation",
-      "dec": "diminution",
-      "inv-dec": "diminution invisible",
-      "tog": "ensemble",
-      "sk": "passer",
-      "yo": "faire un jeté",
-      "blo": "dans le brin arrière seulement",
-      "flo": "dans le brin avant seulement",
-      "front loop": "brin avant",
-      "back loop": "brin arrière",
-      "front post": "autour de la maille en passant devant",
-      "back post": "autour de la maille en passant derrière",
-      "loop": "boucle",
-      "cut": "couper le fil",
-      "weave in ends": "rentrer les fils",
-      "edge": "bordure",
-      "seaming": "couture",
-      "main color": "couleur principale",
-      "contrasting color": "couleur contrastante",
-      "right side": "endroit",
-      "wrong side": "envers",
-      "approximately": "approximativement",
-      "remaining": "restant",
-      "foundation chain": "chaînette de montage",
-      "danmaille": "dans maille",
-      "maillecoulée": "maille coulée",
-      "mailleserrée": "maille serrée",
-      "faireune": "faire une",
-      "surlamaille": "sur la maille"
-    };
-
     function handleInputVisibility() {
       const type = inputTypeSelect.value;
       manualText.style.display = (type === "text") ? "block" : "none";
@@ -168,38 +126,58 @@
     }
 
     function cleanOCR(text) {
-      text = text.toLowerCase();
-      text = text.replace(/(\w)\1{2,}/g, '$1$1');
-      text = text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
-      text = text.replace(/\s{2,}/g, ' ');
-      return text.trim();
-    }
-
-    function correctMergedWords(text) {
-      const corrections = {
-        "danmaille": "dans maille",
-        "maillecoulée": "maille coulée",
-        "mailleserrée": "maille serrée",
-        "faireune": "faire une",
-        "surlamaille": "sur la maille"
-      };
-      for (const mot in corrections) {
-        const regex = new RegExp(mot, 'gi');
-        text = text.replace(regex, corrections[mot]);
-      }
-      return text;
-    }
-
-    function convertUnits(text) {
-      return text
-        .replace(/(\d+(?:\.\d+)?)\s?inches?/gi, (_, val) => `${val} pouces (${(val * 2.54).toFixed(1)} cm)`)
-        .replace(/(\d+(?:\.\d+)?)\s?yards?/gi, (_, val) => `${val} yardes (${(val * 91.44).toFixed(1)} cm)`)
-        .replace(/(\d+(?:\.\d+)?)\s?oz/gi, (_, val) => `${val} onces (${(val * 28.35).toFixed(1)} g)`)
-        .replace(/(\d+(?:\.\d+)?)\s?lb/gi, (_, val) => `${val} livres (${(val * 453.6).toFixed(1)} g)`)
-        .replace(/(\d+(?:\.\d+)?)\s?feet?/gi, (_, val) => `${val} pieds (${(val * 30.48).toFixed(1)} cm)`);
+      return text.toLowerCase().replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
     }
 
     function applyCrochetMapping(text) {
+      const mapping = {
+        "chain": "faire une chaînette",
+        "with white yarn": "avec du fil blanc",
+        "with yarn": "avec du fil",
+        "in next stitch": "dans la maille suivante",
+        "repeat": "répéter",
+        "join": "joindre",
+        "fasten off": "arrêter",
+        "sl st": "maille coulée",
+        "sc": "maille serrée",
+        "hdc": "demi-bride",
+        "dc": "bride",
+        "tr": "double bride",
+        "dtr": "triple bride",
+        "next st": "maille suivante",
+        "into same st": "dans la même maille",
+        "round": "tour",
+        "row": "rang",
+        "skip": "sauter",
+        "repeat from *": "répéter à partir de *",
+        "st": "maille",
+        "ch": "maille en l’air",
+        "slst": "maille coulée",
+        "inc": "augmentation",
+        "dec": "diminution",
+        "inv-dec": "diminution invisible",
+        "tog": "ensemble",
+        "sk": "passer",
+        "yo": "faire un jeté",
+        "blo": "dans le brin arrière seulement",
+        "flo": "dans le brin avant seulement",
+        "front loop": "brin avant",
+        "back loop": "brin arrière",
+        "front post": "autour de la maille en passant devant",
+        "back post": "autour de la maille en passant derrière",
+        "loop": "boucle",
+        "cut": "couper le fil",
+        "weave in ends": "rentrer les fils",
+        "edge": "bordure",
+        "seaming": "couture",
+        "main color": "couleur principale",
+        "contrasting color": "couleur contrastante",
+        "right side": "endroit",
+        "wrong side": "envers",
+        "approximately": "approximativement",
+        "remaining": "restant",
+        "foundation chain": "chaînette de montage"
+      };
       for (let key in mapping) {
         const regex = new RegExp(`\\b${key}\\b`, "gi");
         text = text.replace(regex, mapping[key]);
@@ -207,21 +185,10 @@
       return text;
     }
 
-    function translateCrochetImage(text) {
+    function translateText(text) {
       text = cleanOCR(text);
-      text = correctMergedWords(text);
-      text = convertUnits(text);
       text = applyCrochetMapping(text);
-      return text;
-    }
-
-    async function translateText(text) {
-      const type = inputTypeSelect.value;
-      if (type === "image") {
-        resultDiv.textContent = translateCrochetImage(text);
-      } else {
-        resultDiv.textContent = applyCrochetMapping(text);
-      }
+      resultDiv.textContent = text;
     }
 
     function handleTranslate() {
@@ -291,9 +258,22 @@
       speechSynthesis.speak(utter);
     }
 
+    function copyText() {
+      navigator.clipboard.writeText(resultDiv.textContent)
+        .then(() => alert("Texte copié ✅"))
+        .catch(() => alert("Erreur lors de la copie."));
+    }
+
+    function downloadText() {
+      const blob = new Blob([resultDiv.textContent], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "traduction.txt";
+      link.click();
+    }
+
     inputTypeSelect.addEventListener('change', handleInputVisibility);
-    window.speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-    window.onload = () => handleInputVisibility();
+    window.onload = handleInputVisibility;
   </script>
 </body>
 </html>
