@@ -206,56 +206,55 @@
 
     // SECTION YOUTUBE KARAOKE
     async function loadYouTubeVideo() {
-      const url = document.getElementById('youtubeUrl').value;
-      const videoId = url.split('v=')[1]?.split('&')[0];
-      if (!videoId) return alert("Lien YouTube invalide");
+      const url = document.getElementById('youtubeUrl').value.trim();
+      const videoIdMatch = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (!videoIdMatch) return alert("Lien YouTube invalide");
 
+      const videoId = videoIdMatch[1];
       document.getElementById('videoContainer').innerHTML = `
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+        <iframe id="ytplayer" width="100%" height="315" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
       `;
 
-      const subtitleUrl = `https://video.google.com/timedtext?lang=en&v=${videoId}&tlang=fr`;
-      const response = await fetch(subtitleUrl);
-      const xml = await response.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xml, "text/xml");
-      const texts = xmlDoc.getElementsByTagName("text");
-
       const container = document.getElementById('ytTranslation');
-      container.innerHTML = "";
+      container.innerHTML = "Chargement des sous-titres...";
 
-      Array.from(texts).forEach(el => {
-        const start = parseFloat(el.getAttribute("start"));
-        const dur = parseFloat(el.getAttribute("dur"));
-        const line = document.createElement("div");
-        line.className = "yt-line";
-        line.dataset.start = start;
-        line.textContent = el.textContent;
-        line.onclick = () => {
-          const iframe = document.querySelector("iframe");
-          iframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + start + ', true]}', '*');
-          readText(line.textContent);
-        };
-        container.appendChild(line);
-      });
-    }
+      try {
+        // 1. Récupérer les sous-titres en anglais (lang=en)
+        const subtitleUrl = `https://video.google.com/timedtext?lang=en&v=${videoId}`;
+        let response = await fetch(subtitleUrl);
+        if (!response.ok) throw new Error("Pas de sous-titres en anglais disponibles");
+        let xml = await response.text();
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(xml, "text/xml");
+        let texts = Array.from(xmlDoc.getElementsByTagName("text"));
+        if (texts.length === 0) throw new Error("Sous-titres vides");
 
-    function readText(text) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "fr-FR";
-      utter.voice = speechSynthesis.getVoices().find(v => v.lang === 'fr-FR' && v.name.includes('Google') && v.name.includes('fem')) || null;
-      utter.pitch = 1.1;
-      utter.rate = 0.95;
-      utter.volume = 1;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utter);
-    }
+        // 2. Extraire toutes les lignes en texte clair concaténé pour traduction
+        const originalLines = texts.map(el => el.textContent);
+        const joinedText = originalLines.join("\n");
 
-    inputTypeSelect.addEventListener('change', handleInputVisibility);
-    window.onload = () => {
-      handleInputVisibility();
-      speechSynthesis.getVoices(); // Charger les voix dès que possible
-    };
-  </script>
-</body>
-</html>
+        // 3. Traduction en français via LibreTranslate
+        container.innerHTML = "Traduction en cours...";
+        const translatedText = await translateWithLibreTranslate(joinedText);
+
+        // 4. Découper la traduction ligne par ligne
+        const translatedLines = translatedText.split("\n");
+
+        // 5. Afficher ligne par ligne avec interaction
+        container.innerHTML = "";
+        translatedLines.forEach((line, i) => {
+          const div = document.createElement("div");
+          div.className = "yt-line";
+          div.textContent = line || "[...]";
+          div.dataset.index = i;
+          div.onclick = () => {
+            playSubtitleLine(i);
+          };
+          container.appendChild(div);
+        });
+
+        // Stocker les données pour lecture karaoké
+        window.ytSubtitles = {
+          original: originalLines,
+          translated: translatedLines,
+          times: texts.map(el => parseFloat
