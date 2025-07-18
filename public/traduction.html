@@ -216,8 +216,29 @@
   });
 
   translateSubsBtn.addEventListener('click', () => {
-    alert('Fonction de traduction des sous-titres non implémentée dans cette version simplifiée.');
+  if (!currentVideoId) return;
+
+  ytTranslationDiv.textContent = 'Traduction en cours...';
+
+  fetch('http://127.0.0.1:5000/translate_youtube', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ url: youtubeUrlInput.value.trim() })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      ytTranslationDiv.textContent = "Erreur : " + data.error;
+    } else {
+      ytTranslationDiv.textContent = data.translated;
+    }
+  })
+  .catch(error => {
+    ytTranslationDiv.textContent = "Erreur serveur : " + error.message;
   });
+});
 </script>
 
 </body>
