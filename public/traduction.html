@@ -17,13 +17,11 @@
       color: #fff;
       min-height: 100vh;
     }
-
     h1 {
       text-align: center;
       color: #ff69b4;
       margin-bottom: 20px;
     }
-
     .back-btn {
       display: block;
       width: fit-content;
@@ -35,7 +33,6 @@
       text-decoration: none;
       font-size: 1.1em;
     }
-
     .container {
       background: rgba(0, 0, 0, 0.5);
       border-radius: 12px;
@@ -43,7 +40,6 @@
       max-width: 800px;
       margin: auto;
     }
-
     select, input[type=file], textarea, button, input[type=text] {
       width: 100%;
       padding: 10px;
@@ -53,13 +49,11 @@
       font-family: 'Pacifico', cursive;
       font-size: 1em;
     }
-
     button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
       cursor: pointer;
     }
-
     #result {
       white-space: pre-wrap;
       background: rgba(255, 255, 255, 0.1);
@@ -67,7 +61,6 @@
       border-radius: 12px;
       margin-top: 20px;
     }
-
     .yt-line {
       cursor: pointer;
       margin: 10px 0;
@@ -96,7 +89,6 @@
     <div id="result"></div>
   </div>
 
-  <!-- Bloc vidéo YouTube -->
   <div class="container" style="margin-top: 50px;">
     <h2 style="text-align:center;">🎥 Traduire une vidéo YouTube</h2>
     <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube" />
@@ -115,15 +107,14 @@
     const resultDiv = document.getElementById('result');
 
     const mapping = {
+      "chain": "faire une chaînette",
       "with white yarn": "avec du fil blanc",
       "with yarn": "avec du fil",
       "in next stitch": "dans la maille suivante",
       "repeat": "répéter",
       "join": "joindre",
       "fasten off": "arrêter",
-      "chain": "faire une chaînette",
       "sl st": "maille coulée",
-      "slst": "maille coulée",
       "sc": "maille serrée",
       "hdc": "demi-bride",
       "dc": "bride",
@@ -137,6 +128,7 @@
       "repeat from *": "répéter à partir de *",
       "st": "maille",
       "ch": "maille en l’air",
+      "slst": "maille coulée",
       "inc": "augmentation",
       "dec": "diminution",
       "inv-dec": "diminution invisible",
@@ -175,36 +167,65 @@
       urlInput.style.display = (type === "url") ? "block" : "none";
     }
 
-    function applyCrochetCorrections(text) {
-      let corrected = text;
-
-      // Ne touche pas les mots déjà traduits en français
-      for (let key in mapping) {
-        const regex = new RegExp(`\\b${key}\\b`, 'gi');
-        corrected = corrected.replace(regex, mapping[key]);
-      }
-
-      corrected = corrected.replace(/\s{2,}/g, ' ');
-      return corrected.trim();
+    function cleanOCR(text) {
+      text = text.toLowerCase();
+      text = text.replace(/(\w)\1{2,}/g, '$1$1');
+      text = text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
+      text = text.replace(/\s{2,}/g, ' ');
+      return text.trim();
     }
 
-    function translateText(text) {
-      const result = applyCrochetCorrections(text.toLowerCase());
-      resultDiv.textContent = result;
+    function correctMergedWords(text) {
+      const corrections = {
+        "danmaille": "dans maille",
+        "maillecoulée": "maille coulée",
+        "mailleserrée": "maille serrée",
+        "faireune": "faire une",
+        "surlamaille": "sur la maille"
+      };
+      for (const mot in corrections) {
+        const regex = new RegExp(mot, 'gi');
+        text = text.replace(regex, corrections[mot]);
+      }
+      return text;
+    }
+
+    function convertUnits(text) {
+      return text
+        .replace(/(\d+(?:\.\d+)?)\s?inches?/gi, (_, val) => `${val} pouces (${(val * 2.54).toFixed(1)} cm)`)
+        .replace(/(\d+(?:\.\d+)?)\s?yards?/gi, (_, val) => `${val} yardes (${(val * 91.44).toFixed(1)} cm)`)
+        .replace(/(\d+(?:\.\d+)?)\s?oz/gi, (_, val) => `${val} onces (${(val * 28.35).toFixed(1)} g)`)
+        .replace(/(\d+(?:\.\d+)?)\s?lb/gi, (_, val) => `${val} livres (${(val * 453.6).toFixed(1)} g)`)
+        .replace(/(\d+(?:\.\d+)?)\s?feet?/gi, (_, val) => `${val} pieds (${(val * 30.48).toFixed(1)} cm)`);
+    }
+
+    function applyCrochetMapping(text) {
+      for (let key in mapping) {
+        const regex = new RegExp(`\\b${key}\\b`, "gi");
+        text = text.replace(regex, mapping[key]);
+      }
+      return text;
     }
 
     function translateCrochetImage(text) {
-      let cleaned = text
-        .replace(/[^a-zA-Z0-9\s\-*,.:()\[\]éèêëàâäîïôöùûüç]/g, ' ') // Nettoyage basique
-        .replace(/\s{2,}/g, ' ');
+      text = cleanOCR(text);
+      text = correctMergedWords(text);
+      text = convertUnits(text);
+      text = applyCrochetMapping(text);
+      return text;
+    }
 
-      const corrected = applyCrochetCorrections(cleaned.toLowerCase());
-      resultDiv.textContent = corrected;
+    async function translateText(text) {
+      const type = inputTypeSelect.value;
+      if (type === "image") {
+        resultDiv.textContent = translateCrochetImage(text);
+      } else {
+        resultDiv.textContent = applyCrochetMapping(text);
+      }
     }
 
     function handleTranslate() {
       const type = inputTypeSelect.value;
-
       if (type === 'text') {
         translateText(manualText.value);
       } else if (type === 'file') {
@@ -216,7 +237,7 @@
       } else if (type === 'image') {
         const file = fileInput.files[0];
         if (!file) return alert("Aucune image sélectionnée.");
-        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateCrochetImage(text));
+        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
       } else if (type === 'url') {
         fetch(urlInput.value)
           .then(res => res.text())
