@@ -157,8 +157,8 @@
   </div>
 
   <script>
-    // Vérifie si l’animation a déjà été vue
-    const dejaVue = localStorage.getItem("animationDejaVue");
+    // L'animation d'intro s'affiche à chaque fois (localStorage désactivé)
+    const dejaVue = false;
 
     if (!dejaVue) {
       const overlay = document.createElement("div");
@@ -175,10 +175,7 @@
       overlay.appendChild(texte);
       document.body.appendChild(overlay);
 
-      // Marque l'animation comme vue
-      localStorage.setItem("animationDejaVue", "oui");
-
-      // Supprimer après disparition
+      // localStorage.setItem("animationDejaVue", "oui"); // Désactivé
       setTimeout(() => {
         overlay.remove();
       }, 5000);
