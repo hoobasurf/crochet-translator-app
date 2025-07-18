@@ -1,245 +1,138 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Traduction & Sous-titres YouTube</title>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
-<style>
-  body {
-    font-family: 'Pacifico', cursive;
-    background: url('fond-accueil.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: white;
-    padding: 20px;
-    margin: 0;
-    min-height: 100vh;
-  }
-  h1, h2 {
-    text-align: center;
-    color: #ff69b4;
-    margin-bottom: 20px;
-  }
-  .container {
-    background: rgba(0,0,0,0.6);
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 12px;
-  }
-  select, textarea, input[type="file"], input[type="text"], button {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: none;
-    font-family: 'Pacifico', cursive;
-    font-size: 1em;
-  }
-  button {
-    background: linear-gradient(135deg, violet, pink);
-    color: white;
-    cursor: pointer;
-  }
-  #result, #ytTranslation {
-    margin-top: 20px;
-    background: rgba(255,255,255,0.1);
-    padding: 15px;
-    border-radius: 12px;
-    white-space: pre-wrap;
-    min-height: 100px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  #videoContainer {
-    margin-top: 20px;
-    text-align: center;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Traduction Vidéo YouTube</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      color: #f8b195;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 1em;
+      border: none;
+    }
+    button {
+      background: linear-gradient(135deg, #ff6f91, #ff9671);
+      color: white;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    .line {
+      padding: 5px;
+      margin: 5px 0;
+      background: #333;
+      border-radius: 6px;
+    }
+  </style>
 </head>
 <body>
+  <h1>🎥 Traduction YouTube (Auto)</h1>
 
-<h1>🌐 Traduction & Sous-titres YouTube</h1>
-
-<div class="container">
-  <h2>Traduction de texte / image / fichier / URL</h2>
-  <label for="inputType">Choisir le type d'entrée :</label>
-  <select id="inputType">
-    <option value="text">✍️ Texte</option>
-    <option value="file">📁 Fichier texte (.txt)</option>
-    <option value="image">🖼️ Image (OCR)</option>
-    <option value="url">🔗 URL (page web)</option>
-  </select>
-
-  <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
-  <input type="file" id="fileInput" accept=".txt,image/*" style="display:none" />
-  <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display:none" />
-
-  <button id="translateBtn">Traduire</button>
+  <input type="text" id="youtubeUrl" placeholder="Collez l'URL d'une vidéo YouTube ici" />
+  <button onclick="startTranslation()">Lancer</button>
 
   <div id="result"></div>
-</div>
 
-<div class="container">
-  <h2>🎥 Traduire sous-titres vidéo YouTube (anglais → français)</h2>
-  <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube" />
-  <button id="loadVideoBtn">Lancer la vidéo</button>
-  <button id="translateSubsBtn" disabled>Traduire les sous-titres</button>
+  <script>
+    async function startTranslation() {
+      const url = document.getElementById("youtubeUrl").value;
+      const videoId = extractVideoId(url);
+      if (!videoId) return alert("Lien invalide");
 
-  <div id="videoContainer"></div>
-  <div id="ytTranslation"></div>
-</div>
+      const captionsUrl = `https://video.google.com/timedtext?lang=en&v=${videoId}`;
 
-<script>
-  const inputTypeSelect = document.getElementById('inputType');
-  const manualText = document.getElementById('manualText');
-  const fileInput = document.getElementById('fileInput');
-  const urlInput = document.getElementById('urlInput');
-  const resultDiv = document.getElementById('result');
-  const translateBtn = document.getElementById('translateBtn');
+      const res = await fetch(captionsUrl);
+      const xml = await res.text();
+      if (!xml || xml.includes("xml")) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xml, "text/xml");
+        const texts = Array.from(xmlDoc.getElementsByTagName("text")).map(t => ({
+          start: parseFloat(t.getAttribute("start")),
+          duration: parseFloat(t.getAttribute("dur")),
+          content: decodeHTMLEntities(t.textContent)
+        }));
 
-  function updateInputVisibility() {
-    const type = inputTypeSelect.value;
-    manualText.style.display = type === 'text' ? 'block' : 'none';
-    fileInput.style.display = (type === 'file' || type === 'image') ? 'block' : 'none';
-    urlInput.style.display = type === 'url' ? 'block' : 'none';
-    resultDiv.textContent = '';
-  }
-  inputTypeSelect.addEventListener('change', updateInputVisibility);
-  updateInputVisibility();
+        const translatedLines = await Promise.all(texts.map(line => translate(line.content)));
 
-  function cleanOCR(text) {
-    return text.toLowerCase().replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
-  }
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = '';
+        let i = 0;
 
-  function applyCrochetMapping(text) {
-    const mapping = {
-      "chain": "faire une chaînette",
-      "with white yarn": "avec du fil blanc",
-      "with yarn": "avec du fil",
-      "st": "maille",
-      "sc": "maille serrée",
-      "sl st": "maille coulée",
-      "hdc": "demi-bride",
-      "dc": "bride",
-      "tr": "double bride",
-      "dtr": "triple bride",
-      "yo": "faire un jeté",
-      "round": "tour",
-      "row": "rang",
-      "hook": "crochet",
-      "repeat": "répéter"
-    };
-    for (let key in mapping) {
-      const regex = new RegExp(`\\b${key}\\b`, "gi");
-      text = text.replace(regex, mapping[key]);
+        function showLine() {
+          if (i >= translatedLines.length) return;
+          const lineDiv = document.createElement("div");
+          lineDiv.className = "line";
+          lineDiv.textContent = translatedLines[i];
+          resultDiv.appendChild(lineDiv);
+          speak(translatedLines[i]);
+          i++;
+          setTimeout(showLine, texts[i]?.duration * 1000 || 3000);
+        }
+
+        showLine();
+      } else {
+        alert("Sous-titres non trouvés pour cette vidéo.");
+      }
     }
-    return text;
-  }
 
-  function translateText(text) {
-    text = cleanOCR(text);
-    text = applyCrochetMapping(text);
-    resultDiv.textContent = text;
-  }
+    function extractVideoId(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
 
-  translateBtn.addEventListener('click', () => {
-    const type = inputTypeSelect.value;
-    if (type === 'text') {
-      if (!manualText.value.trim()) {
-        alert('Veuillez entrer du texte.');
-        return;
-      }
-      translateText(manualText.value.trim());
-    } else if (type === 'file') {
-      if (!fileInput.files.length) {
-        alert('Veuillez choisir un fichier texte.');
-        return;
-      }
-      const file = fileInput.files[0];
-      if (!file.name.endsWith('.txt')) {
-        alert('Merci de choisir un fichier .txt');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => translateText(reader.result);
-      reader.readAsText(file);
-    } else if (type === 'image') {
-      if (!fileInput.files.length) {
-        alert('Veuillez choisir une image.');
-        return;
-      }
-      const file = fileInput.files[0];
-      resultDiv.textContent = 'Analyse OCR en cours, merci de patienter...';
-      Tesseract.recognize(file, 'eng')
-        .then(({ data: { text } }) => translateText(text))
-        .catch(() => {
-          resultDiv.textContent = 'Erreur lors de la reconnaissance OCR.';
+    function decodeHTMLEntities(text) {
+      const txt = document.createElement("textarea");
+      txt.innerHTML = text;
+      return txt.value;
+    }
+
+    async function translate(text) {
+      try {
+        const res = await fetch("https://libretranslate.com/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            q: text,
+            source: "en",
+            target: "fr",
+            format: "text"
+          })
         });
-    } else if (type === 'url') {
-      if (!urlInput.value.trim()) {
-        alert('Veuillez coller une URL.');
-        return;
+        const data = await res.json();
+        return data.translatedText || text;
+      } catch (err) {
+        return text;
       }
-      resultDiv.textContent = 'Chargement de la page...';
-      fetch(urlInput.value.trim())
-        .then(res => {
-          if (!res.ok) throw new Error('Erreur lors du chargement de l\'URL');
-          return res.text();
-        })
-        .then(text => translateText(text))
-        .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
     }
-  });
 
-  // --- Section YouTube sous-titres ---
-  const youtubeUrlInput = document.getElementById('youtubeUrl');
-  const loadVideoBtn = document.getElementById('loadVideoBtn');
-  const translateSubsBtn = document.getElementById('translateSubsBtn');
-  const videoContainer = document.getElementById('videoContainer');
-  const ytTranslationDiv = document.getElementById('ytTranslation');
-
-  let currentVideoId = null;
-
-  loadVideoBtn.addEventListener('click', () => {
-    const url = youtubeUrlInput.value.trim();
-    const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (!match) {
-      alert('Lien YouTube invalide');
-      return;
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "fr-FR";
+      utter.voice = speechSynthesis.getVoices().find(v => v.lang === "fr-FR" && v.name.toLowerCase().includes("fem")) || null;
+      utter.pitch = 1;
+      utter.rate = 0.95;
+      utter.volume = 1;
+      speechSynthesis.speak(utter);
     }
-    currentVideoId = match[1];
-    videoContainer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${currentVideoId}" frameborder="0" allowfullscreen></iframe>`;
-    ytTranslationDiv.textContent = '';
-    translateSubsBtn.disabled = false;
-  });
 
-  translateSubsBtn.addEventListener('click', () => {
-  if (!currentVideoId) return;
-
-  ytTranslationDiv.textContent = 'Traduction en cours...';
-
-  fetch('http://127.0.0.1:5000/translate_youtube', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ url: youtubeUrlInput.value.trim() })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.error) {
-      ytTranslationDiv.textContent = "Erreur : " + data.error;
-    } else {
-      ytTranslationDiv.textContent = data.translated;
-    }
-  })
-  .catch(error => {
-    ytTranslationDiv.textContent = "Erreur serveur : " + error.message;
-  });
-});
-</script>
-
+    // Charger les voix au démarrage
+    window.speechSynthesis.onvoiceschanged = () => {};
+  </script>
 </body>
 </html>
