@@ -3,33 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Traduction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <title>Traduction Crochet & Vidéo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
       margin: 0;
       padding: 20px;
       font-family: 'Pacifico', cursive;
-      background-image: url('fond-accueil.jpg');
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
       color: #fff;
       min-height: 100vh;
+      backdrop-filter: blur(6px);
     }
     h1 {
       text-align: center;
       color: #ff69b4;
       margin-bottom: 20px;
+      text-shadow: 1px 1px 3px #000;
     }
     .container {
-      backdrop-filter: blur(10px);
-      background: rgba(0,0,0,0.3);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       padding: 20px;
       max-width: 800px;
       margin: auto;
     }
-    textarea {
+    select, input[type=file], textarea, button, input[type=text] {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -37,161 +38,209 @@
       border: none;
       font-family: 'Pacifico', cursive;
       font-size: 1em;
+      box-shadow: 1px 1px 5px rgba(255,255,255,0.3);
     }
     button {
-      background: linear-gradient(135deg, violet, pink);
+      background: linear-gradient(135deg, pink, violet);
       color: white;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-family: 'Pacifico', cursive;
-      font-size: 0.9em;
       cursor: pointer;
-      margin: 5px;
+      transition: 0.3s;
     }
-    .translated {
-      color: #ff69b4;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-      transform: translateY(-2px);
-      transition: all 0.3s ease-in-out;
+    button:hover {
+      transform: scale(1.05);
     }
     .actions {
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
+      margin-top: 15px;
     }
-    .back-btn {
-      display: block;
-      width: fit-content;
-      margin: 40px auto 0;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 10px 20px;
+    .actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 0.9em;
+    }
+    #result {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
       border-radius: 12px;
-      text-decoration: none;
-      font-size: 1.1em;
+      color: #ffe6f0;
+      text-shadow: 0 0 2px #000;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Traduction Crochet</h1>
+  <h1>✨ Traduction Crochet & Vidéo ✨</h1>
 
-  <div class="container" id="translatorContainer">
-    <div id="inputBlocks">
-      <textarea placeholder="Entrez votre texte ici..."></textarea>
-    </div>
-    <div class="actions">
-      <button onclick="addTextField()">➕ Ajouter un champ texte</button>
-      <button onclick="translateAll()">✨ Traduire tout</button>
-    </div>
-    <div id="outputBlocks"></div>
+  <div class="container">
+    <select id="inputType">
+      <option value="text">📝 Texte</option>
+      <option value="file">📄 Fichier</option>
+      <option value="image">🖼️ Image</option>
+      <option value="url">🌐 URL</option>
+    </select>
+
+    <textarea id="manualText" placeholder="Tape ton texte ici..."></textarea>
+    <input type="file" id="fileInput" accept="image/*,.txt" style="display: none;">
+    <input type="text" id="urlInput" placeholder="Colle une URL ici..." style="display: none;">
+
+    <button onclick="handleTranslate()">Traduire</button>
+
     <div class="actions">
       <button onclick="copyText()">📋 Copier</button>
-      <button onclick="downloadText()">💾 Télécharger</button>
+      <button onclick="downloadText('txt')">💾 TXT</button>
+      <button onclick="downloadText('pdf')">📄 PDF</button>
     </div>
+
+    <div id="result"></div>
   </div>
 
-  <a href="index.html" class="back-btn">⬅ Retour</a>
+  <div class="container" style="margin-top: 40px;">
+    <h2 style="text-align:center;">🎥 Traduction Vidéo YouTube</h2>
+    <input type="text" id="youtubeUrl" placeholder="Colle un lien YouTube ici..." />
+    <button onclick="translateYouTube()">Lancer</button>
+    <div id="videoContainer" style="margin-top:20px; text-align:center;"></div>
+    <div id="ytTranslation" style="margin-top:20px;"></div>
+  </div>
 
   <script>
+    const inputType = document.getElementById("inputType");
+    const manualText = document.getElementById("manualText");
+    const fileInput = document.getElementById("fileInput");
+    const urlInput = document.getElementById("urlInput");
+    const resultDiv = document.getElementById("result");
+
     const mapping = {
-      "chain": "faire une chaînette",
-      "with white yarn": "avec du fil blanc",
-      "with yarn": "avec du fil",
-      "in next stitch": "dans la maille suivante",
-      "repeat": "répéter",
-      "join": "joindre",
-      "fasten off": "arrêter",
-      "sl st": "maille coulée",
       "sc": "maille serrée",
       "hdc": "demi-bride",
       "dc": "bride",
       "tr": "double bride",
       "dtr": "triple bride",
-      "next st": "maille suivante",
-      "into same st": "dans la même maille",
-      "round": "tour",
-      "row": "rang",
-      "skip": "sauter",
-      "repeat from *": "répéter à partir de *",
-      "st": "maille",
       "ch": "maille en l’air",
-      "slst": "maille coulée",
+      "sl st": "maille coulée",
+      "st": "maille",
       "inc": "augmentation",
       "dec": "diminution",
-      "inv-dec": "diminution invisible",
-      "tog": "ensemble",
-      "sk": "passer",
-      "yo": "faire un jeté",
-      "blo": "dans le brin arrière seulement",
-      "flo": "dans le brin avant seulement",
-      "front loop": "brin avant",
-      "back loop": "brin arrière",
-      "front post": "autour de la maille en passant devant",
-      "back post": "autour de la maille en passant derrière",
-      "loop": "boucle",
-      "cut": "couper le fil",
-      "weave in ends": "rentrer les fils",
-      "edge": "bordure",
-      "seaming": "couture",
-      "main color": "couleur principale",
-      "contrasting color": "couleur contrastante",
-      "right side": "endroit",
-      "wrong side": "envers",
-      "approximately": "approximativement",
-      "remaining": "restant",
-      "foundation chain": "chaînette de montage",
-      // unités américaines
-      "inches": "pouces",
-      "oz": "onces",
-      "lb": "livres",
-      "yards": "yardes",
-      "feet": "pieds",
-      // mots mal reconnus en OCR
-      "se": "sc", "s€": "sc", "SC": "sc"
+      "yo": "jeté",
+      "hook": "crochet",
+      "join": "joindre",
+      "fasten off": "arrêter",
+      "foundation chain": "chaînette de base",
+      "row": "rang",
+      "round": "tour",
+      "skip": "sauter",
+      "beginning": "début",
+      "next": "suivante",
+      "repeat": "répéter",
+      "with yarn": "avec le fil",
+      "times": "fois",
+      "from hook": "depuis le crochet",
+      "in last ch": "dans la dernière maille en l’air"
     };
 
     function applyMapping(text) {
-      for (let key in mapping) {
-        const regex = new RegExp(`\\b${key}\\b`, "gi");
-        text = text.replace(regex, mapping[key]);
+      for (let eng in mapping) {
+        const regex = new RegExp(`\\b${eng}\\b`, "gi");
+        text = text.replace(regex, mapping[eng]);
       }
       return text;
     }
 
-    function addTextField() {
-      const block = document.createElement("textarea");
-      block.placeholder = "Entrez votre texte ici...";
-      document.getElementById("inputBlocks").appendChild(block);
+    function cleanOCR(text) {
+      return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
     }
 
-    function translateAll() {
-      const inputs = document.querySelectorAll("#inputBlocks textarea");
-      const output = document.getElementById("outputBlocks");
-      output.innerHTML = "";
-      inputs.forEach(el => {
-        const translated = applyMapping(el.value.toLowerCase());
-        const div = document.createElement("div");
-        div.className = "translated";
-        div.textContent = translated;
-        output.appendChild(div);
-      });
+    function translateText(text) {
+      const cleaned = cleanOCR(text.toLowerCase());
+      resultDiv.textContent = applyMapping(cleaned);
+    }
+
+    function handleTranslate() {
+      const type = inputType.value;
+      if (type === "text") {
+        translateText(manualText.value);
+      } else if (type === "file") {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucun fichier");
+        const reader = new FileReader();
+        reader.onload = () => translateText(reader.result);
+        reader.readAsText(file);
+      } else if (type === "image") {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucune image");
+        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+      } else if (type === "url") {
+        fetch(urlInput.value)
+          .then(res => res.text())
+          .then(text => translateText(text))
+          .catch(() => resultDiv.textContent = "Erreur de chargement");
+      }
     }
 
     function copyText() {
-      const texts = Array.from(document.querySelectorAll("#outputBlocks .translated")).map(div => div.textContent).join("\n\n");
-      navigator.clipboard.writeText(texts).then(() => alert("Texte copié ✅"));
+      navigator.clipboard.writeText(resultDiv.textContent).then(() => alert("Texte copié !"));
     }
 
-    function downloadText() {
-      const texts = Array.from(document.querySelectorAll("#outputBlocks .translated")).map(div => div.textContent).join("\n\n");
-      const blob = new Blob([texts], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "traduction.txt";
-      link.click();
+    function downloadText(type) {
+      const text = resultDiv.textContent;
+      if (type === "txt") {
+        const blob = new Blob([text], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "traduction.txt";
+        link.click();
+      } else if (type === "pdf") {
+        const w = window.open("", "_blank");
+        w.document.write(`<pre style="font-family:'Arial'; white-space:pre-wrap;">${text}</pre>`);
+        w.print();
+      }
     }
+
+    function translateYouTube() {
+      const url = document.getElementById("youtubeUrl").value;
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      if (!videoId) return alert("Lien YouTube invalide");
+
+      document.getElementById("videoContainer").innerHTML = `
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
+        frameborder="0" allowfullscreen></iframe>`;
+
+      // Simulation de traduction vidéo
+      const phrases = [
+        "Faire une chaînette de 5 mailles.",
+        "Rejoindre en rond avec une maille coulée.",
+        "Faire 12 mailles serrées dans l’anneau."
+      ];
+      const container = document.getElementById("ytTranslation");
+      container.innerHTML = '';
+      let i = 0;
+
+      function displayNext() {
+        if (i >= phrases.length) return;
+        const line = document.createElement("div");
+        line.textContent = phrases[i];
+        container.appendChild(line);
+        const utter = new SpeechSynthesisUtterance(phrases[i]);
+        utter.lang = "fr-FR";
+        utter.voice = speechSynthesis.getVoices().find(v => v.name.includes("Google") && v.lang === "fr-FR") || null;
+        utter.pitch = 1.1;
+        utter.rate = 0.9;
+        speechSynthesis.speak(utter);
+        i++;
+        setTimeout(displayNext, 4000);
+      }
+
+      displayNext();
+    }
+
+    inputType.addEventListener("change", () => {
+      manualText.style.display = inputType.value === "text" ? "block" : "none";
+      fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
+      urlInput.style.display = inputType.value === "url" ? "block" : "none";
+    });
+    window.onload = () => inputType.dispatchEvent(new Event("change"));
   </script>
 </body>
 </html>
