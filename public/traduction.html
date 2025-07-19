@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Traduction</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -22,25 +21,15 @@
       color: #ff69b4;
       margin-bottom: 20px;
     }
-    .back-btn {
-      display: block;
-      width: fit-content;
-      margin: 40px auto 0;
-      background: linear-gradient(135deg, violet, pink);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-size: 1.1em;
-    }
     .container {
-      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.3);
       border-radius: 12px;
       padding: 20px;
       max-width: 800px;
       margin: auto;
     }
-    select, input[type=file], textarea, button, input[type=text] {
+    textarea {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -52,141 +41,157 @@
     button {
       background: linear-gradient(135deg, violet, pink);
       color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'Pacifico', cursive;
+      font-size: 0.9em;
       cursor: pointer;
+      margin: 5px;
     }
-    #result {
-      white-space: pre-wrap;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
-    .yt-line {
-      cursor: pointer;
-      margin: 10px 0;
-      font-size: 1.1em;
+    .translated {
       color: #ff69b4;
-      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+      transform: translateY(-2px);
+      transition: all 0.3s ease-in-out;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .back-btn {
+      display: block;
+      width: fit-content;
+      margin: 40px auto 0;
+      background: linear-gradient(135deg, violet, pink);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1.1em;
     }
   </style>
 </head>
 <body>
-  <h1>🌐 Traduction</h1>
+  <h1>🌐 Traduction Crochet</h1>
 
-  <div class="container">
-    <select id="inputType">
-      <option value="text">✍️ Entrer du texte</option>
-      <option value="file">📁 Fichier .txt</option>
-      <option value="image">🖼️ Image (OCR)</option>
-      <option value="url">🔗 URL</option>
-    </select>
-
-    <textarea id="manualText" placeholder="Tapez votre texte ici..."></textarea>
-    <input type="file" id="fileInput" accept="image/*,.txt" style="display: none;">
-    <input type="text" id="urlInput" placeholder="Collez une URL ici" style="display: none;">
-
-    <button onclick="handleTranslate()">Traduire</button>
-    <div id="result"></div>
-  </div>
-
-  <div class="container" style="margin-top: 50px;">
-    <h2 style="text-align:center;">🎥 Traduire une vidéo YouTube</h2>
-    <input type="text" id="youtubeUrl" placeholder="Collez un lien YouTube" />
-    <button onclick="launchYouTubeTranslation()">Lancer</button>
-    <div id="videoContainer" style="margin-top:20px; text-align:center;"></div>
-    <div id="ytTranslation" style="margin-top:20px;"></div>
+  <div class="container" id="translatorContainer">
+    <div id="inputBlocks">
+      <textarea placeholder="Entrez votre texte ici..."></textarea>
+    </div>
+    <div class="actions">
+      <button onclick="addTextField()">➕ Ajouter un champ texte</button>
+      <button onclick="translateAll()">✨ Traduire tout</button>
+    </div>
+    <div id="outputBlocks"></div>
+    <div class="actions">
+      <button onclick="copyText()">📋 Copier</button>
+      <button onclick="downloadText()">💾 Télécharger</button>
+    </div>
   </div>
 
   <a href="index.html" class="back-btn">⬅ Retour</a>
 
   <script>
-    const inputTypeSelect = document.getElementById('inputType');
-    const manualText = document.getElementById('manualText');
-    const fileInput = document.getElementById('fileInput');
-    const urlInput = document.getElementById('urlInput');
-    const resultDiv = document.getElementById('result');
-
-    function handleInputVisibility() {
-      const type = inputTypeSelect.value;
-      manualText.style.display = (type === "text") ? "block" : "none";
-      fileInput.style.display = (type === "file" || type === "image") ? "block" : "none";
-      urlInput.style.display = (type === "url") ? "block" : "none";
-    }
-
-    function cleanOCR(text) {
-      return text.toLowerCase().replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ’']/g, '');
-    }
-
-    function translateText(text) {
-      resultDiv.textContent = text;
-    }
-
-    function handleTranslate() {
-      const type = inputTypeSelect.value;
-      if (type === 'text') {
-        translateText(manualText.value);
-      } else if (type === 'file') {
-        const file = fileInput.files[0];
-        if (!file) return alert("Aucun fichier sélectionné.");
-        const reader = new FileReader();
-        reader.onload = () => translateText(reader.result);
-        reader.readAsText(file);
-      } else if (type === 'image') {
-        const file = fileInput.files[0];
-        if (!file) return alert("Aucune image sélectionnée.");
-        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
-      } else if (type === 'url') {
-        fetch(urlInput.value)
-          .then(res => res.text())
-          .then(text => translateText(text))
-          .catch(() => resultDiv.textContent = "Impossible de charger l'URL.");
-      }
-    }
-
-    async function launchYouTubeTranslation() {
-      const url = document.getElementById('youtubeUrl').value;
-      const videoId = url.split('v=')[1]?.split('&')[0];
-      if (!videoId) return alert("Lien YouTube invalide");
-
-      document.getElementById('videoContainer').innerHTML = `
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
-        frameborder="0" allowfullscreen></iframe>`;
-
-      // Appelle la fonction Netlify (à créer séparément)
-      fetch('/.netlify/functions/translate-video', {
-        method: 'POST',
-        body: new URLSearchParams({ url }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('ytTranslation');
-        container.innerHTML = '';
-        data.translated.forEach((line, i) => {
-          const div = document.createElement('div');
-          div.className = 'yt-line';
-          div.textContent = line;
-          container.appendChild(div);
-          readText(line, i);
-        });
-      })
-      .catch(() => alert("Erreur lors de la traduction vidéo"));
-    }
-
-    function readText(text, delay = 0) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "fr-FR";
-      utter.voice = speechSynthesis.getVoices().find(v => v.lang === "fr-FR" && v.name.toLowerCase().includes("f")) || null;
-      utter.pitch = 1.1;
-      utter.rate = 0.92;
-      utter.volume = 1.0;
-      setTimeout(() => speechSynthesis.speak(utter), delay * 3000);
-    }
-
-    inputTypeSelect.addEventListener('change', handleInputVisibility);
-    window.onload = () => {
-      handleInputVisibility();
-      speechSynthesis.getVoices(); // précharger
+    const mapping = {
+      "chain": "faire une chaînette",
+      "with white yarn": "avec du fil blanc",
+      "with yarn": "avec du fil",
+      "in next stitch": "dans la maille suivante",
+      "repeat": "répéter",
+      "join": "joindre",
+      "fasten off": "arrêter",
+      "sl st": "maille coulée",
+      "sc": "maille serrée",
+      "hdc": "demi-bride",
+      "dc": "bride",
+      "tr": "double bride",
+      "dtr": "triple bride",
+      "next st": "maille suivante",
+      "into same st": "dans la même maille",
+      "round": "tour",
+      "row": "rang",
+      "skip": "sauter",
+      "repeat from *": "répéter à partir de *",
+      "st": "maille",
+      "ch": "maille en l’air",
+      "slst": "maille coulée",
+      "inc": "augmentation",
+      "dec": "diminution",
+      "inv-dec": "diminution invisible",
+      "tog": "ensemble",
+      "sk": "passer",
+      "yo": "faire un jeté",
+      "blo": "dans le brin arrière seulement",
+      "flo": "dans le brin avant seulement",
+      "front loop": "brin avant",
+      "back loop": "brin arrière",
+      "front post": "autour de la maille en passant devant",
+      "back post": "autour de la maille en passant derrière",
+      "loop": "boucle",
+      "cut": "couper le fil",
+      "weave in ends": "rentrer les fils",
+      "edge": "bordure",
+      "seaming": "couture",
+      "main color": "couleur principale",
+      "contrasting color": "couleur contrastante",
+      "right side": "endroit",
+      "wrong side": "envers",
+      "approximately": "approximativement",
+      "remaining": "restant",
+      "foundation chain": "chaînette de montage",
+      // unités américaines
+      "inches": "pouces",
+      "oz": "onces",
+      "lb": "livres",
+      "yards": "yardes",
+      "feet": "pieds",
+      // mots mal reconnus en OCR
+      "se": "sc", "s€": "sc", "SC": "sc"
     };
+
+    function applyMapping(text) {
+      for (let key in mapping) {
+        const regex = new RegExp(`\\b${key}\\b`, "gi");
+        text = text.replace(regex, mapping[key]);
+      }
+      return text;
+    }
+
+    function addTextField() {
+      const block = document.createElement("textarea");
+      block.placeholder = "Entrez votre texte ici...";
+      document.getElementById("inputBlocks").appendChild(block);
+    }
+
+    function translateAll() {
+      const inputs = document.querySelectorAll("#inputBlocks textarea");
+      const output = document.getElementById("outputBlocks");
+      output.innerHTML = "";
+      inputs.forEach(el => {
+        const translated = applyMapping(el.value.toLowerCase());
+        const div = document.createElement("div");
+        div.className = "translated";
+        div.textContent = translated;
+        output.appendChild(div);
+      });
+    }
+
+    function copyText() {
+      const texts = Array.from(document.querySelectorAll("#outputBlocks .translated")).map(div => div.textContent).join("\n\n");
+      navigator.clipboard.writeText(texts).then(() => alert("Texte copié ✅"));
+    }
+
+    function downloadText() {
+      const texts = Array.from(document.querySelectorAll("#outputBlocks .translated")).map(div => div.textContent).join("\n\n");
+      const blob = new Blob([texts], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "traduction.txt";
+      link.click();
+    }
   </script>
 </body>
 </html>
