@@ -96,22 +96,12 @@
     "in last ch": "dans la dernière maille en l’air",
     "last ch": "dernière maille en l’air",
     "first ch": "première maille en l’air",
-    "chain 5": "chaînette de 5 mailles",
     "start": "début",
-    "maille en l’air 1": "1 maille en l’air",
-    "augmentation in 2nd chain": "augmentation dans la 2ème maille en l’air",
-    "from crochet": "depuis le crochet",
-    "maille serrée 2": "2 mailles serrées",
-    "5 maille serrée in the last chain": "5 mailles serrées dans la dernière maille",
-    "continue on the other side of the chain": "continuer de l'autre côté de la chaînette",
-    "base": "base",
-    "3 maille serrée in the last chain": "3 mailles serrées dans la dernière maille",
-    "[14]": "[14 mailles au total]",
-    
-    "other side of the chain": "l'autre côté de la chaînette",
-    "other side": "l'autre côté",
     "chain": "chaînette",
     "the chain": "la chaînette",
+    "other side": "l'autre côté",
+    "other side of the chain": "l'autre côté de la chaînette",
+    "continue on the other side of the chain": "continuer de l'autre côté de la chaînette",
     "turn": "tourner",
     "turn chain": "maille en l’air de montée",
     "turning chain": "maille en l’air de montée",
@@ -162,35 +152,40 @@
     "edge": "bord",
     "corner": "coin",
     "chain 3": "chaînette de 3 mailles",
+    "chain 5": "chaînette de 5 mailles",
+    "chain 5 start": "début avec chaînette de 5 mailles",
+    "in 2nd chain from crochet": "dans la 2ème maille en l’air depuis le crochet",
+    "maille en l’air 1": "1 maille en l’air",
+    "augmentation in 2nd chain": "augmentation dans la 2ème maille en l’air",
+    "maille serrée 2": "2 mailles serrées",
+    "5 maille serrée in the last chain": "5 mailles serrées dans la dernière maille",
+    "3 maille serrée in the last chain": "3 mailles serrées dans la dernière maille",
+    "base": "base",
+    "[14]": "[14 mailles au total]",
     "make": "faire",
     "make 2": "faire 2 fois",
     "together": "ensemble",
     "pull tight": "tirer serré",
     "tighten": "serrer",
     "loose": "lâche",
-    "loosen": "desserer"
+    "loosen": "desserrer"
   };
 
   function translateText() {
     let text = document.getElementById('inputText').value.toLowerCase();
 
-    // Trier les clés par longueur décroissante pour éviter de couper des phrases plus longues avant les courtes
     const sortedKeys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
 
     for (const key of sortedKeys) {
-      // Remplacer globalement et insensible à la casse
-      // On utilise un regex pour correspondre mot entier / expression entière
       const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, 'gi');
       text = text.replace(regex, dictionary[key]);
     }
 
-    // Majuscule première lettre de chaque phrase
     text = text.replace(/(^\s*\w|[.!?]\s*\w)/g, function(c){ return c.toUpperCase(); });
 
     document.getElementById('outputText').textContent = text;
   }
 
-  // Fonction pour échapper les caractères spéciaux pour RegExp
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
