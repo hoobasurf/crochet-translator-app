@@ -2,214 +2,210 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Traduction Crochet Anglais → Français</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>✨ Traduction Crochet & Vidéo ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: url('https://i.imgur.com/vbQzZyM.jpg') center/cover no-repeat fixed;
-      background-color: #fdf6f0;
-      color: #333;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin: 0;
+      padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      backdrop-filter: blur(6px);
     }
-
     h1 {
       text-align: center;
-      color: #d94f91;
-      text-shadow: 1px 1px 1px white;
+      color: #ff69b4;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px #000;
     }
-
-    textarea {
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    select, input[type=file], textarea, button, input[type=text] {
       width: 100%;
-      height: 150px;
-      font-size: 1.1rem;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      background: #fff;
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
-    }
-
-    button {
-      display: block;
-      margin: 0 auto 1rem auto;
-      background: #e8499c;
-      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
       border: none;
-      padding: 0.8rem 1.6rem;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      font-weight: bold;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      box-shadow: 1px 1px 5px rgba(255,255,255,0.3);
+    }
+    button {
+      background: linear-gradient(135deg, pink, violet);
+      color: white;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.3s;
     }
-
     button:hover {
-      background: #d13889;
+      transform: scale(1.05);
     }
-
-    h2 {
-      color: #d94f91;
-      margin-top: 1.5rem;
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
     }
-
-    pre {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 1rem;
-      border-radius: 10px;
+    .actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 0.9em;
+    }
+    #result {
       white-space: pre-wrap;
-      word-wrap: break-word;
-      min-height: 120px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #666;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
+      border-radius: 12px;
+      color: #ffe6f0;
+      text-shadow: 0 0 2px #000;
+      line-height: 1.6em;
     }
   </style>
 </head>
 <body>
+  <h1>✨ Traduction Crochet & Vidéo ✨</h1>
 
-  <h1>Traduction Crochet Anglais → Français</h1>
+  <div class="container">
+    <select id="inputType">
+      <option value="text">📝 Texte</option>
+      <option value="file">📄 Fichier</option>
+      <option value="image">🖼️ Image</option>
+      <option value="url">🌐 URL</option>
+    </select>
 
-  <textarea id="inputText" placeholder="Colle ici tes instructions crochet en anglais..."></textarea>
-  <button onclick="translateText()">Traduire</button>
+    <textarea id="manualText" placeholder="Tape ton texte ici..."></textarea>
+    <input type="file" id="fileInput" accept="image/*,.txt" style="display: none;">
+    <input type="text" id="urlInput" placeholder="Colle une URL ici..." style="display: none;">
 
-  <h2>Traduction :</h2>
-  <pre id="outputText"></pre>
+    <button onclick="handleTranslate()">Traduire</button>
+
+    <div class="actions">
+      <button onclick="copyText()">📋 Copier</button>
+      <button onclick="downloadText('txt')">💾 TXT</button>
+      <button onclick="downloadText('pdf')">📄 PDF</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
 
   <script>
-    const dictionary = {
-      "sc": "maille serrée",
-      "hdc": "demi-bride",
-      "dc": "bride",
-      "tr": "double bride",
-      "dtr": "triple bride",
-      "ch": "maille en l’air",
-      "sl st": "maille coulée",
-      "st": "maille",
-      "inc": "augmentation",
-      "dec": "diminution",
-      "yo": "jeté",
-      "hook": "crochet",
-      "join": "joindre",
-      "fasten off": "arrêter",
-      "foundation chain": "chaînette de base",
-      "row": "rang",
-      "round": "tour",
-      "skip": "sauter",
-      "beginning": "début",
-      "next": "suivante",
-      "repeat": "répéter",
-      "with yarn": "avec le fil",
-      "times": "fois",
-      "from hook": "depuis le crochet",
-      "in last ch": "dans la dernière maille en l’air",
-      "last ch": "dernière maille en l’air",
-      "first ch": "première maille en l’air",
-      "chain 5": "chaînette de 5 mailles",
-      "start": "début",
-      "maille en l’air 1": "1 maille en l’air",
-      "augmentation in 2nd chain": "augmentation dans la 2ème maille en l’air",
-      "from crochet": "depuis le crochet",
-      "maille serrée 2": "2 mailles serrées",
-      "5 maille serrée in the last chain": "5 mailles serrées dans la dernière maille",
-      "continue on the other side of the chain": "continuer de l'autre côté de la chaînette",
-      "base": "base",
-      "3 maille serrée in the last chain": "3 mailles serrées dans la dernière maille",
-      "[14]": "[14 mailles au total]",
-      "other side of the chain": "l'autre côté de la chaînette",
-      "other side": "l'autre côté",
-      "chain": "chaînette",
-      "the chain": "la chaînette",
-      "turn": "tourner",
-      "turn chain": "maille en l’air de montée",
-      "turning chain": "maille en l’air de montée",
-      "skip next st": "sauter la maille suivante",
-      "next st": "maille suivante",
-      "in next st": "dans la maille suivante",
-      "repeat from * to *": "répéter de * à *",
-      "repeat until end": "répéter jusqu’à la fin",
-      "work": "travailler",
-      "work into": "travailler dans",
-      "work around": "travailler autour",
-      "work back": "revenir sur",
-      "work across": "travailler tout le long",
-      "turn work": "tourner le travail",
-      "insert hook": "insérer le crochet",
-      "pull up a loop": "faire un jeté pour attraper une boucle",
-      "yarn over": "faire un jeté",
-      "yarn over hook": "faire un jeté sur le crochet",
-      "chain space": "espace de mailles en l’air",
-      "space": "espace",
-      "skip stitch": "sauter une maille",
-      "around post": "autour de la maille",
-      "front post": "maille devant la barre",
-      "back post": "maille derrière la barre",
-      "double crochet decrease": "diminution en bride",
-      "single crochet decrease": "diminution en maille serrée",
-      "half double crochet decrease": "diminution en demi-bride",
-      "increase in next stitch": "augmentation dans la maille suivante",
-      "increase in next ch": "augmentation dans la maille en l’air suivante",
-      "between stitches": "entre les mailles",
-      "stitch marker": "marqueur de maille",
-      "repeat round": "répéter le tour",
-      "repeat row": "répéter le rang",
-      "fasten off yarn": "arrêter le fil",
-      "slip stitch join": "maille coulée pour joindre",
-      "chain loop": "boucle de chaînette",
-      "loop": "boucle",
-      "loop on hook": "boucle sur le crochet",
-      "pull through": "passer à travers",
-      "pull through loops": "passer à travers les boucles",
-      "yo twice": "faire deux jetés",
-      "skip next 2 sts": "sauter les 2 mailles suivantes",
-      "stitch": "maille",
-      "next stitch": "maille suivante",
-      "last stitch": "dernière maille",
-      "first stitch": "première maille",
-      "along": "le long de",
-      "edge": "bord",
-      "corner": "coin",
-      "chain 3": "chaînette de 3 mailles",
-      "make": "faire",
-      "make 2": "faire 2 fois",
-      "together": "ensemble",
-      "pull tight": "tirer serré",
-      "tighten": "serrer",
-      "loose": "lâche",
-      "loosen": "desserrer",
+    const inputType = document.getElementById("inputType");
+    const manualText = document.getElementById("manualText");
+    const fileInput = document.getElementById("fileInput");
+    const urlInput = document.getElementById("urlInput");
+    const resultDiv = document.getElementById("result");
 
-      // ✅ Ajouts récents demandés
-      "chain 5 début: in 2nd chain": "chaînette de 5 mailles, début : dans la 2ème maille",
-      "in the last chain.": "dans la dernière maille",
-      "base, in the last chain [14]": "base, dans la dernière maille [14 mailles au total]"
+    const dictionary = {
+      "sc": "maille serrée", "hdc": "demi-bride", "dc": "bride", "tr": "double bride",
+      "dtr": "triple bride", "ch": "maille en l’air", "sl st": "maille coulée", "st": "maille",
+      "inc": "augmentation", "dec": "diminution", "yo": "jeté", "hook": "crochet",
+      "join": "joindre", "fasten off": "arrêter", "foundation chain": "chaînette de base",
+      "row": "rang", "round": "tour", "skip": "sauter", "beginning": "début", "next": "suivante",
+      "repeat": "répéter", "with yarn": "avec le fil", "times": "fois", "from hook": "depuis le crochet",
+      "in last ch": "dans la dernière maille en l’air", "last ch": "dernière maille en l’air",
+      "first ch": "première maille en l’air", "start": "début", "turn": "tourner",
+      "turning chain": "maille en l’air de montée", "skip next st": "sauter la maille suivante",
+      "in next st": "dans la maille suivante", "repeat from * to *": "répéter de * à *",
+      "work into": "travailler dans", "pull up a loop": "attraper une boucle", "yarn over": "faire un jeté",
+      "chain space": "espace de mailles en l’air", "front post": "maille devant la barre",
+      "back post": "maille derrière la barre", "increase in next stitch": "augmentation dans la maille suivante",
+      "skip next 2 sts": "sauter les 2 mailles suivantes", "next stitch": "maille suivante",
+      "last stitch": "dernière maille", "first stitch": "première maille", "edge": "bord",
+      "corner": "coin", "chain 3": "chaînette de 3 mailles", "together": "ensemble",
+      "pull tight": "tirer serré", "tighten": "serrer", "loose": "lâche",
+
+      // Phrases supplémentaires ajoutées :
+      "chain 5 start": "chaînette de 5 mailles – début",
+      "in 2nd chain": "dans la 2ème maille en l’air",
+      "in the last chain": "dans la dernière maille en l’air",
+      "continue on the other side of the chain": "continuer de l’autre côté de la chaînette",
+      "base": "base",
+      "in the last chain [14]": "dans la dernière maille en l’air [14]"
     };
 
-    function translateText() {
-      let text = document.getElementById('inputText').value.toLowerCase();
-      const sortedKeys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
-      for (const key of sortedKeys) {
-        const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, 'gi');
-        text = text.replace(regex, dictionary[key]);
+    function applyMapping(text) {
+      const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+      const lines = text.split('\n');
+      let output = [];
+
+      for (let line of lines) {
+        for (const key of keys) {
+          const regex = new RegExp(`\\b${key}\\b`, 'gi');
+          line = line.replace(regex, dictionary[key]);
+        }
+        output.push(line);
       }
-      text = text.replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase());
-      document.getElementById('outputText').textContent = text;
+
+      resultDiv.innerHTML = output.map(l => `<div>👉 ${l}</div>`).join('\n');
     }
 
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    function cleanOCR(text) {
+      return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
     }
+
+    function translateText(text) {
+      const cleaned = cleanOCR(text.toLowerCase());
+      applyMapping(cleaned);
+    }
+
+    function handleTranslate() {
+      const type = inputType.value;
+      if (type === "text") {
+        translateText(manualText.value);
+      } else if (type === "file") {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucun fichier");
+        const reader = new FileReader();
+        reader.onload = () => translateText(reader.result);
+        reader.readAsText(file);
+      } else if (type === "image") {
+        const file = fileInput.files[0];
+        if (!file) return alert("Aucune image");
+        Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+      } else if (type === "url") {
+        fetch(urlInput.value)
+          .then(res => res.text())
+          .then(text => translateText(text))
+          .catch(() => resultDiv.textContent = "Erreur de chargement");
+      }
+    }
+
+    function copyText() {
+      const text = resultDiv.innerText;
+      navigator.clipboard.writeText(text).then(() => alert("Texte copié !"));
+    }
+
+    function downloadText(type) {
+      const text = resultDiv.innerText;
+      if (type === "txt") {
+        const blob = new Blob([text], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "traduction.txt";
+        link.click();
+      } else if (type === "pdf") {
+        const w = window.open("", "_blank");
+        w.document.write(`<pre style="font-family:'Arial'; white-space:pre-wrap;">${text}</pre>`);
+        w.print();
+      }
+    }
+
+    inputType.addEventListener("change", () => {
+      manualText.style.display = inputType.value === "text" ? "block" : "none";
+      fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
+      urlInput.style.display = inputType.value === "url" ? "block" : "none";
+    });
+    window.onload = () => inputType.dispatchEvent(new Event("change"));
   </script>
-
-  <footer>&copy; 2025 Traduction Crochet</footer>
 </body>
 </html>
