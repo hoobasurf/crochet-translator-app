@@ -98,138 +98,36 @@
     <div id="result"></div>
   </div>
 
-  <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>✨ Traduction Crochet & Vidéo ✨</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: 'Pacifico', cursive;
-      background: url('fond-accueil.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-      min-height: 100vh;
-      backdrop-filter: blur(6px);
-    }
-    h1 {
-      text-align: center;
-      color: #ff69b4;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 3px #000;
-    }
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
-    select, input[type=file], textarea, button, input[type=text] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: none;
-      font-family: 'Pacifico', cursive;
-      font-size: 1em;
-      box-shadow: 1px 1px 5px rgba(255,255,255,0.3);
-    }
-    button {
-      background: linear-gradient(135deg, pink, violet);
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-    .actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .actions button {
-      width: auto;
-      padding: 8px 12px;
-      font-size: 0.9em;
-    }
-    #result {
-      white-space: pre-wrap;
-      margin-top: 20px;
-      background: rgba(255,255,255,0.15);
-      padding: 15px;
-      border-radius: 12px;
-      color: #ffe6f0;
-      text-shadow: 0 0 2px #000;
-      line-height: 1.6em;
-    }
-  </style>
-</head>
-<body>
-  <h1>✨ Traduction Crochet & Vidéo ✨</h1>
-
-  <div class="container">
-    <select id="inputType">
-      <option value="text">📝 Texte</option>
-      <option value="file">📄 Fichier</option>
-      <option value="image">🖼️ Image</option>
-      <option value="url">🌐 URL</option>
-    </select>
-
-    <textarea id="manualText" placeholder="Tape ton texte ici..."></textarea>
-    <input type="file" id="fileInput" accept="image/*,.txt" style="display: none;">
-    <input type="text" id="urlInput" placeholder="Colle une URL ici..." style="display: none;">
-
-    <button onclick="handleTranslate()">Traduire</button>
-
-    <div class="actions">
-      <button onclick="copyText()">📋 Copier</button>
-      <button onclick="downloadText('txt')">💾 TXT</button>
-      <button onclick="downloadText('pdf')">📄 PDF</button>
-    </div>
-
-    <div id="result"></div>
-  </div>
-
-  <script>
+<script>
 const inputType = document.getElementById("inputType");
 const manualText = document.getElementById("manualText");
 const fileInput = document.getElementById("fileInput");
 const urlInput = document.getElementById("urlInput");
 const resultDiv = document.getElementById("result");
 
-// 🔧 Dictionnaire enrichi avec unités, phrases, nombres collés, etc.
 const dictionary = {
-  // Abréviations et unités de crochet
+  // Abréviations
   "sc": "maille serrée",
   "dc": "bride",
   "hdc": "demi-bride",
   "tr": "double bride",
   "dtr": "triple bride",
-  "sl st": "maille coulée",
   "slst": "maille coulée",
+  "sl st": "maille coulée",
   "ch": "maille en l’air",
   "st": "maille",
   "inc": "augmentation",
   "linc": "augmentation",
   "dec": "diminution",
   "yo": "jeté",
-  "yo twice": "faire deux jetés",
-  "tog": "ensemble",
   "lp": "boucle",
-  "flo": "brin avant seulement",
-  "blo": "brin arrière seulement",
+  "flo": "brin avant",
+  "blo": "brin arrière",
   "beg": "début",
   "mc": "couleur principale",
+  "tog": "ensemble",
 
-  // Phrases fréquentes
+  // Phrases
   "magic ring": "cercle magique",
   "magic loop": "cercle magique",
   "pull through": "passer à travers",
@@ -239,20 +137,22 @@ const dictionary = {
   "yarn over": "jeté",
   "break the yarn": "couper le fil",
   "cut the yarn": "couper le fil",
+  "foundation chain": "chaînette de base",
+  "fasten off": "arrêter",
   "with the yellow yarn": "avec le fil jaune",
   "with the green yarn": "avec le fil vert",
-  "using off-white yarn": "en utilisant du fil écru",
+  "using off-white yarn": "avec du fil écru",
   "join the two sides": "assembler les deux côtés",
   "only the back stitches": "uniquement dans le brin arrière",
   "of each part": "de chaque partie",
   "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
+  "right side": "endroit",
+  "wrong side": "envers",
 
-  // Instructions générales
-  "join": "joindre",
-  "fasten off": "arrêter",
-  "foundation chain": "chaînette de base",
+  // Instructions
   "row": "rang",
   "round": "tour",
+  "rounds": "tours",
   "turn": "tourner",
   "repeat": "répéter",
   "start": "commencer",
@@ -264,32 +164,37 @@ const dictionary = {
   "needle": "aiguille",
   "materials": "fournitures",
   "contrast color": "couleur contrastante",
-  "right side": "endroit",
-  "wrong side": "envers",
 
-  // Autres formes
-  "picot": "picot",
-  "shell": "coquille",
-  "diagram": "diagramme",
-  "corner": "coin",
-  "square": "carré",
-  "edge": "bord",
-  "repeat until end": "répéter jusqu’à la fin",
-
-  // Segments anglais
+  // Segments
   "on the": "sur le",
   "in the": "dans le",
   "into the": "dans le",
   "and": "et",
 
-  // Traduction mots fréquents OCR liés à crochet
-  "crochet": "crochet",
-  "pattern": "modèle",
-  "design": "modèle",
-  "free pattern": "modèle gratuit"
+  // Formes OCR
+  "isc": "1 maille serrée",
+  "xé": "x6",
+  "r n": "rang",
+  "maille serrée": "mailles serrées",
+  "double bride": "double bride",
+  "2 tours": "2 tours"
 };
 
-// ✅ Détection des formes "6sc", "8inc", etc.
+// Corrige erreurs courantes OCR et traductions bancales
+function fixCommonErrors(text) {
+  return text
+    .replace(/\bon the cercle magique\b/gi, "sur le cercle magique")
+    .replace(/\bthe two sides\b/gi, "les deux côtés")
+    .replace(/\bsingle crochet across the entire\b/gi, "faire des mailles serrées sur toute la")
+    .replace(/\busing only the back stitches\b/gi, "en utilisant uniquement le brin arrière")
+    .replace(/\busing off-white yarn\b/gi, "avec du fil écru")
+    .replace(/\br n\b/gi, "rang")
+    .replace(/\brounds?\b/gi, "tours")
+    .replace(/\bxé\b/gi, "x6")
+    .replace(/\bisc\b/gi, "1sc");
+}
+
+// Remplace les chiffres collés aux abréviations : 6sc → 6 mailles serrées
 function normalizeNumbers(text) {
   return text.replace(/(\d+)([a-z]{2,5})\b/gi, (match, num, abbr) => {
     const translated = dictionary[abbr.toLowerCase()];
@@ -297,7 +202,7 @@ function normalizeNumbers(text) {
   });
 }
 
-// ✅ Applique le dictionnaire en priorité aux longs termes
+// Applique le dictionnaire de traduction
 function applyDictionary(text) {
   const sortedKeys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {
@@ -307,24 +212,24 @@ function applyDictionary(text) {
   return normalizeNumbers(text);
 }
 
-// 🔍 Nettoyage OCR (évite les caractères fantômes)
+// Nettoie le texte OCR
 function cleanOCR(text) {
   return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
 }
 
-// 🧠 Traduction complète
+// Fonction principale
 function translateText(text) {
   const cleaned = cleanOCR(text.toLowerCase());
-  const translated = applyDictionary(cleaned);
+  const fixed = fixCommonErrors(cleaned);
+  const translated = applyDictionary(fixed);
   resultDiv.textContent = translated;
 
-  // Log console des mots manquants
-  const words = cleaned.split(/\s+/);
+  const words = fixed.split(/\s+/);
   const missing = words.filter(w => w.length > 3 && !(dictionary.hasOwnProperty(w)));
   console.log("❓ Mots non traduits :", [...new Set(missing)]);
 }
 
-// 📥 Gestion des types d’entrée
+// Types d'entrée
 function handleTranslate() {
   const type = inputType.value;
   if (type === "text") {
@@ -347,12 +252,10 @@ function handleTranslate() {
   }
 }
 
-// 📋 Copier
 function copyText() {
   navigator.clipboard.writeText(resultDiv.textContent).then(() => alert("Texte copié ✅"));
 }
 
-// 💾 Télécharger
 function downloadText(type) {
   const text = resultDiv.textContent;
   if (type === "txt") {
@@ -368,7 +271,6 @@ function downloadText(type) {
   }
 }
 
-// 🎛️ Affichage dynamique des champs
 inputType.addEventListener("change", () => {
   manualText.style.display = inputType.value === "text" ? "block" : "none";
   fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
@@ -376,8 +278,5 @@ inputType.addEventListener("change", () => {
 });
 window.onload = () => inputType.dispatchEvent(new Event("change"));
 </script>
-</body>
-</html>
-
 </body>
 </html>
