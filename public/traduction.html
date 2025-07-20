@@ -99,228 +99,192 @@
   </div>
 
   <script>
-  const inputType = document.getElementById("inputType");
-  const manualText = document.getElementById("manualText");
-  const fileInput = document.getElementById("fileInput");
-  const urlInput = document.getElementById("urlInput");
-  const resultDiv = document.getElementById("result");
+const inputType = document.getElementById("inputType");
+const manualText = document.getElementById("manualText");
+const fileInput = document.getElementById("fileInput");
+const urlInput = document.getElementById("urlInput");
+const resultDiv = document.getElementById("result");
 
-  const dictionary = {
-    "sc": "maille serrée",
-    "hdc": "demi-bride",
-    "dc": "bride",
-    "tr": "double bride",
-    "dtr": "triple bride",
-    "ch": "maille en l’air",
-    "sl st": "maille coulée",
-    "slst": "maille coulée",
-    "st": "maille",
-    "inc": "augmentation",
-    "dec": "diminution",
-    "yo": "jeté",
-    "hook": "crochet",
-    "join": "joindre",
-    "fasten off": "arrêter",
-    "foundation chain": "chaînette de base",
-    "row": "rang",
-    "round": "tour",
-    "skip": "sauter",
-    "beginning": "début",
-    "next": "suivante",
-    "repeat": "répéter",
-    "from hook": "depuis le crochet",
-    "in last ch": "dans la dernière maille en l’air",
-    "last ch": "dernière maille en l’air",
-    "first ch": "première maille en l’air",
-    "alt": "alternativement",
-    "lp": "boucle",
-    "blo": "brin arrière seulement",
-    "flo": "brin avant seulement",
-    "mc": "couleur principale",
-    "beg": "début",
-    "yo twice": "faire deux jetés",
-    "tog": "ensemble",
-    "turn": "tourner",
-    "magic loop": "cercle magique",
-    "magic ring": "cercle magique",
-    "marker": "marqueur",
-    "stuffing": "rembourrage",
-    "needle": "aiguille",
-    "break the yarn": "couper le fil",
-    "cut the yarn": "couper le fil",
-    "yarn over": "jeté",
-    "pull through": "passer à travers",
-    "loop on hook": "boucle sur le crochet",
-    "insert hook": "insérer le crochet",
-    "draw through": "passer à travers",
-    "together": "ensemble",
-    "weave in ends": "arrêter le fil",
-    "picot": "picot",
-    "shell": "coquille",
-    "diagram": "diagramme",
-    "corner": "coin",
-    "square": "carré",
-    "edge": "bord",
-    "finish": "terminer",
-    "start": "commencer",
-    "end": "fin",
-    "materials": "fournitures",
-    "main color": "couleur principale",
-    "contrast color": "couleur contrastante",
-    "loop": "boucle",
-    "back loop": "brin arrière",
-    "front loop": "brin avant",
-    "right side": "endroit",
-    "wrong side": "envers",
-    "turning chain": "maille de montée",
-    "repeat until end": "répéter jusqu’à la fin",
-    "next stitch": "maille suivante",
-    "last stitch": "dernière maille",
-    "first stitch": "première maille",
-    "triple treble": "triple bride",
-    "double treble": "double bride",
-    "single crochet 2 together": "maille serrée liée",
-    "double crochet 2 together": "bride liée"
-    "with the yellow yarn": "avec le fil jaune",
+// 🔧 Dictionnaire enrichi + extensible
+const dictionary = {
+  "sc": "maille serrée",
+  "hdc": "demi-bride",
+  "dc": "bride",
+  "tr": "double bride",
+  "dtr": "triple bride",
+  "ch": "maille en l’air",
+  "sl st": "maille coulée",
+  "slst": "maille coulée",
+  "st": "maille",
+  "inc": "augmentation",
+  "linc": "augmentation",
+  "dec": "diminution",
+  "yo": "jeté",
+  "hook": "crochet",
+  "join": "joindre",
+  "fasten off": "arrêter",
+  "foundation chain": "chaînette de base",
+  "row": "rang",
+  "round": "tour",
+  "skip": "sauter",
+  "beginning": "début",
+  "next": "suivante",
+  "repeat": "répéter",
+  "from hook": "depuis le crochet",
+  "in last ch": "dans la dernière maille en l’air",
+  "last ch": "dernière maille en l’air",
+  "first ch": "première maille en l’air",
+  "alt": "alternativement",
+  "lp": "boucle",
+  "blo": "brin arrière seulement",
+  "flo": "brin avant seulement",
+  "mc": "couleur principale",
+  "beg": "début",
+  "yo twice": "faire deux jetés",
+  "tog": "ensemble",
+  "turn": "tourner",
+  "magic loop": "cercle magique",
+  "magic ring": "cercle magique",
+  "marker": "marqueur",
+  "stuffing": "rembourrage",
+  "needle": "aiguille",
+  "break the yarn": "couper le fil",
+  "cut the yarn": "couper le fil",
+  "yarn over": "jeté",
+  "pull through": "passer à travers",
+  "loop on hook": "boucle sur le crochet",
+  "insert hook": "insérer le crochet",
+  "draw through": "passer à travers",
+  "together": "ensemble",
+  "weave in ends": "arrêter le fil",
+  "picot": "picot",
+  "shell": "coquille",
+  "diagram": "diagramme",
+  "corner": "coin",
+  "square": "carré",
+  "edge": "bord",
+  "finish": "terminer",
+  "start": "commencer",
+  "end": "fin",
+  "materials": "fournitures",
+  "main color": "couleur principale",
+  "contrast color": "couleur contrastante",
+  "loop": "boucle",
+  "back loop": "brin arrière",
+  "front loop": "brin avant",
+  "right side": "endroit",
+  "wrong side": "envers",
+  "turning chain": "maille de montée",
+  "repeat until end": "répéter jusqu’à la fin",
+  "next stitch": "maille suivante",
+  "last stitch": "dernière maille",
+  "first stitch": "première maille",
+  "triple treble": "triple bride",
+  "double treble": "double bride",
+  "single crochet 2 together": "maille serrée liée",
+  "double crochet 2 together": "bride liée",
+  "with the yellow yarn": "avec le fil jaune",
   "with the green yarn": "avec le fil vert",
   "using off-white yarn": "en utilisant du fil écru",
   "join the two sides": "assembler les deux côtés",
   "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
   "only the back stitches": "uniquement dans le brin arrière",
   "of each part": "de chaque partie",
-  "magic ring": "cercle magique",
-  "magic loop": "cercle magique",
-  "sc": "maille serrée",
-  "inc": "augmentation",
-  "linc": "augmentation",
+  "back part": "partie arrière",
+  "8sc": "8 mailles serrées",
   "6sc": "6 mailles serrées",
   "6inc": "6 augmentations",
-  "(1sc, inc)x6": "(1 maille serrée, 1 augmentation) x6",
-  "(2sc, inc)x6": "(2 mailles serrées, 1 augmentation) x6",
-  "(3sc, inc)x6": "(3 mailles serrées, 1 augmentation) x6",
-  "(4sc, inc)x6": "(4 mailles serrées, 1 augmentation) x6",
-  "(5sc, inc)x6": "(5 mailles serrées, 1 augmentation) x6",
-  "(6sc, inc)x6": "(6 mailles serrées, 1 augmentation) x6",
-  "(1sc, linc)x6": "(1 maille serrée, 1 augmentation) x6",
-  "(2sc, linc)x6": "(2 mailles serrées, 1 augmentation) x6",
-  "(3sc, linc)x6": "(3 mailles serrées, 1 augmentation) x6",
-  "(4sc, linc)x6": "(4 mailles serrées, 1 augmentation) x6",
-  "(1sc, linc)x8": "(1 maille serrée, 1 augmentation) x8",
-  "(2sc, linc)x8": "(2 mailles serrées, 1 augmentation) x8",
-  "(3sc, linc)x8": "(3 mailles serrées, 1 augmentation) x8",
-  "(4sc, linc)x6": "(4 mailles serrées, 1 augmentation) x6",
   "48sc": "48 mailles serrées",
-  "8sc": "8 mailles serrées",
-  "8inc": "8 augmentations",
   "2 rounds": "2 tours",
   "rounds": "tours",
-  "back part": "partie arrière"
-    // Tu peux continuer à enrichir ici si tu veux
-  };
+  "(1sc, inc)x6": "(1 ms, 1 aug) x6",
+  "(2sc, inc)x6": "(2 ms, 1 aug) x6",
+  "(3sc, inc)x6": "(3 ms, 1 aug) x6",
+  "(4sc, inc)x6": "(4 ms, 1 aug) x6",
+  "(5sc, inc)x6": "(5 ms, 1 aug) x6",
+  "(6sc, inc)x6": "(6 ms, 1 aug) x6",
+  "(1sc, linc)x6": "(1 ms, 1 aug) x6",
+  "(2sc, linc)x8": "(2 ms, 1 aug) x8"
+};
 
-  function applyDictionary(text) {
-    const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
-    for (const key of keys) {
-      const regex = new RegExp(`\\b${key}\\b`, "gi");
-      text = text.replace(regex, dictionary[key]);
-    }
-    return text;
+// 🔍 Applique le dictionnaire avec priorité aux longs mots
+function applyDictionary(text) {
+  const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    const regex = new RegExp(`\\b${key}\\b`, "gi");
+    text = text.replace(regex, dictionary[key]);
   }
+  return text;
+}
 
-  function cleanOCR(text) {
-    return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
+// 🔎 Nettoyage simple du texte OCR
+function cleanOCR(text) {
+  return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
+}
+
+// 🎯 Fonction principale de traduction
+function translateText(text) {
+  const cleaned = cleanOCR(text.toLowerCase());
+  const translated = applyDictionary(cleaned);
+  resultDiv.textContent = translated;
+
+  // 👁 Journal des mots non trouvés
+  const words = cleaned.split(/\s+/);
+  const missing = words.filter(w => w.length > 3 && !(w in dictionary));
+  console.log("🧩 Mots non traduits : ", [...new Set(missing)]);
+}
+
+// 📥 Traitement selon type d'entrée
+function handleTranslate() {
+  const type = inputType.value;
+  if (type === "text") {
+    translateText(manualText.value);
+  } else if (type === "file") {
+    const file = fileInput.files[0];
+    if (!file) return alert("Aucun fichier");
+    const reader = new FileReader();
+    reader.onload = () => translateText(reader.result);
+    reader.readAsText(file);
+  } else if (type === "image") {
+    const file = fileInput.files[0];
+    if (!file) return alert("Aucune image");
+    Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
+  } else if (type === "url") {
+    fetch(urlInput.value)
+      .then(res => res.text())
+      .then(text => translateText(text))
+      .catch(() => resultDiv.textContent = "Erreur de chargement");
   }
+}
 
-  function translateText(text) {
-    const cleaned = cleanOCR(text.toLowerCase());
-    const translated = applyDictionary(cleaned);
-    resultDiv.textContent = translated;
+// 📋 Copier
+function copyText() {
+  navigator.clipboard.writeText(resultDiv.textContent).then(() => alert("Texte copié ✅"));
+}
+
+// 💾 Télécharger
+function downloadText(type) {
+  const text = resultDiv.textContent;
+  if (type === "txt") {
+    const blob = new Blob([text], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "traduction.txt";
+    link.click();
+  } else if (type === "pdf") {
+    const w = window.open("", "_blank");
+    w.document.write(`<pre style="font-family:'Arial'; white-space:pre-wrap;">${text}</pre>`);
+    w.print();
   }
+}
 
-  function handleTranslate() {
-    const type = inputType.value;
-    if (type === "text") {
-      translateText(manualText.value);
-    } else if (type === "file") {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucun fichier");
-      const reader = new FileReader();
-      reader.onload = () => translateText(reader.result);
-      reader.readAsText(file);
-    } else if (type === "image") {
-      const file = fileInput.files[0];
-      if (!file) return alert("Aucune image");
-      Tesseract.recognize(file, 'eng').then(({ data: { text } }) => translateText(text));
-    } else if (type === "url") {
-      fetch(urlInput.value)
-        .then(res => res.text())
-        .then(text => translateText(text))
-        .catch(() => resultDiv.textContent = "Erreur de chargement");
-    }
-  }
-
-  function copyText() {
-    navigator.clipboard.writeText(resultDiv.textContent).then(() => alert("Texte copié !"));
-  }
-
-  function downloadText(type) {
-    const text = resultDiv.textContent;
-    if (type === "txt") {
-      const blob = new Blob([text], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "traduction.txt";
-      link.click();
-    } else if (type === "pdf") {
-      const w = window.open("", "_blank");
-      w.document.write(`<pre style="font-family:'Arial'; white-space:pre-wrap;">${text}</pre>`);
-      w.print();
-    }
-  }
-
-  function translateYouTube() {
-    const url = document.getElementById("youtubeUrl").value;
-    const videoId = url.split('v=')[1]?.split('&')[0];
-    if (!videoId) return alert("Lien YouTube invalide");
-
-    document.getElementById("videoContainer").innerHTML = `
-      <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
-      frameborder="0" allowfullscreen></iframe>`;
-
-    // Simulation de traduction vidéo
-    const phrases = [
-      "Faire une chaînette de 5 mailles.",
-      "Rejoindre en rond avec une maille coulée.",
-      "Faire 12 mailles serrées dans l’anneau."
-    ];
-    const container = document.getElementById("ytTranslation");
-    container.innerHTML = '';
-    let i = 0;
-
-    function displayNext() {
-      if (i >= phrases.length) return;
-      const line = document.createElement("div");
-      line.textContent = phrases[i];
-      container.appendChild(line);
-      const utter = new SpeechSynthesisUtterance(phrases[i]);
-      utter.lang = "fr-FR";
-      utter.voice = speechSynthesis.getVoices().find(v => v.name.includes("Google") && v.lang === "fr-FR") || null;
-      utter.pitch = 1.1;
-      utter.rate = 0.9;
-      speechSynthesis.speak(utter);
-      i++;
-      setTimeout(displayNext, 4000);
-    }
-
-    displayNext();
-  }
-
-  inputType.addEventListener("change", () => {
-    manualText.style.display = inputType.value === "text" ? "block" : "none";
-    fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
-    urlInput.style.display = inputType.value === "url" ? "block" : "none";
-  });
-  window.onload = () => inputType.dispatchEvent(new Event("change"));
+// 🧠 Gestion affichage champs
+inputType.addEventListener("change", () => {
+  manualText.style.display = inputType.value === "text" ? "block" : "none";
+  fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
+  urlInput.style.display = inputType.value === "url" ? "block" : "none";
+});
+window.onload = () => inputType.dispatchEvent(new Event("change"));
 </script>
 </body>
 </html>
