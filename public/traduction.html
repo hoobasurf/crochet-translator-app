@@ -98,13 +98,14 @@
     <div id="result"></div>
   </div>
 
-<script>
+  <script>
 const inputType = document.getElementById("inputType");
 const manualText = document.getElementById("manualText");
 const fileInput = document.getElementById("fileInput");
 const urlInput = document.getElementById("urlInput");
 const resultDiv = document.getElementById("result");
 
+// 🔧 Dictionnaire enrichi
 const dictionary = {
   // Abréviations
   "sc": "maille serrée",
@@ -112,22 +113,25 @@ const dictionary = {
   "hdc": "demi-bride",
   "tr": "double bride",
   "dtr": "triple bride",
-  "slst": "maille coulée",
   "sl st": "maille coulée",
+  "slst": "maille coulée",
   "ch": "maille en l’air",
   "st": "maille",
   "inc": "augmentation",
   "linc": "augmentation",
   "dec": "diminution",
   "yo": "jeté",
+  "yo twice": "faire deux jetés",
+  "tog": "ensemble",
   "lp": "boucle",
-  "flo": "brin avant",
-  "blo": "brin arrière",
+  "flo": "brin avant seulement",
+  "blo": "brin arrière seulement",
   "beg": "début",
   "mc": "couleur principale",
-  "tog": "ensemble",
+  "rnd": "tour",
+  "rep": "répéter",
 
-  // Phrases
+  // Phrases courantes
   "magic ring": "cercle magique",
   "magic loop": "cercle magique",
   "pull through": "passer à travers",
@@ -137,22 +141,21 @@ const dictionary = {
   "yarn over": "jeté",
   "break the yarn": "couper le fil",
   "cut the yarn": "couper le fil",
-  "foundation chain": "chaînette de base",
-  "fasten off": "arrêter",
-  "with the yellow yarn": "avec le fil jaune",
-  "with the green yarn": "avec le fil vert",
-  "using off-white yarn": "avec du fil écru",
   "join the two sides": "assembler les deux côtés",
+  "using off-white yarn": "en utilisant du fil écru",
+  "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
   "only the back stitches": "uniquement dans le brin arrière",
   "of each part": "de chaque partie",
-  "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
-  "right side": "endroit",
-  "wrong side": "envers",
+  "with the yellow yarn": "avec le fil jaune",
+  "with the green yarn": "avec le fil vert",
+  "join double bride": "joindre par une double bride",
+  "on the": "sur le",
+  "in the": "dans le",
+  "into the": "dans le",
 
-  // Instructions
+  // Segments
   "row": "rang",
   "round": "tour",
-  "rounds": "tours",
   "turn": "tourner",
   "repeat": "répéter",
   "start": "commencer",
@@ -160,41 +163,20 @@ const dictionary = {
   "next": "suivant",
   "skip": "sauter",
   "marker": "marqueur",
-  "stuffing": "rembourrage",
   "needle": "aiguille",
+  "stuffing": "rembourrage",
+  "pattern": "modèle",
+  "design": "modèle",
+  "diagram": "diagramme",
+  "corner": "coin",
+  "square": "carré",
+  "edge": "bord",
   "materials": "fournitures",
-  "contrast color": "couleur contrastante",
-
-  // Segments
-  "on the": "sur le",
-  "in the": "dans le",
-  "into the": "dans le",
-  "and": "et",
-
-  // Formes OCR
-  "isc": "1 maille serrée",
-  "xé": "x6",
-  "r n": "rang",
-  "maille serrée": "mailles serrées",
-  "double bride": "double bride",
-  "2 tours": "2 tours"
+  "right side": "endroit",
+  "wrong side": "envers"
 };
 
-// Corrige erreurs courantes OCR et traductions bancales
-function fixCommonErrors(text) {
-  return text
-    .replace(/\bon the cercle magique\b/gi, "sur le cercle magique")
-    .replace(/\bthe two sides\b/gi, "les deux côtés")
-    .replace(/\bsingle crochet across the entire\b/gi, "faire des mailles serrées sur toute la")
-    .replace(/\busing only the back stitches\b/gi, "en utilisant uniquement le brin arrière")
-    .replace(/\busing off-white yarn\b/gi, "avec du fil écru")
-    .replace(/\br n\b/gi, "rang")
-    .replace(/\brounds?\b/gi, "tours")
-    .replace(/\bxé\b/gi, "x6")
-    .replace(/\bisc\b/gi, "1sc");
-}
-
-// Remplace les chiffres collés aux abréviations : 6sc → 6 mailles serrées
+// 🔄 Gère les cas type "6sc", "4inc"
 function normalizeNumbers(text) {
   return text.replace(/(\d+)([a-z]{2,5})\b/gi, (match, num, abbr) => {
     const translated = dictionary[abbr.toLowerCase()];
@@ -202,34 +184,29 @@ function normalizeNumbers(text) {
   });
 }
 
-// Applique le dictionnaire de traduction
+// 🔠 Applique le dictionnaire
 function applyDictionary(text) {
-  const sortedKeys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
-  for (const key of sortedKeys) {
-    const regex = new RegExp(`\\b${key}\\b`, 'gi');
+  const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    const regex = new RegExp(`\\b${key}\\b`, "gi");
     text = text.replace(regex, dictionary[key]);
   }
   return normalizeNumbers(text);
 }
 
-// Nettoie le texte OCR
+// Nettoyage OCR
 function cleanOCR(text) {
   return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
 }
 
-// Fonction principale
+// Traduction principale
 function translateText(text) {
   const cleaned = cleanOCR(text.toLowerCase());
-  const fixed = fixCommonErrors(cleaned);
-  const translated = applyDictionary(fixed);
+  const translated = applyDictionary(cleaned);
   resultDiv.textContent = translated;
-
-  const words = fixed.split(/\s+/);
-  const missing = words.filter(w => w.length > 3 && !(dictionary.hasOwnProperty(w)));
-  console.log("❓ Mots non traduits :", [...new Set(missing)]);
 }
 
-// Types d'entrée
+// Lecture et traduction
 function handleTranslate() {
   const type = inputType.value;
   if (type === "text") {
@@ -252,10 +229,12 @@ function handleTranslate() {
   }
 }
 
+// Copier
 function copyText() {
   navigator.clipboard.writeText(resultDiv.textContent).then(() => alert("Texte copié ✅"));
 }
 
+// Télécharger
 function downloadText(type) {
   const text = resultDiv.textContent;
   if (type === "txt") {
@@ -271,6 +250,7 @@ function downloadText(type) {
   }
 }
 
+// Affichage dynamique
 inputType.addEventListener("change", () => {
   manualText.style.display = inputType.value === "text" ? "block" : "none";
   fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
