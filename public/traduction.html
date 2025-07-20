@@ -98,6 +98,106 @@
     <div id="result"></div>
   </div>
 
+  <!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>✨ Traduction Crochet & Vidéo ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Pacifico', cursive;
+      background: url('fond-accueil.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      backdrop-filter: blur(6px);
+    }
+    h1 {
+      text-align: center;
+      color: #ff69b4;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px #000;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    select, input[type=file], textarea, button, input[type=text] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Pacifico', cursive;
+      font-size: 1em;
+      box-shadow: 1px 1px 5px rgba(255,255,255,0.3);
+    }
+    button {
+      background: linear-gradient(135deg, pink, violet);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 0.9em;
+    }
+    #result {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
+      border-radius: 12px;
+      color: #ffe6f0;
+      text-shadow: 0 0 2px #000;
+      line-height: 1.6em;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ Traduction Crochet & Vidéo ✨</h1>
+
+  <div class="container">
+    <select id="inputType">
+      <option value="text">📝 Texte</option>
+      <option value="file">📄 Fichier</option>
+      <option value="image">🖼️ Image</option>
+      <option value="url">🌐 URL</option>
+    </select>
+
+    <textarea id="manualText" placeholder="Tape ton texte ici..."></textarea>
+    <input type="file" id="fileInput" accept="image/*,.txt" style="display: none;">
+    <input type="text" id="urlInput" placeholder="Colle une URL ici..." style="display: none;">
+
+    <button onclick="handleTranslate()">Traduire</button>
+
+    <div class="actions">
+      <button onclick="copyText()">📋 Copier</button>
+      <button onclick="downloadText('txt')">💾 TXT</button>
+      <button onclick="downloadText('pdf')">📄 PDF</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
   <script>
 const inputType = document.getElementById("inputType");
 const manualText = document.getElementById("manualText");
@@ -105,136 +205,126 @@ const fileInput = document.getElementById("fileInput");
 const urlInput = document.getElementById("urlInput");
 const resultDiv = document.getElementById("result");
 
-// 🔧 Dictionnaire enrichi + extensible
+// 🔧 Dictionnaire enrichi avec unités, phrases, nombres collés, etc.
 const dictionary = {
+  // Abréviations et unités de crochet
   "sc": "maille serrée",
-  "hdc": "demi-bride",
   "dc": "bride",
+  "hdc": "demi-bride",
   "tr": "double bride",
   "dtr": "triple bride",
-  "ch": "maille en l’air",
   "sl st": "maille coulée",
   "slst": "maille coulée",
+  "ch": "maille en l’air",
   "st": "maille",
   "inc": "augmentation",
   "linc": "augmentation",
   "dec": "diminution",
   "yo": "jeté",
-  "hook": "crochet",
+  "yo twice": "faire deux jetés",
+  "tog": "ensemble",
+  "lp": "boucle",
+  "flo": "brin avant seulement",
+  "blo": "brin arrière seulement",
+  "beg": "début",
+  "mc": "couleur principale",
+
+  // Phrases fréquentes
+  "magic ring": "cercle magique",
+  "magic loop": "cercle magique",
+  "pull through": "passer à travers",
+  "draw through": "passer à travers",
+  "loop on hook": "boucle sur le crochet",
+  "insert hook": "insérer le crochet",
+  "yarn over": "jeté",
+  "break the yarn": "couper le fil",
+  "cut the yarn": "couper le fil",
+  "with the yellow yarn": "avec le fil jaune",
+  "with the green yarn": "avec le fil vert",
+  "using off-white yarn": "en utilisant du fil écru",
+  "join the two sides": "assembler les deux côtés",
+  "only the back stitches": "uniquement dans le brin arrière",
+  "of each part": "de chaque partie",
+  "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
+
+  // Instructions générales
   "join": "joindre",
   "fasten off": "arrêter",
   "foundation chain": "chaînette de base",
   "row": "rang",
   "round": "tour",
-  "skip": "sauter",
-  "beginning": "début",
-  "next": "suivante",
-  "repeat": "répéter",
-  "from hook": "depuis le crochet",
-  "in last ch": "dans la dernière maille en l’air",
-  "last ch": "dernière maille en l’air",
-  "first ch": "première maille en l’air",
-  "alt": "alternativement",
-  "lp": "boucle",
-  "blo": "brin arrière seulement",
-  "flo": "brin avant seulement",
-  "mc": "couleur principale",
-  "beg": "début",
-  "yo twice": "faire deux jetés",
-  "tog": "ensemble",
   "turn": "tourner",
-  "magic loop": "cercle magique",
-  "magic ring": "cercle magique",
+  "repeat": "répéter",
+  "start": "commencer",
+  "end": "fin",
+  "next": "suivant",
+  "skip": "sauter",
   "marker": "marqueur",
   "stuffing": "rembourrage",
   "needle": "aiguille",
-  "break the yarn": "couper le fil",
-  "cut the yarn": "couper le fil",
-  "yarn over": "jeté",
-  "pull through": "passer à travers",
-  "loop on hook": "boucle sur le crochet",
-  "insert hook": "insérer le crochet",
-  "draw through": "passer à travers",
-  "together": "ensemble",
-  "weave in ends": "arrêter le fil",
+  "materials": "fournitures",
+  "contrast color": "couleur contrastante",
+  "right side": "endroit",
+  "wrong side": "envers",
+
+  // Autres formes
   "picot": "picot",
   "shell": "coquille",
   "diagram": "diagramme",
   "corner": "coin",
   "square": "carré",
   "edge": "bord",
-  "finish": "terminer",
-  "start": "commencer",
-  "end": "fin",
-  "materials": "fournitures",
-  "main color": "couleur principale",
-  "contrast color": "couleur contrastante",
-  "loop": "boucle",
-  "back loop": "brin arrière",
-  "front loop": "brin avant",
-  "right side": "endroit",
-  "wrong side": "envers",
-  "turning chain": "maille de montée",
   "repeat until end": "répéter jusqu’à la fin",
-  "next stitch": "maille suivante",
-  "last stitch": "dernière maille",
-  "first stitch": "première maille",
-  "triple treble": "triple bride",
-  "double treble": "double bride",
-  "single crochet 2 together": "maille serrée liée",
-  "double crochet 2 together": "bride liée",
-  "with the yellow yarn": "avec le fil jaune",
-  "with the green yarn": "avec le fil vert",
-  "using off-white yarn": "en utilisant du fil écru",
-  "join the two sides": "assembler les deux côtés",
-  "single crochet across the entire piece": "faire des mailles serrées sur toute la pièce",
-  "only the back stitches": "uniquement dans le brin arrière",
-  "of each part": "de chaque partie",
-  "back part": "partie arrière",
-  "8sc": "8 mailles serrées",
-  "6sc": "6 mailles serrées",
-  "6inc": "6 augmentations",
-  "48sc": "48 mailles serrées",
-  "2 rounds": "2 tours",
-  "rounds": "tours",
-  "(1sc, inc)x6": "(1 ms, 1 aug) x6",
-  "(2sc, inc)x6": "(2 ms, 1 aug) x6",
-  "(3sc, inc)x6": "(3 ms, 1 aug) x6",
-  "(4sc, inc)x6": "(4 ms, 1 aug) x6",
-  "(5sc, inc)x6": "(5 ms, 1 aug) x6",
-  "(6sc, inc)x6": "(6 ms, 1 aug) x6",
-  "(1sc, linc)x6": "(1 ms, 1 aug) x6",
-  "(2sc, linc)x8": "(2 ms, 1 aug) x8"
+
+  // Segments anglais
+  "on the": "sur le",
+  "in the": "dans le",
+  "into the": "dans le",
+  "and": "et",
+
+  // Traduction mots fréquents OCR liés à crochet
+  "crochet": "crochet",
+  "pattern": "modèle",
+  "design": "modèle",
+  "free pattern": "modèle gratuit"
 };
 
-// 🔍 Applique le dictionnaire avec priorité aux longs mots
-function applyDictionary(text) {
-  const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
-  for (const key of keys) {
-    const regex = new RegExp(`\\b${key}\\b`, "gi");
-    text = text.replace(regex, dictionary[key]);
-  }
-  return text;
+// ✅ Détection des formes "6sc", "8inc", etc.
+function normalizeNumbers(text) {
+  return text.replace(/(\d+)([a-z]{2,5})\b/gi, (match, num, abbr) => {
+    const translated = dictionary[abbr.toLowerCase()];
+    return translated ? `${num} ${translated}` : match;
+  });
 }
 
-// 🔎 Nettoyage simple du texte OCR
+// ✅ Applique le dictionnaire en priorité aux longs termes
+function applyDictionary(text) {
+  const sortedKeys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+  for (const key of sortedKeys) {
+    const regex = new RegExp(`\\b${key}\\b`, 'gi');
+    text = text.replace(regex, dictionary[key]);
+  }
+  return normalizeNumbers(text);
+}
+
+// 🔍 Nettoyage OCR (évite les caractères fantômes)
 function cleanOCR(text) {
   return text.replace(/[^\w\s.,:*\[\]\(\)\-éèêëàâäîïçùûüôœ'’]/gi, '');
 }
 
-// 🎯 Fonction principale de traduction
+// 🧠 Traduction complète
 function translateText(text) {
   const cleaned = cleanOCR(text.toLowerCase());
   const translated = applyDictionary(cleaned);
   resultDiv.textContent = translated;
 
-  // 👁 Journal des mots non trouvés
+  // Log console des mots manquants
   const words = cleaned.split(/\s+/);
-  const missing = words.filter(w => w.length > 3 && !(w in dictionary));
-  console.log("🧩 Mots non traduits : ", [...new Set(missing)]);
+  const missing = words.filter(w => w.length > 3 && !(dictionary.hasOwnProperty(w)));
+  console.log("❓ Mots non traduits :", [...new Set(missing)]);
 }
 
-// 📥 Traitement selon type d'entrée
+// 📥 Gestion des types d’entrée
 function handleTranslate() {
   const type = inputType.value;
   if (type === "text") {
@@ -278,7 +368,7 @@ function downloadText(type) {
   }
 }
 
-// 🧠 Gestion affichage champs
+// 🎛️ Affichage dynamique des champs
 inputType.addEventListener("change", () => {
   manualText.style.display = inputType.value === "text" ? "block" : "none";
   fileInput.style.display = inputType.value === "file" || inputType.value === "image" ? "block" : "none";
@@ -286,5 +376,8 @@ inputType.addEventListener("change", () => {
 });
 window.onload = () => inputType.dispatchEvent(new Event("change"));
 </script>
+</body>
+</html>
+
 </body>
 </html>
